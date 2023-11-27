@@ -5,7 +5,25 @@ import INodePath, { makeINodePath } from "./INodePath";
 export const nodeTypes: string[] = ["text", "image", "folder"];
 
 // Supported nodeTypes for file browser
-export type NodeType = "text" | "image" | "folder" | "pdf" | "audio" | "video";
+export type NodeType =
+  | "text"
+  | "image"
+  | "folder"
+  | "pdf"
+  | "audio"
+  | "video"
+  | "recipe";
+
+// type representing valid cuisines in our applicaiton
+export type Cuisine =
+  | "American"
+  | "Italian"
+  | "Chinese"
+  | "Korean"
+  | "French"
+  | "Mexican"
+  | "Japanese"
+  | "British";
 
 /**
  * // TODO [Editable]: Since we want to store new metadata for images we should add
@@ -24,14 +42,24 @@ export interface INode {
   nodeId: string; // unique randomly generated ID which contains the type as a prefix
   title: string; // user create node title
   dateCreated?: Date; // date that the node was created
-  height?: number[];
-  width?: number[];
+  defHeight?: number; // original height for an image
+  defWidth?: number; // original width for an image
+  height?: number; // container height for an image
+  width?: number; // container width for an image
 }
 
 export type FolderContentType = "list" | "grid";
 
 export interface IFolderNode extends INode {
   viewType: FolderContentType;
+}
+
+export interface IRecipeNode extends INode {
+  ingredients: string[]; // a list of ingredients to make the recipe
+  steps: INode[]; // list of nodes detailing the steps for the recipe (text/image)
+  serving: number; // number of people the recipe serves
+  cuisine: Cuisine; // the cuisine that the recipe falls into
+  time: number; // the amount of time the recipe takes to complete
 }
 
 export type NodeFields = keyof INode | keyof IFolderNode;
@@ -43,6 +71,8 @@ export const allNodeFields: string[] = [
   "content",
   "filePath",
   "viewType",
+  "defHeight",
+  "defWidth",
   "height",
   "width",
 ];
@@ -58,8 +88,6 @@ export type NodeIdsToNodesMap = { [nodeId: string]: INode };
  * @param type
  * @param title
  * @param content
- * @param height
- * @param width
  * @returns INode object
  */
 
@@ -69,9 +97,7 @@ export function makeINode(
   children?: any,
   type?: any,
   title?: any,
-  content?: any,
-  height?: any,
-  width?: any
+  content?: any
 ): INode {
   return {
     content: content ?? "content" + nodeId,
@@ -79,8 +105,6 @@ export function makeINode(
     nodeId: nodeId,
     title: title ?? "node" + nodeId,
     type: type ?? "text",
-    height: height ?? [],
-    width: width ?? [],
   };
 }
 
@@ -91,9 +115,7 @@ export function makeIFolderNode(
   type?: any,
   title?: any,
   content?: any,
-  viewType?: any,
-  height?: any,
-  width?: any
+  viewType?: any
 ): IFolderNode {
   return {
     content: content ?? "content" + nodeId,
@@ -102,8 +124,6 @@ export function makeIFolderNode(
     title: title ?? "node" + nodeId,
     type: type ?? "text",
     viewType: viewType ?? "grid",
-    height: height ?? [],
-    width: width ?? [],
   };
 }
 
