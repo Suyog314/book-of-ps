@@ -1,0 +1,22 @@
+@import "../../../global/globalCssVariables";
+
+$input-margin: 10px;
+
+.results {
+  padding: 12px;
+  padding-top: 0px;
+  overflow-y: scroll;
+  margin-top: 12px;
+  max-height: 70vh;
+  .filters {
+    .filter-button,
+    .sort-button {
+      background-color: white;
+      border-color: $secondary-background-color;
+      border-width: 2px;
+      font-weight: normal;
+      border-radius: 20px;
+      margin-right: 12px;
+    }
+  }
+}
