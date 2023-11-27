@@ -58,7 +58,7 @@ export interface IFolderNode extends INode {
   viewType: FolderContentType;
 }
 
-export type NodeFields = keyof INode | keyof IFolderNode;
+export type NodeFields = keyof INode | keyof IFolderNode | keyof IRecipeNode;
 
 export const allNodeFields: string[] = [
   "nodeId",
@@ -69,6 +69,11 @@ export const allNodeFields: string[] = [
   "viewType",
   "height",
   "width",
+  "ingredients",
+  "steps",
+  "serving",
+  "cuisine",
+  "time",
 ];
 
 // Type declaration for map from nodeId --> INode
