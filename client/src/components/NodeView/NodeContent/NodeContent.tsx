@@ -5,6 +5,7 @@ import { FolderContent } from "./FolderContent";
 import { ImageContent } from "./ImageContent";
 import "./NodeContent.scss";
 import { TextContent } from "./TextContent";
+import { RecipeContent } from "./RecipeContent/RecipeContent";
 
 /** Props needed to render any node content */
 
@@ -29,6 +30,8 @@ export const NodeContent = (props: INodeContentProps) => {
     case "text":
       return <TextContent nodeIdsToNodesMap={nodeIdsToNodesMap} />;
       break;
+    case "recipe":
+      return <RecipeContent />;
     case "folder":
       if (childNodes) {
         return (
