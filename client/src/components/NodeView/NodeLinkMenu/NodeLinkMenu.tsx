@@ -3,7 +3,7 @@ import { IAnchor, ILink, INode, NodeIdsToNodesMap } from "../../../types";
 import { AnchorItem, LinkItem } from "./AnchorItem";
 import "./NodeLinkMenu.scss";
 import { includesAnchorId, loadAnchorToLinksMap } from "./nodeLinkMenuUtils";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import {
   refreshState,
   selectedAnchorsState,
@@ -20,6 +20,8 @@ export const NodeLinkMenu = (props: INodeLinkMenuProps) => {
   const { nodeIdsToNodesMap } = props;
   const currentNode = useRecoilValue(currentNodeState);
   const refresh = useRecoilValue(refreshState);
+  const refreshAnchor = useRecoilValue(refreshAnchorState);
+  const refreshLinkMenu = useRecoilValue(refreshLinkListState);
   const selectedAnchors = useRecoilValue(selectedAnchorsState);
   const [anchorsMap, setAnchorsMap] = useState<{
     [anchorId: string]: {
@@ -27,15 +29,13 @@ export const NodeLinkMenu = (props: INodeLinkMenuProps) => {
       links: { link: ILink; oppNode: INode; oppAnchor: IAnchor }[];
     };
   }>({});
-  const [anchorRefresh] = useRecoilState(refreshAnchorState);
-  const [linkMenuRefresh] = useRecoilState(refreshLinkListState);
 
   useEffect(() => {
     const fetchLinks = async () => {
       setAnchorsMap(await loadAnchorToLinksMap({ ...props, currentNode }));
     };
     fetchLinks();
-  }, [currentNode, refresh, selectedAnchors, anchorRefresh, linkMenuRefresh]);
+  }, [currentNode, refresh, selectedAnchors, refreshAnchor, refreshLinkMenu]);
 
   const loadMenu = () => {
     const anchorItems: JSX.Element[] = [];

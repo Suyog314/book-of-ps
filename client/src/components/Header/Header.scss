@@ -21,28 +21,6 @@
     justify-content: flex-start;
   }
 
-  .middle-bar {
-    width: 50%; /* Set the width of the middle-bar to 50% of the header's width */
-    display: flex;
-    margin-left: 50px;
-    align-items: center; /* Center its children vertically */
-    .search-button {
-      width: 100%;
-      display: flex;
-      justify-content: flex-start;
-      font-weight: normal;
-      background-color: $secondary-background-color;
-      transition: 0.3s;
-
-      &:hover {
-        background-color: darken($secondary-background-color, 10);
-      }
-      .placeholder {
-        color: gray;
-      }
-    }
-  }
-
   .right-bar {
     width: max-content;
     display: flex;

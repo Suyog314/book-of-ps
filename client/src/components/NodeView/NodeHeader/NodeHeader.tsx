@@ -26,18 +26,18 @@ import {
 interface INodeHeaderProps {
   onHandleCompleteLinkClick: () => void;
   onHandleStartLinkClick: () => void;
-  onGraphButtonClick: () => void;
   onDeleteButtonClick: (node: INode) => void;
   onMoveButtonClick: (node: INode) => void;
+  onGraphViewButtonClick: () => void;
 }
 
 export const NodeHeader = (props: INodeHeaderProps) => {
   const {
     onDeleteButtonClick,
     onMoveButtonClick,
-    onGraphButtonClick,
     onHandleStartLinkClick,
     onHandleCompleteLinkClick,
+    onGraphViewButtonClick,
   } = props;
   const currentNode = useRecoilValue(currentNodeState);
   const [refresh, setRefresh] = useRecoilState(refreshState);
@@ -70,14 +70,12 @@ export const NodeHeader = (props: INodeHeaderProps) => {
 
   /* Method to update the node title */
   const handleUpdateTitle = async (title: string) => {
-    // TODO: Task 9
     setTitle(title);
     const nodeProperty: INodeProperty = makeINodeProperty("title", title);
     const titleUpdateResp = await FrontendNodeGateway.updateNode(
       currentNode.nodeId,
       [nodeProperty]
     );
-
     if (!titleUpdateResp.success) {
       setAlertIsOpen(true);
       setAlertTitle("Title update failed");
@@ -88,7 +86,6 @@ export const NodeHeader = (props: INodeHeaderProps) => {
 
   /* Method called on title right click */
   const handleTitleRightClick = () => {
-    // TODO: Task 10
     ContextMenuItems.splice(0, ContextMenuItems.length);
     const menuItem: JSX.Element = (
       <div
@@ -143,7 +140,6 @@ export const NodeHeader = (props: INodeHeaderProps) => {
 
   /* Trigger on node load or when editingTitle changes */
   useEffect(() => {
-    // TODO: Task 10
     document.addEventListener("keydown", nodeKeyHandlers);
   }, [editingTitle]);
 
@@ -176,6 +172,7 @@ export const NodeHeader = (props: INodeHeaderProps) => {
               text="Move"
               onClick={() => onMoveButtonClick(currentNode)}
             />
+            <Button text="Graph" onClick={onGraphViewButtonClick} />
             <Button
               icon={<ri.RiExternalLinkLine />}
               text="Start Link"
@@ -188,12 +185,6 @@ export const NodeHeader = (props: INodeHeaderProps) => {
                 onClick={onHandleCompleteLinkClick}
               />
             )}
-            <Button
-              icon={<bi.BiLogoGraphql />}
-              text="Graph"
-              onClick={onGraphButtonClick}
-            />
-
             {isFolder && (
               <div className="select">
                 <Select

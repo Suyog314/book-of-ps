@@ -21,7 +21,7 @@ import {
 import { Button } from "../../Button";
 import { TreeView } from "../../TreeView";
 import "./CreateNodeModal.scss";
-import { createNodeFromModal, getMeta, uploadImage } from "./createNodeUtils";
+import { createNodeFromModal, uploadImage } from "./createNodeUtils";
 import { useSetRecoilState } from "recoil";
 import { selectedNodeState } from "../../../global/Atoms";
 
@@ -63,7 +63,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     setTitle(event.target.value);
   };
 
-  const handleImageContentChange = async (
+  const handleImageContentChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setContent(event.target.value);
@@ -85,22 +85,12 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       setError("Error: No title");
       return;
     }
-    let width: number[] = [];
-    let height: number[] = [];
-    if (selectedType == "image") {
-      const getMetaRes = await getMeta(content);
-      width = [getMetaRes.normalizedWidth, getMetaRes.normalizedWidth];
-      height = [getMetaRes.normalizedHeight, getMetaRes.normalizedHeight];
-    }
-
     const attributes = {
       content,
       nodeIdsToNodesMap,
       parentNodeId: selectedParentNode ? selectedParentNode.nodeId : null,
       title,
       type: selectedType as NodeType,
-      height,
-      width,
     };
     const node = await createNodeFromModal(attributes);
     node && setSelectedNode(node);

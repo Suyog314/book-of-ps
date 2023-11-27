@@ -32,37 +32,6 @@ export class NodeCollectionConnection {
     this.collectionName = collectionName ?? "nodes";
   }
 
-  async searchNodes(string: string): Promise<any> {
-    await this.client
-      .db()
-      .collection(this.collectionName)
-      .createIndex({ title: "text", content: "text" });
-
-    const query = { $text: { $search: string } };
-    console.log(query);
-
-    const sort: { score: { $meta: "textScore" } } = {
-      score: { $meta: "textScore" },
-    };
-    const projection = {
-      _id: 0,
-      title: 1,
-      nodeId: 1,
-      type: 1,
-      dateCreated: 1,
-      score: { $meta: "textScore" },
-    };
-
-    const nodes = await this.client.db().collection(this.collectionName);
-    const cursor = nodes.find(query).sort(sort).project(projection);
-    const documents = await cursor.toArray();
-    if (documents.length == 0) {
-      return failureServiceResponse("No Search Results Found");
-    } else {
-      return successfulServiceResponse(documents);
-    }
-  }
-
   /**
    * Inserts a new node into the database
    * Returns successfulServiceResponse with INode that was inserted as the payload
@@ -142,6 +111,50 @@ export class NodeCollectionConnection {
         foundNodes.push(doc);
       });
     return successfulServiceResponse(foundNodes);
+  }
+
+  /**
+   * Searches for nodes containing a search query in the title or content.
+   * Returned results are sorted by relevancy.
+   * Returns successfulServiceResponse with empty array when no nodes found.
+   *
+   * @param {string }searchQ
+   * @returns successfulServiceResponse<INode[]>
+   */
+  async searchForNodes(
+    searchQ: string,
+    sortType: string
+  ): Promise<IServiceResponse<INode[]>> {
+    const collection = await this.client.db().collection(this.collectionName);
+
+    //create text indices for title and content fields
+    collection.createIndex({ title: "text", content: "text" });
+
+    const myquery = { $text: { $search: searchQ } };
+    const projection = {
+      _id: 0,
+      title: 1,
+      type: 1,
+      nodeId: 1,
+      dateCreated: 1,
+      score: { $meta: "textScore" },
+    };
+
+    const nodes: INode[] = [];
+    let sort = {};
+    if (sortType == "Date Created") {
+      sort = { dateCreated: -1 };
+    } else {
+      sort = { score: { $meta: "textScore" } };
+    }
+    await collection
+      .find(myquery)
+      .sort(sort)
+      .project(projection)
+      .forEach(function (node) {
+        nodes.push(node);
+      });
+    return successfulServiceResponse(nodes);
   }
 
   /**

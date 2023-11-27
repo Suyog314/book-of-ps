@@ -1,26 +1,16 @@
 import { Editor } from "@tiptap/react";
 import "./TextMenu.scss";
-import * as ri from "react-icons/ri";
 
 interface IEditorProps {
   editor: Editor | null;
-  save: () => Promise<void>;
+  onSave: () => void;
 }
 
 export const TextMenu = (props: IEditorProps) => {
-  const { editor, save } = props;
+  const { editor, onSave } = props;
   if (!editor) {
     return null;
   }
-
-  //helper to toggle highlight when clicked/unclicked
-  const toggleHighlight = () => {
-    if (editor.isActive("highlight")) {
-      editor.chain().focus().unsetHighlight().run();
-    } else {
-      editor.chain().focus().toggleHighlight({ color: "#FFFFFF" }).run();
-    }
-  };
 
   // TODO: Add a menu of buttons for your text editor here
   return (
@@ -46,7 +36,8 @@ export const TextMenu = (props: IEditorProps) => {
         Italic
       </button>
       <button
-        onClick={toggleHighlight}
+        onClick={() => editor.chain().focus().toggleHighlight().run()}
+        disabled={!editor.can().chain().focus().toggleHighlight().run()}
         className={
           "textEditorButton" +
           (editor.isActive("highlight") ? " activeTextEditorButton" : "")
@@ -56,6 +47,7 @@ export const TextMenu = (props: IEditorProps) => {
       </button>
       <button
         onClick={() => editor.chain().focus().toggleUnderline().run()}
+        disabled={!editor.can().chain().focus().toggleUnderline().run()}
         className={
           "textEditorButton" +
           (editor.isActive("underline") ? " activeTextEditorButton" : "")
@@ -64,25 +56,17 @@ export const TextMenu = (props: IEditorProps) => {
         Underline
       </button>
       <button
-        onClick={() => editor.chain().focus().setTextAlign("left").run()}
-        className={"align-button"}
+        onClick={() => editor.chain().focus().toggleCode().run()}
+        disabled={!editor.can().chain().focus().toggleCode().run()}
+        className={
+          "textEditorButton" +
+          (editor.isActive("code") ? " activeTextEditorButton" : "")
+        }
       >
-        <ri.RiAlignLeft />
+        Code
       </button>
-      <button
-        onClick={() => editor.chain().focus().setTextAlign("center").run()}
-        className={"align-button"}
-      >
-        <ri.RiAlignCenter />
-      </button>
-      <button
-        onClick={() => editor.chain().focus().setTextAlign("right").run()}
-        className={"align-button"}
-      >
-        <ri.RiAlignRight />
-      </button>
-      <button onClick={save} className="save-button">
-        Save
+      <button className={"textEditorButton"} onClick={onSave}>
+        Save Changes
       </button>
     </div>
   );

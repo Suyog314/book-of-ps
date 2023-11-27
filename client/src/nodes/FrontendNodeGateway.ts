@@ -122,6 +122,25 @@ export const FrontendNodeGateway = {
     }
   },
 
+  searchForNodes: async (
+    searchQ: string,
+    sortType: string
+  ): Promise<IServiceResponse<INode[]>> => {
+    try {
+      return await post<IServiceResponse<INode[]>>(
+        baseEndpoint + servicePath + "search",
+        {
+          searchQ: searchQ,
+          sortType: sortType,
+        }
+      );
+    } catch (exception) {
+      return failureServiceResponse(
+        "[searchForNodes] Unable to access backend"
+      );
+    }
+  },
+
   getRoots: async (): Promise<IServiceResponse<RecursiveNodeTree[]>> => {
     try {
       return await get<IServiceResponse<RecursiveNodeTree[]>>(
@@ -163,17 +182,6 @@ export const FrontendNodeGateway = {
       );
     } catch (exception) {
       return failureServiceResponse("[updateNode] Unable to access backend");
-    }
-  },
-
-  searchNodes: async (query: string): Promise<IServiceResponse<any>> => {
-    try {
-      return await post<IServiceResponse<any>>(
-        baseEndpoint + servicePath + "search/",
-        { query: query }
-      );
-    } catch (exception) {
-      return failureServiceResponse("[searchNodes] Unable to access backend");
     }
   },
 };

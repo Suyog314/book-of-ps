@@ -29,13 +29,13 @@ import {
   CompleteLinkModal,
   CreateNodeModal,
   MoveNodeModal,
+  GraphViewModal,
   SearchModal,
 } from "../Modals";
 import { NodeView } from "../NodeView";
 import { TreeView } from "../TreeView";
 import "./MainView.scss";
 import { createNodeIdsToNodesMap, makeRootWrapper } from "./mainViewUtils";
-import { GraphModal } from "../Modals/GraphModal/GraphModal";
 
 export const MainView = React.memo(function MainView() {
   // app states
@@ -44,8 +44,9 @@ export const MainView = React.memo(function MainView() {
   const [createNodeModalOpen, setCreateNodeModalOpen] = useState(false);
   const [completeLinkModalOpen, setCompleteLinkModalOpen] = useState(false);
   const [moveNodeModalOpen, setMoveNodeModalOpen] = useState(false);
-  const [graphModalOpen, setGraphModalOpen] = useState(false);
+  const [graphViewModalOpen, setGraphViewModalOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+
   // node states
   const [selectedNode, setSelectedNode] = useRecoilState(selectedNodeState);
   const [rootNodes, setRootNodes] = useRecoilState(rootNodesState);
@@ -112,10 +113,6 @@ export const MainView = React.memo(function MainView() {
   }, []);
 
   // button handlers
-
-  const handleGraphButtonClick = useCallback(() => {
-    setGraphModalOpen(true);
-  }, []);
   const handleCreateNodeButtonClick = useCallback(() => {
     setCreateNodeModalOpen(true);
   }, [setCreateNodeModalOpen]);
@@ -157,6 +154,14 @@ export const MainView = React.memo(function MainView() {
 
   const handleHomeClick = useCallback(() => {
     setSelectedNode(null);
+  }, []);
+
+  const handleGraphViewClick = useCallback(() => {
+    setGraphViewModalOpen(true);
+  }, []);
+
+  const handleSearchBarButtonClick = useCallback(() => {
+    setSearchModalOpen(true);
   }, []);
 
   const getSelectedNodeChildren = useCallback(() => {
@@ -217,11 +222,7 @@ export const MainView = React.memo(function MainView() {
             onHomeClick={handleHomeClick}
             onCreateNodeButtonClick={handleCreateNodeButtonClick}
             nodeIdsToNodesMap={nodeIdsToNodesMap}
-            onSearchClick={() => setSearchModalOpen(true)}
-          />
-          <SearchModal
-            isOpen={searchModalOpen}
-            onClose={() => setSearchModalOpen(false)}
+            onSearchBarButtonClick={handleSearchBarButtonClick}
           />
           <CreateNodeModal
             isOpen={createNodeModalOpen}
@@ -235,22 +236,22 @@ export const MainView = React.memo(function MainView() {
             onClose={() => setCompleteLinkModalOpen(false)}
             nodeIdsToNodes={nodeIdsToNodesMap}
           />
+          <GraphViewModal
+            isOpen={graphViewModalOpen}
+            onClose={() => setGraphViewModalOpen(false)}
+          />
+          <SearchModal
+            isOpen={searchModalOpen}
+            onClose={() => setSearchModalOpen(false)}
+          />
           {selectedNode && (
-            <>
-              <GraphModal
-                isOpen={graphModalOpen}
-                onClose={() => setGraphModalOpen(false)}
-                node={selectedNode}
-                nodeIdsToNodesMap={nodeIdsToNodesMap}
-              />
-              <MoveNodeModal
-                isOpen={moveNodeModalOpen}
-                onClose={() => setMoveNodeModalOpen(false)}
-                onSubmit={loadRootsFromDB}
-                node={selectedNode}
-                roots={rootNodes}
-              />
-            </>
+            <MoveNodeModal
+              isOpen={moveNodeModalOpen}
+              onClose={() => setMoveNodeModalOpen(false)}
+              onSubmit={loadRootsFromDB}
+              node={selectedNode}
+              roots={rootNodes}
+            />
           )}
           <div className="content">
             <div
@@ -275,8 +276,8 @@ export const MainView = React.memo(function MainView() {
                 currentNode={selectedNode ?? rootRecursiveNodeTree.node}
                 onDeleteButtonClick={handleDeleteNodeButtonClick}
                 onMoveButtonClick={handleMoveNodeButtonClick}
-                onGraphButtonClick={handleGraphButtonClick}
                 onCompleteLinkClick={handleCompleteLinkClick}
+                onGraphViewClick={handleGraphViewClick}
                 onCreateNodeButtonClick={handleCreateNodeButtonClick}
                 nodeIdsToNodesMap={nodeIdsToNodesMap}
               />
