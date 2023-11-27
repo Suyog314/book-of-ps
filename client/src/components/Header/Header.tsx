@@ -50,7 +50,7 @@ export const Header = (props: IHeaderProps) => {
       <div className="left-bar">
         <Link href={"/"}>
           <div className="name" onClick={onHomeClick}>
-            My<b>Hypermedia</b>
+            BookOf<b>P's</b>
           </div>
         </Link>
         <Link href={"/"}>
