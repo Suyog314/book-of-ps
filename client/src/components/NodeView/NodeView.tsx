@@ -28,12 +28,12 @@ export interface INodeViewProps {
   // handler for completing link
   onCompleteLinkClick: () => void;
   // handler for opening create node modal
-  onGraphViewClick: () => void;
-  //handler for opening graph view modal
   onCreateNodeButtonClick: () => void;
   // handler for deleting currentNode
   onDeleteButtonClick: (node: INode) => void;
   // handler for opening move node modal
+  onGraphButtonClick: () => void;
+  // handler for opening graph modal
   onMoveButtonClick: (node: INode) => void;
   // children used when rendering folder node
   childNodes?: INode[];
@@ -47,8 +47,8 @@ export const NodeView = (props: INodeViewProps) => {
     onCompleteLinkClick,
     onCreateNodeButtonClick,
     onDeleteButtonClick,
+    onGraphButtonClick,
     onMoveButtonClick,
-    onGraphViewClick,
     childNodes,
   } = props;
   const setIsLinking = useSetRecoilState(isLinkingState);
@@ -181,9 +181,9 @@ export const NodeView = (props: INodeViewProps) => {
         <NodeHeader
           onMoveButtonClick={onMoveButtonClick}
           onDeleteButtonClick={onDeleteButtonClick}
+          onGraphButtonClick={onGraphButtonClick}
           onHandleStartLinkClick={handleStartLinkClick}
           onHandleCompleteLinkClick={handleCompleteLinkClick}
-          onGraphViewButtonClick={onGraphViewClick}
         />
         <div className="nodeView-scrollable">
           {hasBreadcrumb && (
@@ -198,6 +198,7 @@ export const NodeView = (props: INodeViewProps) => {
             <NodeContent
               childNodes={childNodes}
               onCreateNodeButtonClick={onCreateNodeButtonClick}
+              nodeIdsToNodesMap={nodeIdsToNodesMap}
             />
           </div>
         </div>

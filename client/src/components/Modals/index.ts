@@ -1,5 +1,5 @@
 export * from "./CompleteLinkModal";
 export * from "./CreateNodeModal";
 export * from "./MoveNodeModal";
-export * from "./GraphViewModal";
+export * from "./GraphModal";
 export * from "./SearchModal";

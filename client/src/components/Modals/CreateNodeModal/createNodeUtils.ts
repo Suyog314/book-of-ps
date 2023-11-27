@@ -21,6 +21,8 @@ export interface ICreateNodeModalAttributes {
   parentNodeId: string | null;
   title: string;
   type: NodeType; // if null, add node as a root
+  height: number[];
+  width: number[];
 }
 
 /**
@@ -73,6 +75,8 @@ export async function createNodeFromModal({
   parentNodeId,
   content,
   nodeIdsToNodesMap,
+  height,
+  width,
 }: ICreateNodeModalAttributes): Promise<INode | null> {
   const nodeId = generateObjectId(type);
   // Initial filePath value: create node as a new root
@@ -95,6 +99,8 @@ export async function createNodeFromModal({
     nodeId: nodeId,
     title: title,
     type: type,
+    height: height,
+    width: width,
   };
 
   switch (type) {
@@ -102,17 +108,6 @@ export async function createNodeFromModal({
       newNode = {
         ...newNode,
         viewType: "grid",
-      };
-      break;
-    //set height and width metadata
-    case "image":
-      const data = await getMeta(content);
-      newNode = {
-        ...newNode,
-        defHeight: data.normalizedHeight,
-        defWidth: data.normalizedWidth,
-        height: data.normalizedHeight,
-        width: data.normalizedWidth,
       };
       break;
   }

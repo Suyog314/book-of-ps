@@ -15,6 +15,7 @@ export const fetchLinks = async (href: string): Promise<ILink[]> => {
   const linksResp = await FrontendLinkGateway.getLinksByAnchorId(href);
   if (linksResp.success) {
     const links = linksResp.payload;
+    console.log(links);
     return links;
   }
   return [];

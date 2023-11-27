@@ -89,6 +89,15 @@ export class BackendNodeGateway {
   }
 
   /**
+   * Method to get nodes by searching for a query and filtering which nodes
+   * contain that query in the node.title or node.content fields
+   * @param query
+   * @returns IServiceResponse<INode[]>
+   */
+  async searchNodes(query: string): Promise<IServiceResponse<any>> {
+    return this.nodeCollectionConnection.searchNodes(query);
+  }
+  /**
    * Method to retrieve node with a given nodeId.
    *
    * @param nodeId - The nodeId of the node to be retrieved.
@@ -106,19 +115,6 @@ export class BackendNodeGateway {
    */
   async getNodesById(nodeIds: string[]): Promise<IServiceResponse<INode[]>> {
     return this.nodeCollectionConnection.findNodesById(nodeIds);
-  }
-
-  /**
-   * Method to retrieve nodes that contain a search query.
-   *
-   * @param searchQ - The search query of the nodes being searche for
-   * @returns IServiceResponse<INode[]>
-   */
-  async searchForNodes(
-    searchQ: string,
-    sortType: string
-  ): Promise<IServiceResponse<INode[]>> {
-    return this.nodeCollectionConnection.searchForNodes(searchQ, sortType);
   }
 
   /**
@@ -329,6 +325,9 @@ export class BackendNodeGateway {
       if (!isINodeProperty(toUpdate[i])) {
         return failureServiceResponse("toUpdate parameters invalid");
       }
+      console.log(toUpdate[i].fieldName);
+      console.log(toUpdate[i].value);
+      console.log(isINodeProperty(toUpdate[i]));
       const fieldName = toUpdate[i].fieldName;
       const value = toUpdate[i].value;
       properties[fieldName] = value;
@@ -337,6 +336,7 @@ export class BackendNodeGateway {
       nodeId,
       properties
     );
+    console.log(nodeResponse, "nodeResponse");
     if (!nodeResponse.success) {
       return failureServiceResponse(
         "This node does not exist in the database!"

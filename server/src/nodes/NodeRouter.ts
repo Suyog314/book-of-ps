@@ -49,6 +49,25 @@ export class NodeRouter {
     });
 
     /**
+     * Request to retrieve node by search queries
+     *
+     * @param req request object coming from client
+     * @param res response object to send to client
+     */
+    NodeExpressRouter.post("/search", async (req: Request, res: Response) => {
+      try {
+        const query = req.body.query;
+        if (!(typeof query === "string")) {
+          res.status(400).send("query not a string!");
+        } else {
+          const response = await this.BackendNodeGateway.searchNodes(query);
+          res.status(200).send(response);
+        }
+      } catch (e) {
+        res.status(500).send(e.message);
+      }
+    });
+    /**
      * Request to retrieve node by nodeId
      *
      * @param req request object coming from client
@@ -87,21 +106,6 @@ export class NodeRouter {
         }
       }
     );
-
-    /**
-     * Request to retrieve nodes related to search query
-     */
-    NodeExpressRouter.post("/search", async (req: Request, res: Response) => {
-      try {
-        const searchQ = req.body.searchQ;
-        const sortType = req.body.sortType;
-        const response: IServiceResponse<INode[]> =
-          await this.BackendNodeGateway.searchForNodes(searchQ, sortType);
-        res.status(200).send(response);
-      } catch (e) {
-        res.status(500).send(e.message);
-      }
-    });
 
     /**
      * Request to update the node with the given nodeId

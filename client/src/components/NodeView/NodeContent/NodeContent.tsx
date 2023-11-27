@@ -1,6 +1,6 @@
 import { useRecoilValue } from "recoil";
 import { currentNodeState } from "../../../global/Atoms";
-import { IFolderNode, INode } from "../../../types";
+import { IFolderNode, INode, NodeIdsToNodesMap } from "../../../types";
 import { FolderContent } from "./FolderContent";
 import { ImageContent } from "./ImageContent";
 import "./NodeContent.scss";
@@ -11,6 +11,7 @@ import { TextContent } from "./TextContent";
 export interface INodeContentProps {
   childNodes?: INode[];
   onCreateNodeButtonClick: () => void;
+  nodeIdsToNodesMap: NodeIdsToNodesMap;
 }
 
 /**
@@ -20,13 +21,13 @@ export interface INodeContentProps {
  * @returns Content that any type of node renders
  */
 export const NodeContent = (props: INodeContentProps) => {
-  const { onCreateNodeButtonClick, childNodes } = props;
+  const { onCreateNodeButtonClick, childNodes, nodeIdsToNodesMap } = props;
   const currentNode = useRecoilValue(currentNodeState);
   switch (currentNode.type) {
     case "image":
       return <ImageContent />;
     case "text":
-      return <TextContent />;
+      return <TextContent nodeIdsToNodesMap={nodeIdsToNodesMap} />;
       break;
     case "folder":
       if (childNodes) {

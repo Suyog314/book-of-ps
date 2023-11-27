@@ -12,19 +12,23 @@ import {
   startAnchorState,
 } from "../../../../global/Atoms";
 import { IAnchor, IImageExtent } from "../../../../types";
-import { FrontendNodeGateway } from "~/nodes";
-import { INodeProperty, makeINodeProperty } from "~/types";
 import "./ImageContent.scss";
-import { ImageMenu } from "./ImageMenu";
+import ImageResizer from "./ImageResizer";
 
 /** The content of an image node, including any anchors */
 export const ImageContent = () => {
   const currentNode = useRecoilValue(currentNodeState);
-  const [refresh, setRefresh] = useRecoilState(refreshState);
+  const refresh = useRecoilValue(refreshState);
   const startAnchor = useRecoilValue(startAnchorState);
   const [selectedAnchors, setSelectedAnchors] =
     useRecoilState(selectedAnchorsState);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
+  const [height, setHeight] = useState(
+    currentNode.height && currentNode.height[currentNode.height.length - 1]
+  );
+  const [width, setWidth] = useState(
+    currentNode.width && currentNode.width[currentNode.width.length - 1]
+  );
   let dragging = false; // Indicated whether we are currently dragging the image
   let currentTop: number; // To store the top of the currently selected region for onMove
   let currentLeft: number; // To store the left of the currently selected region for onMove
@@ -40,6 +44,14 @@ export const ImageContent = () => {
   const imageContainer = useRef<HTMLHeadingElement>(null);
   const selection = useRef<HTMLHeadingElement>(null);
 
+  //update height on the front end based on height/width state
+  useEffect(() => {
+    if (imageContainer.current) {
+      imageContainer.current.style.height = String(height) + "px";
+      imageContainer.current.style.width = String(width) + "px";
+    }
+  }, [refresh]);
+
   /* State variable to keep track of anchors rendered on image */
   const [imageAnchors, setImageAnchors] = useState<JSX.Element[]>([]);
 
@@ -48,13 +60,6 @@ export const ImageContent = () => {
    * Compare with selectedAnchors to update previous state
    */
   const [selectedAnchorIds, setSelectedAnchorIds] = useState<string[]>([]);
-
-  /**
-   * State variables to keep track of height and width of image used for
-   * resizing.
-   */
-  const [imgHeight, setImgHeight] = useState(currentNode.height);
-  const [imgWidth, setImgWidth] = useState(currentNode.width);
 
   const router = useRouter();
 
@@ -194,44 +199,6 @@ export const ImageContent = () => {
     displayImageAnchors();
   }, [selectedAnchors, currentNode, refresh, startAnchor]);
 
-  /**
-   * To save height and width fields for node in backend when img is resized
-   */
-  const setDims = async () => {
-    const nodePropertyHeight: INodeProperty = makeINodeProperty(
-      "height",
-      imgHeight
-    );
-    let resp = await FrontendNodeGateway.updateNode(currentNode.nodeId, [
-      nodePropertyHeight,
-    ]);
-    if (!resp.success) {
-      console.error(resp.message);
-    }
-
-    const nodePropertyWidth: INodeProperty = makeINodeProperty(
-      "width",
-      imgWidth
-    );
-    resp = await FrontendNodeGateway.updateNode(currentNode.nodeId, [
-      nodePropertyWidth,
-    ]);
-    if (!resp.success) {
-      console.error(resp.message);
-    }
-
-    //update the image container
-    if (imageContainer.current) {
-      imageContainer.current.style.height = imgHeight?.toString() + "px";
-      imageContainer.current.style.width = imgWidth?.toString() + "px";
-    }
-    setRefresh(!refresh);
-  };
-
-  useEffect(() => {
-    setDims();
-  }, [currentNode, imgHeight, imgWidth]);
-
   /* onSelectionPointerDown initializes the selection */
   const onSelectionPointerDown = (e: React.PointerEvent) => {
     e.preventDefault();
@@ -355,32 +322,40 @@ export const ImageContent = () => {
   };
 
   return (
-    <div>
-      <ImageMenu setResizeHeight={setImgHeight} setResizeWidth={setImgWidth} />
-      <div className="imageWrapper">
-        <div
-          ref={imageContainer}
-          onPointerDown={onSelectionPointerDown}
-          className="imageContainer"
-        >
-          <div className="image">
-            {
-              <div className="selection" ref={selection}>
-                <div
-                  onClick={onHandleClearSelectionClick}
-                  onPointerDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  className="selection-close"
-                >
-                  <ri.RiCloseFill />
-                </div>
+    <div className="imageWrapper">
+      <ImageResizer
+        height={height}
+        width={width}
+        setHeight={setHeight}
+        setWidth={setWidth}
+      />
+      <div
+        ref={imageContainer}
+        onPointerDown={onSelectionPointerDown}
+        className="imageContainer"
+      >
+        <div className="image">
+          {
+            <div className="selection" ref={selection}>
+              <div
+                onClick={onHandleClearSelectionClick}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className="selection-close"
+              >
+                <ri.RiCloseFill />
               </div>
-            }
-            {imageAnchors}
-            <img src={currentNode.content} alt={currentNode.title} />
-          </div>
+            </div>
+          }
+          {imageAnchors}
+          <img
+            src={currentNode.content}
+            alt={currentNode.title}
+            height={height}
+            width={width}
+          />
         </div>
       </div>
     </div>

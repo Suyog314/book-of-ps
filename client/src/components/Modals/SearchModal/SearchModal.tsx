@@ -1,186 +1,223 @@
+import React, { useEffect, useState } from "react";
+import * as ri from "react-icons/ri";
+
 import {
+  Button,
   Input,
   InputGroup,
   InputLeftElement,
-  Modal,
-  ModalContent,
-  ModalOverlay,
+  InputRightElement,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalOverlay,
 } from "@chakra-ui/react";
-import Link from "next/link";
-import * as ai from "react-icons/ai";
-import * as ri from "react-icons/ri";
-import { useEffect, useState } from "react";
-import { SearchIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { FrontendNodeGateway } from "~/nodes";
-import { INode } from "~/types";
 import "./SearchModal.scss";
+import { SearchResultItem } from "./SearchResultItem";
 
-export interface ISearchModal {
+export interface ISearchModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-export const SearchModal = (props: ISearchModal) => {
+export const SearchModal = (props: ISearchModalProps) => {
   const { isOpen, onClose } = props;
-  const [searchQ, setSearchQ] = useState("");
-  const [searchNodes, setSearchNodes] = useState<INode[]>([]);
-  const [filterType, setFilterType] = useState("");
-  const [sortType, setSortType] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<any>([]);
+  const [filteredResults, setFilteredResults] = useState<any>([]);
+  const [sortingOrder, setSortingOrder] = useState<string>("relevance");
 
   useEffect(() => {
-    getSearchNodes();
-  }, [searchQ, filterType, sortType]);
+    console.log(searchInput);
+  }, [searchInput]);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchQ = event.target.value;
-    setSearchQ(searchQ);
+  const handleInputChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setSearchInput(event.target.value);
   };
 
-  const getSearchNodes = async () => {
-    const searchRes = await FrontendNodeGateway.searchForNodes(
-      searchQ,
-      sortType
-    );
-    if (!searchRes.success) {
-      console.error(searchRes.message);
-      return;
+  const onSearch = async () => {
+    const searchResp = await FrontendNodeGateway.searchNodes(searchInput);
+    if (searchResp.success) {
+      setSearchResults(searchResp.payload);
+      setFilteredResults(searchResp.payload);
+    } else {
+      console.log(searchResp.message);
+      setSearchResults([]);
+      setFilteredResults([]);
     }
-
-    let searchNodes = searchRes.payload;
-    if (filterType != "") {
-      searchNodes = searchNodes.filter((node) => {
-        return filterType.toLowerCase() == node.type;
-      });
-    }
-    console.log(searchNodes);
-    setSearchNodes(searchNodes);
   };
 
-  /**
-   * Takes a date and parses it into a desired format (DD/MM/YY)
-   * @param nodeDate
-   * @returns string of parsed date
-   */
-  const parseDateString = (nodeDate: Date) => {
-    const date = new Date(nodeDate);
-    const year = date.getFullYear().toString().slice(2);
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
+  useEffect(() => {
+    console.log(searchResults);
+  }, [searchResults]);
 
-    const formattedDate = `${month}/${day}/${year}`;
+  useEffect(() => {
+    onSearch();
+  }, [searchInput]);
 
-    return formattedDate;
-  };
+  useEffect(() => {
+    console.log(searching);
+  }, [searching]);
 
   const handleClose = () => {
+    setSearchInput("");
+    setSearchResults([]);
     onClose();
-    setSearchQ("");
-    setSearchNodes([]);
-    setFilterType("");
-    setSortType("");
+  };
+
+  useEffect(() => {
+    console.log(filteredResults);
+  }, [filteredResults]);
+
+  const handleFiltering = (type: string) => {
+    if (type === "all") {
+      setFilteredResults(searchResults);
+      handleSorting(sortingOrder, searchResults);
+    } else {
+      const newSearchResults = searchResults.filter(
+        (result: { type: string }) => {
+          return result.type === type;
+        }
+      );
+      setFilteredResults(newSearchResults);
+      handleSorting(sortingOrder, newSearchResults);
+    }
+  };
+
+  const handleSorting = (order: string, results = filteredResults) => {
+    setSortingOrder(order);
+    const newSearchResults = [...results];
+    console.log(newSearchResults);
+
+    if (order === "oldest") {
+      newSearchResults.sort((a, b) => {
+        const dateATime = new Date(a.dateCreated).getTime();
+        const dateBTime = new Date(b.dateCreated).getTime();
+        return dateATime - dateBTime;
+      });
+    } else if (order === "newest") {
+      newSearchResults.sort((a, b) => {
+        const dateATime = new Date(a.dateCreated).getTime();
+        const dateBTime = new Date(b.dateCreated).getTime();
+        return dateBTime - dateATime;
+      });
+    } else if (order === "relevance") {
+      newSearchResults.sort((a, b) => {
+        const scoreA = a.score;
+        const scoreB = b.score;
+        return scoreB - scoreA;
+      });
+    }
+    setFilteredResults(newSearchResults);
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      motionPreset="slideInBottom"
-      size="3xl"
-    >
+    <Modal size={"4xl"} isOpen={isOpen} onClose={handleClose}>
       <div className="modal-font">
         <ModalOverlay />
-        <ModalContent top={100}>
-          <InputGroup size="lg">
-            <InputLeftElement
-              height="100%"
-              display="flex"
-              alignItems="center"
-              pl="3"
-              color="gray.500"
-            >
-              <SearchIcon />
-            </InputLeftElement>
-            <Input
-              placeholder="Search..."
-              variant="unstyled"
-              focusBorderColor="white"
-              height="70px"
-              onChange={handleSearchChange}
-            />
-          </InputGroup>
-          <div className="filter-sort-container">
-            <Menu autoSelect={false}>
-              <MenuButton
-                className="menu-button"
-                as={Button}
-                rightIcon={<ChevronDownIcon />}
+        <ModalContent>
+          <ModalBody style={{ padding: "0px" }}>
+            <InputGroup>
+              <InputLeftElement
+                pointerEvents="none"
+                alignItems={"center"}
+                display={"flex"}
+                height={"100%"}
               >
-                {filterType == "" ? "Filter" : filterType}
-              </MenuButton>
-              <MenuList>
-                <MenuItem onClick={() => setFilterType("")}>
-                  <ai.AiOutlineStop style={{ margin: "0px 6px 0px 0px" }} />
-                  <span>None</span>
-                </MenuItem>
-                <MenuItem onClick={() => setFilterType("Text")}>
-                  <ri.RiStickyNoteLine style={{ margin: "0px 6px 0px 0px" }} />
-                  <span>Text</span>
-                </MenuItem>
-                <MenuItem onClick={() => setFilterType("Image")}>
-                  <ri.RiImageLine style={{ margin: "0px 6px 0px 0px" }} />
-                  <span>Image</span>
-                </MenuItem>
-                <MenuItem onClick={() => setFilterType("Folder")}>
-                  <ri.RiFolderLine style={{ margin: "0px 6px 0px 0px" }} />
-                  <span>Folder</span>
-                </MenuItem>
-              </MenuList>
-            </Menu>
-            <Menu autoSelect={false}>
-              <MenuButton
-                className="menu-button"
-                as={Button}
-                rightIcon={<ChevronDownIcon />}
-              >
-                {sortType == "" ? "Sort" : sortType}
-              </MenuButton>
-              <MenuList>
-                <MenuItem onClick={() => setSortType("")}>
-                  <ai.AiOutlineStop style={{ margin: "0px 6px 0px 0px" }} />
-                  <span>None</span>
-                </MenuItem>
-                <MenuItem onClick={() => setSortType("Date Created")}>
-                  <ri.RiSortDesc style={{ margin: "0px 6px 0px 0px" }} />
-                  <span>Sort by Date Created</span>
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </div>
+                <ri.RiSearchLine />
+              </InputLeftElement>
+              <Input
+                placeholder="Search"
+                value={searchInput}
+                border="0px"
+                onChange={handleInputChange}
+                onFocus={() => setSearching(true)}
+                onBlur={() => setSearching(false)}
+                focusBorderColor="white"
+                variant={"unstyled"}
+                height={"60px"}
+              />
+            </InputGroup>
 
-          <div className="search-results-container">
-            {searchNodes.map((node, index) => (
-              <div key={index} onClick={handleClose}>
-                <Link href={"/" + node.nodeId}>
-                  <div className="search-result">
-                    <div className="node-title">{node.title}</div>
-                    <div className="node-type-date-container">
-                      <div className="node-type">{"type: " + node.type}</div>
-                      <div className="node-date">
-                        {node.dateCreated
-                          ? parseDateString(node.dateCreated)
-                          : "N/A"}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+            {searchResults.length > 0 && (
+              <div className="results">
+                <div className="filters">
+                  <Menu>
+                    <MenuButton
+                      as={Button}
+                      rightIcon={<ri.RiArrowDropDownLine />}
+                      className="filter-button"
+                    >
+                      Filter by
+                    </MenuButton>
+
+                    <MenuList>
+                      <MenuItem onClick={() => handleFiltering("all")}>
+                        All
+                      </MenuItem>
+                      <MenuItem onClick={() => handleFiltering("text")}>
+                        Text
+                      </MenuItem>
+                      <MenuItem onClick={() => handleFiltering("image")}>
+                        Image
+                      </MenuItem>
+                      <MenuItem onClick={() => handleFiltering("folder")}>
+                        Folder
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
+                  <Menu>
+                    <MenuButton
+                      as={Button}
+                      leftIcon={<ri.RiArrowUpDownLine />}
+                      rightIcon={<ri.RiArrowDropDownLine />}
+                      className="sort-button"
+                    >
+                      Sort
+                    </MenuButton>
+                    <MenuList>
+                      <MenuItem onClick={() => handleSorting("relevance")}>
+                        Relevance
+                      </MenuItem>
+                      <MenuItem onClick={() => handleSorting("newest")}>
+                        Created: Newest First
+                      </MenuItem>
+                      <MenuItem onClick={() => handleSorting("oldest")}>
+                        Created: Oldest First
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
+                </div>
+                {filteredResults.map(
+                  (
+                    result: {
+                      type: string;
+                      title: string;
+                      nodeId: string;
+                      dateCreated: string;
+                    },
+                    index: number
+                  ) => (
+                    <SearchResultItem
+                      key={index}
+                      type={result.type}
+                      title={result.title}
+                      nodeId={result.nodeId}
+                      date={result.dateCreated}
+                      onClose={handleClose}
+                    />
+                  )
+                )}
               </div>
-            ))}
-          </div>
+            )}
+          </ModalBody>
         </ModalContent>
       </div>
     </Modal>

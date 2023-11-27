@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { FrontendAnchorGateway } from "../../../../anchors";
 import {
   currentNodeState,
@@ -7,223 +7,62 @@ import {
   refreshLinkListState,
   refreshState,
   selectedExtentState,
-  isLinkingState,
 } from "../../../../global/Atoms";
 import { FrontendLinkGateway } from "../../../../links";
+import { FrontendNodeGateway } from "../../../../nodes";
 import {
   Extent,
   INodeProperty,
   IServiceResponse,
-  ITextExtent,
+  NodeIdsToNodesMap,
   failureServiceResponse,
   makeINodeProperty,
+  makeITextExtent,
   successfulServiceResponse,
 } from "../../../../types";
 import "./TextContent.scss";
+import { TextMenu } from "./TextMenu";
 import { Link } from "@tiptap/extension-link";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Highlight } from "@tiptap/extension-highlight";
-import { TextMenu } from "./TextMenu";
+import Highlight from "@tiptap/extension-highlight";
 import Underline from "@tiptap/extension-underline";
-import Code from "@tiptap/extension-code";
-import { FrontendNodeGateway } from "~/nodes";
+import { loadAnchorToLinksMap } from "../../NodeLinkMenu";
+import TextAlign from "@tiptap/extension-text-align";
+
+export interface INodeLinkMenuProps {
+  nodeIdsToNodesMap: NodeIdsToNodesMap;
+}
 
 /** The content of an text node, including all its anchors */
-export const TextContent = () => {
-  const currentNode = useRecoilValue(currentNodeState);
-  const [refresh, setRefresh] = useRecoilState(refreshState);
+export const TextContent = (props: INodeLinkMenuProps) => {
+  const [refresh] = useRecoilState(refreshState);
   const [anchorRefresh, setAnchorRefresh] = useRecoilState(refreshAnchorState);
   const [linkMenuRefresh, setLinkMenuRefresh] =
     useRecoilState(refreshLinkListState);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
-  const isLinking = useRecoilValue(isLinkingState);
+  const [currentNode] = useRecoilState(currentNodeState);
 
-  // TODO: Add all of the functionality for a rich text editor!
-  // (This file is where the majority of your work on text editing will be done)
+  //editor and all extensions are added here
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Highlight,
-      Underline,
-      Code,
       Link.configure({
         openOnClick: true,
         autolink: false,
         linkOnPaste: false,
       }),
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      Highlight,
+      Underline,
     ],
     content: currentNode.content,
   });
 
-  /** Function to update changes in content and anchors in the editor in database */
-  const updateContent = async () => {
-    if (!editor) {
-      return failureServiceResponse("no editor");
-    }
-
-    //get anchors from database
-    const anchorsRes = await FrontendAnchorGateway.getAnchorsByNodeId(
-      currentNode.nodeId
-    );
-    if (!anchorsRes.success) {
-      console.error(anchorsRes.message);
-    }
-    const databaseAnchors = anchorsRes.payload;
-    const databaseAnchorIds: string[] = [];
-    databaseAnchors &&
-      databaseAnchors.forEach((anchor) => {
-        databaseAnchorIds.push(anchor.anchorId);
-      });
-
-    //update anchor extents
-    const updateAnchorsRes = await updateAnchors();
-    if (!updateAnchorsRes.success) {
-      return failureServiceResponse(updateAnchorsRes.message);
-    }
-    const editorAnchorIds = updateAnchorsRes.payload;
-
-    //delete anchors that are in database but not in editor
-    const deleteAnchorsIds = databaseAnchorIds.filter((databaseAnchorId) => {
-      return !editorAnchorIds.includes(databaseAnchorId);
-    });
-    await deleteAnchors(deleteAnchorsIds);
-
-    //update node with content
-    const updateContentRes = await setNewNodeContent();
-    if (!updateContentRes.success) {
-      return failureServiceResponse(updateContentRes.message);
-    }
-
-    //refresh!
-    setAnchorRefresh(!anchorRefresh);
-    setLinkMenuRefresh(!linkMenuRefresh);
-    setRefresh(!refresh);
-  };
-
-  /** Updates the extent of any text anchors that were edited */
-  const updateAnchors = async (): Promise<IServiceResponse<string[]>> => {
-    if (!editor) {
-      return failureServiceResponse("no editor");
-    }
-
-    const editorAnchorIds: string[] = [];
-
-    //loop through anchors
-    editor.state.doc.descendants(function (node, pos) {
-      const marks = node.marks;
-      const links = marks.filter((mark) => {
-        return mark.type.name == "link";
-      });
-      links.forEach(async (mark) => {
-        //get anchors
-        const anchorId = mark.attrs.target;
-        console.log(mark);
-        editorAnchorIds.push(anchorId);
-        const anchorRes = await FrontendAnchorGateway.getAnchor(anchorId);
-        if (!anchorRes.success) {
-          return failureServiceResponse(anchorRes.message);
-        }
-        const anchor = anchorRes.payload;
-
-        if (anchor?.extent?.type !== "text") {
-          return;
-        }
-
-        //check if anchor has different text
-        if (
-          anchor.extent.text != node.text ||
-          anchor.extent.startCharacter != pos - 1
-        ) {
-          //update in datatbase
-          const newText = node.text ?? "";
-          const newExtent: ITextExtent = {
-            type: "text",
-            text: newText,
-            startCharacter: pos - 1,
-            endCharacter: pos - 1 + newText.length,
-          };
-          console.log(newExtent);
-          const updateRes = await FrontendAnchorGateway.updateExtent(
-            anchorId,
-            newExtent
-          );
-          if (!updateRes.success) {
-            return failureServiceResponse(updateRes.message);
-          }
-        }
-      });
-    });
-    return successfulServiceResponse(editorAnchorIds);
-  };
-
-  /** Deletes all anchors in the database that were deleted in editor */
-  const deleteAnchors = async (deleteAnchorIds: string[]) => {
-    for (let i = 0; i < deleteAnchorIds.length; i++) {
-      //get links associated with anchor
-      const linkRes = await FrontendLinkGateway.getLinksByAnchorId(
-        deleteAnchorIds[i]
-      );
-      if (!linkRes.success) {
-        console.error(linkRes.message);
-      }
-      const links = linkRes.payload;
-
-      if (!links) {
-        continue;
-      }
-      const linksIds: string[] = [];
-      for (let i = 0; i < links.length; i++) {
-        linksIds.push(links[i].linkId);
-
-        //if anchor being deleted is linked to another anchor on the same node,
-        //unset link for the other anchor
-        if (links[i].anchor1NodeId == links[i].anchor2NodeId) {
-          let anchorId = links[i].anchor1Id;
-          if (anchorId == deleteAnchorIds[i]) {
-            anchorId = links[i].anchor2Id;
-          }
-          const anchorRes = await FrontendAnchorGateway.getAnchor(anchorId);
-          if (!anchorRes.success) {
-            console.error(anchorRes.message);
-          }
-          const anchor = anchorRes.payload;
-          if (anchor?.extent?.type === "text" && editor) {
-            editor.commands.setTextSelection({
-              from: anchor.extent.startCharacter,
-              to: anchor.extent.endCharacter + 1,
-            });
-            editor.commands.unsetLink();
-          }
-        }
-      }
-
-      //delete links
-      const deleteLinkRes = await FrontendLinkGateway.deleteLinks(linksIds);
-      if (!deleteLinkRes.success) {
-        console.error(deleteLinkRes.message);
-      }
-    }
-  };
-
-  /** Sets the node content to the new editor content */
-  const setNewNodeContent = async (): Promise<IServiceResponse<null>> => {
-    if (!editor) {
-      return failureServiceResponse("no editor");
-    }
-    const newContent = editor.getHTML();
-    const nodePropertyContent: INodeProperty = makeINodeProperty(
-      "content",
-      newContent
-    );
-    const nodeRes = await FrontendNodeGateway.updateNode(currentNode.nodeId, [
-      nodePropertyContent,
-    ]);
-    if (!nodeRes.success) {
-      return failureServiceResponse(nodeRes.message);
-    }
-    return successfulServiceResponse(null);
-  };
+  // TODO: Add all of the functionality for a rich text editor!
+  // (This file is where the majority of your work on text editing will be done)
 
   /** This function adds anchor marks for anchors in the database to the text editor */
   const addAnchorMarks = async (): Promise<IServiceResponse<any>> => {
@@ -233,9 +72,11 @@ export const TextContent = () => {
     const anchorResponse = await FrontendAnchorGateway.getAnchorsByNodeId(
       currentNode.nodeId
     );
+    console.log(anchorResponse.payload, "payload");
     if (!anchorResponse || !anchorResponse.success) {
       return failureServiceResponse("failed to get anchors");
     }
+
     if (!anchorResponse.payload) {
       return successfulServiceResponse("no anchors to add");
     }
@@ -270,14 +111,115 @@ export const TextContent = () => {
   useEffect(() => {
     if (editor) {
       editor.commands.setContent(currentNode.content);
+      // editor?.commands.selectAll();
+      // editor?.commands.unsetLink();
       addAnchorMarks();
     }
-  }, [currentNode, editor, isLinking]);
+  }, [currentNode, editor, refresh]);
 
   // Set the selected extent to null when this component loads
   useEffect(() => {
     setSelectedExtent(null);
   }, [currentNode]);
+
+  /**
+   * Helper function that finds all anchor marks from the editor and adds
+   * to the anchorIDtoExtent map as well as finding what anchors exist
+   * in the editor
+   * @param anchorIDToExtent map of anchorIds to their extents
+   * @param editorAnchorIds anchor IDs present in the editor
+   */
+  const findAnchorMarks = async (
+    anchorIDToExtent: Map<string, Extent>,
+    editorAnchorIds: string[]
+  ) => {
+    editor?.state?.doc?.descendants(function (node, pos) {
+      node.marks.forEach((mark) => {
+        console.log(mark);
+        const target: string = mark.attrs.target;
+        if (mark.type.name === "link" && target.includes("anchor")) {
+          editorAnchorIds.push(target);
+          const text = node.text ?? "";
+          const extent: Extent = makeITextExtent(
+            text,
+            pos - 1,
+            pos - 1 + text.length
+          );
+          console.log(extent);
+          anchorIDToExtent.set(target, extent);
+        }
+      });
+    });
+    anchorIDToExtent.forEach(async (extent: Extent, anchorID: string) => {
+      await FrontendAnchorGateway.updateExtent(anchorID, extent);
+    });
+  };
+
+  /**
+   * Method that handles any change of content, calls helpers to achieve
+   * the full functionality.
+   */
+  const handleContentChange = async () => {
+    const anchorIDToExtent = new Map();
+    const editorAnchorIds: string[] = [];
+
+    findAnchorMarks(anchorIDToExtent, editorAnchorIds);
+
+    const nodeAnchorIdsResp = await FrontendAnchorGateway.getAnchorsByNodeId(
+      currentNode.nodeId
+    );
+    let anchorsToDelete: string[] = [];
+    const linksToDelete: any[] = [];
+    if (nodeAnchorIdsResp.success) {
+      const nodeAnchorIds = nodeAnchorIdsResp.payload
+        .filter((anchor) => anchor.extent !== null) // Filter out elements with non-null extent
+        .map((anchor) => anchor.anchorId);
+      if (nodeAnchorIds) {
+        anchorsToDelete = nodeAnchorIds.filter(
+          (nodeAnchorId) => !editorAnchorIds.includes(nodeAnchorId) //and the corresponding anchor doesn't have null extent
+        );
+      }
+    } else {
+      console.log(nodeAnchorIdsResp.message);
+    }
+
+    const anchorsToLinksMap = await loadAnchorToLinksMap({
+      ...props,
+      currentNode,
+    });
+    //finding links to delete based on anchors to delete
+    anchorsToDelete.forEach((anchorId) => {
+      anchorsToLinksMap[anchorId].links.forEach((link) => {
+        !linksToDelete.includes(link.link.linkId) &&
+          linksToDelete.push(link.link.linkId);
+        !anchorsToDelete.includes(link.oppAnchor.anchorId) &&
+          anchorsToDelete.push(link.oppAnchor.anchorId);
+      });
+    });
+    console.log(anchorsToDelete, linksToDelete);
+
+    //delete the links associated with the deleted anchors
+    const deleteLinkResp =
+      linksToDelete.length > 0
+        ? await FrontendLinkGateway.deleteLinks(linksToDelete)
+        : { success: false };
+
+    await FrontendAnchorGateway.deleteAnchors(anchorsToDelete);
+    if (deleteLinkResp.success) {
+      setLinkMenuRefresh(!linkMenuRefresh);
+      setAnchorRefresh(!anchorRefresh);
+      //unset the links in the editor that were deleted
+      editor?.commands.selectAll();
+      editor?.commands.unsetLink();
+    }
+
+    //update content and re-add the anchor marks
+    const content = editor?.getHTML();
+    const nodeProperty: INodeProperty = makeINodeProperty("content", content);
+    await FrontendNodeGateway.updateNode(currentNode.nodeId, [nodeProperty]);
+    addAnchorMarks();
+    setLinkMenuRefresh(!linkMenuRefresh);
+  };
 
   const onPointerUp = () => {
     if (!editor) {
@@ -293,6 +235,7 @@ export const TextContent = () => {
         endCharacter: to - 1,
         text: text,
       };
+      console.log(selectedExtent, "selectedExtent");
       setSelectedExtent(selectedExtent);
     } else {
       setSelectedExtent(null);
@@ -300,13 +243,18 @@ export const TextContent = () => {
   };
 
   if (!editor) {
-    return <div>{currentNode.content}</div>;
+    return <div className="text-content">{currentNode.content}</div>;
   }
 
   return (
     <div>
-      <TextMenu editor={editor} onSave={updateContent} />
-      <EditorContent editor={editor} onPointerUp={onPointerUp} />
+      <TextMenu editor={editor} save={handleContentChange} />
+      <EditorContent
+        style={{ padding: 10, whiteSpace: "pre-line" }}
+        className="editor-content"
+        editor={editor}
+        onPointerUp={onPointerUp}
+      />
     </div>
   );
 };

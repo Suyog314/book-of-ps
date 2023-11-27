@@ -41,18 +41,9 @@ export interface INode {
   nodeId: string; // unique randomly generated ID which contains the type as a prefix
   title: string; // user create node title
   dateCreated?: Date; // date that the node was created
-  defHeight?: number; // original height for an image
-  defWidth?: number; // original width for an image
-  height?: number; // container height for an image
-  width?: number; // container width for an image
+  height?: number[];
+  width?: number[];
 }
-
-export type FolderContentType = "list" | "grid";
-
-export interface IFolderNode extends INode {
-  viewType: FolderContentType;
-}
-
 export interface IRecipeNode extends INode {
   ingredients: string[]; // a list of ingredients to make the recipe
   steps: INode[]; // list of nodes detailing the steps for the recipe (text/image)
@@ -61,7 +52,13 @@ export interface IRecipeNode extends INode {
   time: number; // the amount of time the recipe takes to complete
 }
 
-export type NodeFields = keyof INode | keyof IFolderNode | keyof IRecipeNode;
+export type FolderContentType = "list" | "grid";
+
+export interface IFolderNode extends INode {
+  viewType: FolderContentType;
+}
+
+export type NodeFields = keyof INode | keyof IFolderNode;
 
 // Type declaration for map from nodeId --> INode
 export type NodeIdsToNodesMap = { [nodeId: string]: INode };
@@ -74,6 +71,8 @@ export type NodeIdsToNodesMap = { [nodeId: string]: INode };
  * @param type
  * @param title
  * @param content
+ * @param height
+ * @param width
  * @returns INode object
  */
 export function makeINode(
@@ -82,7 +81,9 @@ export function makeINode(
   children: string[] = [],
   type: NodeType = "text",
   title: string | null = null,
-  content: any = null
+  content: any = null,
+  height: number[] = [],
+  width: number[] = []
 ): INode {
   return {
     nodeId: nodeId,
@@ -90,6 +91,8 @@ export function makeINode(
     type: type,
     content: content ?? "content" + nodeId,
     filePath: makeINodePath(path, children),
+    height: height ?? [],
+    width: width ?? [],
   };
 }
 
@@ -100,7 +103,9 @@ export function makeIFolderNode(
   type?: any,
   title?: any,
   content?: any,
-  viewType?: any
+  viewType?: any,
+  height?: any,
+  width?: any
 ): IFolderNode {
   return {
     content: content ?? "content" + nodeId,
@@ -109,5 +114,7 @@ export function makeIFolderNode(
     title: title ?? "node" + nodeId,
     type: type ?? "text",
     viewType: viewType ?? "grid",
+    height: height ?? [],
+    width: width ?? [],
   };
 }

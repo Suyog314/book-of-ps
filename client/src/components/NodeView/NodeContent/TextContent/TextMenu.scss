@@ -15,7 +15,9 @@
   background-color: $primary-background-color;
   z-index: 3;
 
-  .textEditorButton {
+  .textEditorButton,
+  .save-button,
+  .align-button {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -33,6 +35,19 @@
     cursor: pointer;
     margin: 0;
     background-color: rgb(241, 241, 241);
+    &:hover {
+      background-color: darken($secondary-background-color, 10);
+    }
+  }
+
+  .align-button {
+    padding: 7px;
+  }
+
+  .save-button {
+    &:hover {
+      background-color: rgb(186, 231, 255);
+    }
   }
 
   .activeTextEditorButton {
