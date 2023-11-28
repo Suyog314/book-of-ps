@@ -3,16 +3,24 @@
 .recipe-container {
   display: flex;
   .recipe-left {
-    width: 40%;
+    width: 30%;
     padding: 16px;
+    .image-container {
+      width: 100%;
+      height: 60%;
+    }
     .recipe-image {
+      width: 100%;
+      height: 100%;
       border-radius: 15px;
+      object-fit: cover;
     }
     .cooking-stats {
       margin-top: 16px;
       display: flex;
       flex-direction: row;
       align-items: center;
+      width: 100%;
 
       .serving {
         display: flex;
@@ -48,6 +56,11 @@
         .cuisine-type {
         }
       }
+    }
+  }
+  .recipe-right {
+    padding: 16px;
+    .recipe-description {
     }
   }
 }

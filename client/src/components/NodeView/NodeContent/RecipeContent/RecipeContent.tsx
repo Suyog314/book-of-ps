@@ -14,11 +14,7 @@ export const RecipeContent = () => {
     <div className="recipe-container">
       <div className="recipe-left">
         <div className="image-container">
-          <img
-            src={currentNode.content}
-            alt="image"
-            className="recipe-image"
-          ></img>
+          <img src={currentNode.content} alt="image" className="recipe-image" />
         </div>
         <div className="cooking-stats">
           <div className="serving">
@@ -41,7 +37,13 @@ export const RecipeContent = () => {
           </div>
         </div>
       </div>
-      <div className="recipe-right"></div>
+      <div className="recipe-right">
+        <div className="recipe-description-container">
+          <b style={{ fontSize: 30 }}>Description</b>
+          <div>{(currentNode as IRecipeNode).description}</div>
+        </div>
+        <div className="recipe-ingredients-container"></div>
+      </div>
     </div>
   );
 };
