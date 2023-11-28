@@ -20,19 +20,73 @@ import {
 export const RecipeContent = () => {
   const [currentNode] = useRecoilState(currentNodeState);
   const [tempUnits] = useState(["celsius", "fahrenheit", "kelvin"]);
-  const [volumeUnits] = useState(["ml", "l", "fl oz", "cup"]);
+  const [volumeUnits] = useState(["ml", "l", "fl oz", "cup", "tsp"]);
   const [weightUnits] = useState(["oz", "lb", "g", "kg"]);
   const [selectedUnitType, setSelectedUnitType] = useState("Temperature");
+  const [leftSelectedUnit, setLeftSelectedUnit] = useState("");
+  const [rightSelectedUnit, setRightSelectedUnit] = useState("");
+  const [leftUnitValue, setLeftUnitValue] = useState<number>(0);
+  const [rightUnitValue, setRightUnitValue] = useState<number>(0);
   useEffect(() => {
-    console.log((currentNode as IRecipeNode).description.content);
-    console.log(convert(2, "ml").to("l"));
+    console.log((currentNode as IRecipeNode).description?.node.content);
+    console.log(convert(2, "tsp").to("fl oz"));
     console.log(selectedUnitType);
-  }, [selectedUnitType]);
+    console.log(leftSelectedUnit);
+    console.log(rightSelectedUnit);
+    console.log(leftUnitValue);
+    console.log(rightUnitValue);
+    convertUnits();
+  }, [
+    selectedUnitType,
+    leftSelectedUnit,
+    rightSelectedUnit,
+    leftUnitValue,
+    rightUnitValue,
+  ]);
 
   const handleUnitTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
+    switch (event.target.value) {
+      case "Temperature":
+        setLeftSelectedUnit(tempUnits[0]);
+        setRightSelectedUnit(tempUnits[1]);
+        break;
+      case "Volume":
+        setLeftSelectedUnit(volumeUnits[0]);
+        setRightSelectedUnit(volumeUnits[1]);
+        break;
+      case "Weight":
+        setLeftSelectedUnit(weightUnits[0]);
+        setRightSelectedUnit(weightUnits[1]);
+        break;
+      default:
+        break;
+    }
     setSelectedUnitType(event.target.value);
+  };
+
+  const handleUnitChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+    input: string
+  ) => {
+    if (input == "left") {
+      setLeftSelectedUnit(event.target.value);
+    } else {
+      setRightSelectedUnit(event.target.value);
+    }
+  };
+  const convertUnits = () => {
+    if (leftSelectedUnit === rightSelectedUnit) {
+      // If the units are the same, no need to convert
+      setRightUnitValue(leftUnitValue);
+    } else {
+      // Implement your conversion logic here
+      const convertedValue = convert(leftUnitValue, leftSelectedUnit).to(
+        rightSelectedUnit
+      );
+      setRightUnitValue(convertedValue);
+    }
   };
 
   const displayUnits = () => {
@@ -91,8 +145,19 @@ export const RecipeContent = () => {
           </Select>
           <div className="input-section">
             <div className="left-input">
-              <NumberInput style={{ width: "90%" }} defaultValue={1}>
-                <NumberInputField />
+              <NumberInput
+                style={{ width: "90%" }}
+                defaultValue={1}
+                onChange={(valueString) => {
+                  setLeftUnitValue(Number(valueString));
+                }}
+                value={leftUnitValue}
+              >
+                <NumberInputField
+                  onChange={(value) =>
+                    setLeftUnitValue(Number(value.target.value))
+                  }
+                />
                 <NumberInputStepper>
                   <NumberIncrementStepper />
                   <NumberDecrementStepper />
@@ -101,8 +166,19 @@ export const RecipeContent = () => {
             </div>
             <b>=</b>
             <div className="right-input">
-              <NumberInput style={{ width: "90%" }} defaultValue={15}>
-                <NumberInputField />
+              <NumberInput
+                style={{ width: "90%" }}
+                defaultValue={1}
+                onChange={(valueString) => {
+                  setRightUnitValue(Number(valueString));
+                }}
+                value={rightUnitValue}
+              >
+                <NumberInputField
+                  onChange={(value) =>
+                    setRightUnitValue(Number(value.target.value))
+                  }
+                />
                 <NumberInputStepper>
                   <NumberIncrementStepper />
                   <NumberDecrementStepper />
@@ -112,10 +188,26 @@ export const RecipeContent = () => {
           </div>
           <div className="unit-section">
             <div className="left-unit">
-              <Select variant={"filled"}>{displayUnits()}</Select>
+              <Select
+                onChange={(event) => {
+                  handleUnitChange(event, "left");
+                }}
+                variant={"filled"}
+                value={leftSelectedUnit}
+              >
+                {displayUnits()}
+              </Select>
             </div>
             <div className="right-unit">
-              <Select variant={"filled"}>{displayUnits()}</Select>
+              <Select
+                onChange={(event) => {
+                  handleUnitChange(event, "right");
+                }}
+                variant={"filled"}
+                value={rightSelectedUnit}
+              >
+                {displayUnits()}
+              </Select>
             </div>
           </div>
         </div>
@@ -123,7 +215,7 @@ export const RecipeContent = () => {
       <div className="recipe-right">
         <div className="recipe-description-container">
           <b style={{ fontSize: 30 }}>Description</b>
-          <div>{(currentNode as IRecipeNode).description.content}</div>
+          <div>{(currentNode as IRecipeNode).description?.node.content}</div>
         </div>
         <div className="recipe-ingredients-container"></div>
       </div>
