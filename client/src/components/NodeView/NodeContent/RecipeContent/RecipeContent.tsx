@@ -20,14 +20,41 @@ import {
 export const RecipeContent = () => {
   const [currentNode] = useRecoilState(currentNodeState);
   const [tempUnits] = useState(["celsius", "fahrenheit", "kelvin"]);
-  const [selectedUnitType, setSelectedUnitType] = useState("");
+  const [volumeUnits] = useState(["ml", "l", "fl oz", "cup"]);
+  const [weightUnits] = useState(["oz", "lb", "g", "kg"]);
+  const [selectedUnitType, setSelectedUnitType] = useState("Temperature");
   useEffect(() => {
     console.log((currentNode as IRecipeNode).description.content);
-    console.log(convert(1, "kelvin").to("fahrenheit"));
+    console.log(convert(2, "ml").to("l"));
     console.log(selectedUnitType);
   }, [selectedUnitType]);
 
-  const handleUnitTypeChange = () => {};
+  const handleUnitTypeChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSelectedUnitType(event.target.value);
+  };
+
+  const displayUnits = () => {
+    console.log("displayUnits");
+    switch (selectedUnitType) {
+      case "Temperature":
+        return tempUnits.map((tempUnit) => (
+          <option key={tempUnit}>{tempUnit}</option>
+        ));
+      case "Volume":
+        return volumeUnits.map((volumeUnit) => (
+          <option key={volumeUnit}>{volumeUnit}</option>
+        ));
+      case "Weight":
+        return weightUnits.map((weightUnit) => (
+          <option key={weightUnit}>{weightUnit}</option>
+        ));
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="recipe-container">
       <div className="recipe-left">
@@ -81,6 +108,14 @@ export const RecipeContent = () => {
                   <NumberDecrementStepper />
                 </NumberInputStepper>
               </NumberInput>
+            </div>
+          </div>
+          <div className="unit-section">
+            <div className="left-unit">
+              <Select variant={"filled"}>{displayUnits()}</Select>
+            </div>
+            <div className="right-unit">
+              <Select variant={"filled"}>{displayUnits()}</Select>
             </div>
           </div>
         </div>

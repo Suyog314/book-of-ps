@@ -65,11 +65,23 @@
         align-items: center;
         .left-input {
           display: flex;
-          justify-content: left;
+          flex-direction: column;
+          align-items: flex-start;
         }
         .right-input {
           display: flex;
-          justify-content: right;
+          flex-direction: column;
+          align-items: flex-end;
+        }
+      }
+      .unit-section {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        .left-unit,
+        .right-unit {
+          display: flex;
+          width: 44%;
         }
       }
     }
