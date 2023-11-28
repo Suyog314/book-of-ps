@@ -1,0 +1,53 @@
+@import "../../../../global/globalCssVariables";
+
+.recipe-container {
+  display: flex;
+  .recipe-left {
+    width: 40%;
+    padding: 16px;
+    .recipe-image {
+      border-radius: 15px;
+    }
+    .cooking-stats {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .serving {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .serving-icon {
+          margin-right: 8px;
+        }
+        .serving-number {
+          // font-weight: bold;
+        }
+        margin-right: 8px;
+      }
+      .time {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-right: 8px;
+        .time-icon {
+          margin-right: 8px;
+        }
+        .time-number {
+          // font-weight: bold;
+        }
+      }
+      .cuisine {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .cuisine-logo {
+          margin-right: 8px;
+        }
+        .cuisine-type {
+        }
+      }
+    }
+  }
+}

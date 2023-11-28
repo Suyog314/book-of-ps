@@ -58,7 +58,7 @@ export interface IFolderNode extends INode {
   viewType: FolderContentType;
 }
 
-export type NodeFields = keyof INode | keyof IFolderNode;
+export type NodeFields = keyof INode | keyof IFolderNode | keyof IRecipeNode;
 
 // Type declaration for map from nodeId --> INode
 export type NodeIdsToNodesMap = { [nodeId: string]: INode };
