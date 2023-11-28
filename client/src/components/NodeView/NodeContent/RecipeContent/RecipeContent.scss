@@ -21,6 +21,7 @@
       flex-direction: row;
       align-items: center;
       width: 100%;
+      margin-bottom: 16px;
 
       .serving {
         display: flex;
@@ -54,6 +55,21 @@
           margin-right: 8px;
         }
         .cuisine-type {
+        }
+      }
+    }
+    .unit-converter {
+      .input-section {
+        display: flex;
+        margin-top: 16px;
+        align-items: center;
+        .left-input {
+          display: flex;
+          justify-content: left;
+        }
+        .right-input {
+          display: flex;
+          justify-content: right;
         }
       }
     }
