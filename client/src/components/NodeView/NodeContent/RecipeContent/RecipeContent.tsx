@@ -86,6 +86,9 @@ export const RecipeContent = () => {
         rightSelectedUnit
       );
       setRightUnitValue(convertedValue);
+      // setLeftUnitValue(
+      //   convert(rightUnitValue, rightSelectedUnit).to(leftSelectedUnit)
+      // );
     }
   };
 
