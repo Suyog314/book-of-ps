@@ -115,6 +115,39 @@ export function makeINode(
   };
 }
 
+export function makeIRecipeNode(
+  nodeId: any,
+  path: any,
+  description: any,
+  ingredients: any,
+  steps: any,
+  serving: any,
+  cuisine: any,
+  time: any,
+  children?: any,
+  type?: any,
+  title?: any,
+  content?: any,
+  height?: any,
+  width?: any
+): IRecipeNode {
+  return {
+    content: content ?? "content" + nodeId,
+    filePath: makeINodePath(path, children),
+    nodeId: nodeId,
+    title: title ?? "node" + nodeId,
+    type: type ?? "text",
+    height: height ?? [],
+    width: width ?? [],
+    description: description,
+    ingredients: ingredients,
+    steps: steps,
+    serving: serving,
+    cuisine: cuisine,
+    time: time,
+  };
+}
+
 export function makeIFolderNode(
   nodeId: any,
   path: any,

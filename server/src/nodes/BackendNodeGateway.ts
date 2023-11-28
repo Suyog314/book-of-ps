@@ -325,9 +325,6 @@ export class BackendNodeGateway {
       if (!isINodeProperty(toUpdate[i])) {
         return failureServiceResponse("toUpdate parameters invalid");
       }
-      console.log(toUpdate[i].fieldName);
-      console.log(toUpdate[i].value);
-      console.log(isINodeProperty(toUpdate[i]));
       const fieldName = toUpdate[i].fieldName;
       const value = toUpdate[i].value;
       properties[fieldName] = value;
@@ -336,7 +333,6 @@ export class BackendNodeGateway {
       nodeId,
       properties
     );
-    console.log(nodeResponse, "nodeResponse");
     if (!nodeResponse.success) {
       return failureServiceResponse(
         "This node does not exist in the database!"
