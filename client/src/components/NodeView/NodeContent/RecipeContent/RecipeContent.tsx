@@ -78,17 +78,12 @@ export const RecipeContent = () => {
   };
   const convertUnits = () => {
     if (leftSelectedUnit === rightSelectedUnit) {
-      // If the units are the same, no need to convert
       setRightUnitValue(leftUnitValue);
     } else {
-      // Implement your conversion logic here
       const convertedValue = convert(leftUnitValue, leftSelectedUnit).to(
         rightSelectedUnit
       );
       setRightUnitValue(convertedValue);
-      // setLeftUnitValue(
-      //   convert(rightUnitValue, rightSelectedUnit).to(leftSelectedUnit)
-      // );
     }
   };
 
