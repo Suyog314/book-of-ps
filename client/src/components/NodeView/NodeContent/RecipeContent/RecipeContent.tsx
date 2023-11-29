@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { TextContent } from "../TextContent";
 import { FrontendNodeGateway } from "~/nodes";
+import { RecipeTimer } from "./RecipeTimer";
 
 export interface RecipeContentProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
@@ -34,6 +35,8 @@ export const RecipeContent = (props: RecipeContentProps) => {
   const [leftUnitValue, setLeftUnitValue] = useState<number>(0);
   const [rightUnitValue, setRightUnitValue] = useState<number>(0);
   const [descriptionNode, setDescriptionNode] = useState<INode>();
+  const [ingredientsNode, setIngredientsNode] = useState<INode>();
+  const [ingredients, setIngredients] = useState<string[]>([]);
   useEffect(() => {
     console.log(convert(2, "tsp").to("fl oz"));
     console.log(selectedUnitType);
@@ -62,8 +65,14 @@ export const RecipeContent = (props: RecipeContentProps) => {
         console.log(descriptionNodeResp.message);
       }
     };
+    const getIngredientNode = async () => {
+      const ingredientNodeResp = await FrontendNodeGateway.getNode(
+        currentNode as IRecipeNode
+      );
+    };
     getDescriptionNode();
   }, [currentNode]);
+
   const handleUnitTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -229,6 +238,7 @@ export const RecipeContent = (props: RecipeContentProps) => {
             </div>
           </div>
         </div>
+        {/* <RecipeTimer /> */}
       </div>
       <div className="recipe-right">
         <div className="recipe-description-container">
@@ -242,10 +252,13 @@ export const RecipeContent = (props: RecipeContentProps) => {
         </div>
         <div className="recipe-ingredients-container">
           <b style={{ fontSize: 30 }}>Ingredients</b>
-          <div>
-            {(currentNode as IRecipeNode).ingredients.map((ingredient) => {
-              <p>{ingredient}</p>;
-            })}
+          <div className="ingredients">
+            {
+              <TextContent
+                nodeIdsToNodesMap={nodeIdsToNodesMap}
+                currentNode={}
+              />
+            }
           </div>
         </div>
       </div>

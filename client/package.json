@@ -14,8 +14,10 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@tiptap/core": "^2.1.12",
+    "@tiptap/extension-bullet-list": "^2.1.12",
     "@tiptap/extension-highlight": "^2.1.12",
     "@tiptap/extension-link": "^2.1.12",
+    "@tiptap/extension-list-item": "^2.1.12",
     "@tiptap/extension-text-align": "^2.1.12",
     "@tiptap/extension-underline": "^2.1.12",
     "@tiptap/react": "^2.1.12",
@@ -29,6 +31,7 @@
     "react-dom": "18.2.0",
     "react-flow-renderer": "^10.3.17",
     "react-icons": "^4.9.0",
+    "react-timer-hook": "^3.0.7",
     "recoil": "^0.7.7",
     "uniqid": "^5.4.0"
   },

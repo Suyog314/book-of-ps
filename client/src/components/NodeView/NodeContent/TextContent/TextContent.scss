@@ -1,17 +1,19 @@
 @import "../../../../global/globalCssVariables";
 
-.editorContent {
-  padding: 20px;
-}
+.editor-container {
+  .editorContent {
+    padding: 20px;
+  }
 
-.ProseMirror {
-  a {
-    color: #3366bb;
-    text-decoration: underline;
+  .ProseMirror {
+    a {
+      color: #3366bb;
+      text-decoration: underline;
 
-    &:hover {
-      cursor: pointer;
-      color: #093075;
+      &:hover {
+        cursor: pointer;
+        color: #093075;
+      }
     }
   }
 }
