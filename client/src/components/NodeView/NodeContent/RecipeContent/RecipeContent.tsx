@@ -6,7 +6,7 @@ import { LuUtensils } from "react-icons/lu";
 import { useRecoilState } from "recoil";
 import { currentNodeState } from "~/global/Atoms";
 import "./RecipeContent.scss";
-import { IRecipeNode } from "~/types";
+import { IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
 import {
   NumberDecrementStepper,
@@ -16,8 +16,13 @@ import {
   NumberInputStepper,
   Select,
 } from "@chakra-ui/react";
+import { TextContent } from "../TextContent";
 
-export const RecipeContent = () => {
+export interface RecipeContentProps {
+  nodeIdsToNodesMap: NodeIdsToNodesMap;
+}
+export const RecipeContent = (props: RecipeContentProps) => {
+  const { nodeIdsToNodesMap } = props;
   const [currentNode] = useRecoilState(currentNodeState);
   const [tempUnits] = useState(["celsius", "fahrenheit", "kelvin"]);
   const [volumeUnits] = useState(["ml", "l", "fl oz", "cup", "tsp"]);
@@ -28,13 +33,13 @@ export const RecipeContent = () => {
   const [leftUnitValue, setLeftUnitValue] = useState<number>(0);
   const [rightUnitValue, setRightUnitValue] = useState<number>(0);
   useEffect(() => {
-    console.log((currentNode as IRecipeNode).description?.node.content);
     console.log(convert(2, "tsp").to("fl oz"));
     console.log(selectedUnitType);
     console.log(leftSelectedUnit);
     console.log(rightSelectedUnit);
     console.log(leftUnitValue);
     console.log(rightUnitValue);
+    console.log(currentNode);
     convertUnits();
   }, [
     selectedUnitType,
@@ -213,7 +218,14 @@ export const RecipeContent = () => {
       <div className="recipe-right">
         <div className="recipe-description-container">
           <b style={{ fontSize: 30 }}>Description</b>
-          <div>{(currentNode as IRecipeNode).description?.node.content}</div>
+          <div>
+            {/* <TextContent
+              nodeIdsToNodesMap={nodeIdsToNodesMap}
+              currentNode={currentNode}
+              isRecipe={true}
+            /> */}
+            {(currentNode as IRecipeNode).description.node.content}
+          </div>
         </div>
         <div className="recipe-ingredients-container"></div>
       </div>

@@ -28,9 +28,15 @@ export const NodeContent = (props: INodeContentProps) => {
     case "image":
       return <ImageContent />;
     case "text":
-      return <TextContent nodeIdsToNodesMap={nodeIdsToNodesMap} />;
+      return (
+        <TextContent
+          nodeIdsToNodesMap={nodeIdsToNodesMap}
+          currentNode={currentNode}
+          isRecipe={false}
+        />
+      );
     case "recipe":
-      return <RecipeContent />;
+      return <RecipeContent nodeIdsToNodesMap={nodeIdsToNodesMap} />;
     case "folder":
       if (childNodes) {
         return (

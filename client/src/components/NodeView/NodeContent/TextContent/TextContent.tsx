@@ -12,7 +12,9 @@ import { FrontendLinkGateway } from "../../../../links";
 import { FrontendNodeGateway } from "../../../../nodes";
 import {
   Extent,
+  INode,
   INodeProperty,
+  IRecipeNode,
   IServiceResponse,
   NodeIdsToNodesMap,
   failureServiceResponse,
@@ -32,16 +34,18 @@ import TextAlign from "@tiptap/extension-text-align";
 
 export interface INodeLinkMenuProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
+  currentNode: INode;
+  isRecipe: boolean;
 }
 
 /** The content of an text node, including all its anchors */
 export const TextContent = (props: INodeLinkMenuProps) => {
+  const { currentNode, isRecipe } = props;
   const [refresh] = useRecoilState(refreshState);
   const [anchorRefresh, setAnchorRefresh] = useRecoilState(refreshAnchorState);
   const [linkMenuRefresh, setLinkMenuRefresh] =
     useRecoilState(refreshLinkListState);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
-  const [currentNode] = useRecoilState(currentNodeState);
 
   //editor and all extensions are added here
   const editor = useEditor({
@@ -58,7 +62,9 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       Highlight,
       Underline,
     ],
-    content: currentNode.content,
+    content: isRecipe
+      ? (currentNode as IRecipeNode).description.node.content
+      : currentNode.content,
   });
 
   // TODO: Add all of the functionality for a rich text editor!
@@ -110,11 +116,19 @@ export const TextContent = (props: INodeLinkMenuProps) => {
   // Set the content and add anchor marks when this component loads
   useEffect(() => {
     if (editor) {
-      editor.commands.setContent(currentNode.content);
-      // editor?.commands.selectAll();
-      // editor?.commands.unsetLink();
+      if (isRecipe) {
+        editor.commands.setContent(
+          (currentNode as IRecipeNode).description.content
+        );
+      } else {
+        editor.commands.setContent(currentNode.content);
+      }
       addAnchorMarks();
     }
+    console.log((currentNode as IRecipeNode).description);
+    console.log(
+      ((currentNode as IRecipeNode).description as INode).node.content
+    );
   }, [currentNode, editor, refresh]);
 
   // Set the selected extent to null when this component loads
@@ -215,7 +229,12 @@ export const TextContent = (props: INodeLinkMenuProps) => {
 
     //update content and re-add the anchor marks
     const content = editor?.getHTML();
-    const nodeProperty: INodeProperty = makeINodeProperty("content", content);
+    let nodeProperty: INodeProperty;
+    if (isRecipe) {
+      nodeProperty = makeINodeProperty("description", content);
+    } else {
+      nodeProperty = makeINodeProperty("content", content);
+    }
     await FrontendNodeGateway.updateNode(currentNode.nodeId, [nodeProperty]);
     addAnchorMarks();
     setLinkMenuRefresh(!linkMenuRefresh);
