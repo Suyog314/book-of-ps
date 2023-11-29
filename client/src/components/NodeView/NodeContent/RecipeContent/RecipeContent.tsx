@@ -65,12 +65,18 @@ export const RecipeContent = (props: RecipeContentProps) => {
         console.log(descriptionNodeResp.message);
       }
     };
-    const getIngredientNode = async () => {
-      const ingredientNodeResp = await FrontendNodeGateway.getNode(
-        currentNode as IRecipeNode
+    const getIngredientsNode = async () => {
+      const ingredientsNodeResp = await FrontendNodeGateway.getNode(
+        (currentNode as IRecipeNode).ingredientsID
       );
+      if (ingredientsNodeResp.success) {
+        setIngredientsNode(ingredientsNodeResp.payload);
+      } else {
+        console.log(ingredientsNodeResp.message);
+      }
     };
     getDescriptionNode();
+    getIngredientsNode();
   }, [currentNode]);
 
   const handleUnitTypeChange = (
@@ -256,7 +262,7 @@ export const RecipeContent = (props: RecipeContentProps) => {
             {
               <TextContent
                 nodeIdsToNodesMap={nodeIdsToNodesMap}
-                currentNode={}
+                currentNode={ingredientsNode}
               />
             }
           </div>

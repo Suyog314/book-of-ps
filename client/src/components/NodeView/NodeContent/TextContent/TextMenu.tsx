@@ -64,6 +64,15 @@ export const TextMenu = (props: IEditorProps) => {
         Underline
       </button>
       <button
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={
+          "textEditorButton" +
+          (editor.isActive("bulletList") ? "activeTextEditorButton" : "")
+        }
+      >
+        Bullet
+      </button>
+      <button
         onClick={() => editor.chain().focus().setTextAlign("left").run()}
         className={"align-button"}
       >
@@ -81,12 +90,7 @@ export const TextMenu = (props: IEditorProps) => {
       >
         <ri.RiAlignRight />
       </button>
-      <button
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={editor.isActive("bulletList") ? "is-active" : ""}
-      >
-        Bullet
-      </button>
+
       <button onClick={save} className="save-button">
         Save
       </button>
