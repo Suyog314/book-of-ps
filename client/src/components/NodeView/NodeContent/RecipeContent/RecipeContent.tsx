@@ -36,7 +36,8 @@ export const RecipeContent = (props: RecipeContentProps) => {
   const [rightUnitValue, setRightUnitValue] = useState<number>(0);
   const [descriptionNode, setDescriptionNode] = useState<INode>();
   const [ingredientsNode, setIngredientsNode] = useState<INode>();
-  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [stepsNode, setStepsNode] = useState<INode>();
+
   useEffect(() => {
     console.log(convert(2, "tsp").to("fl oz"));
     console.log(selectedUnitType);
@@ -75,8 +76,19 @@ export const RecipeContent = (props: RecipeContentProps) => {
         console.log(ingredientsNodeResp.message);
       }
     };
+    const getStepsNode = async () => {
+      const stepsNodeResp = await FrontendNodeGateway.getNode(
+        (currentNode as IRecipeNode).stepsID
+      );
+      if (stepsNodeResp.success) {
+        setStepsNode(stepsNodeResp.payload);
+      } else {
+        console.log(stepsNodeResp.message);
+      }
+    };
     getDescriptionNode();
     getIngredientsNode();
+    getStepsNode();
   }, [currentNode]);
 
   const handleUnitTypeChange = (
@@ -266,6 +278,14 @@ export const RecipeContent = (props: RecipeContentProps) => {
               />
             }
           </div>
+        </div>
+        <div className="recipe-steps-container">
+          {
+            <TextContent
+              nodeIdsToNodesMap={nodeIdsToNodesMap}
+              currentNode={stepsNode}
+            />
+          }
         </div>
       </div>
     </div>

@@ -34,6 +34,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import { join } from "path";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
+import OrderedList from "@tiptap/extension-ordered-list";
 
 export interface INodeLinkMenuProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
@@ -70,6 +71,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       Underline,
       BulletList,
       ListItem,
+      OrderedList,
     ],
     content: currentNode?.content,
   });
