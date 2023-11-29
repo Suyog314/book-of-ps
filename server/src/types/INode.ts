@@ -46,9 +46,9 @@ export interface INode {
   width?: number[];
 }
 export interface IRecipeNode extends INode {
-  description: INode;
+  descriptionID: string;
   ingredients: string[]; // a list of ingredients to make the recipe
-  steps: INode[]; // list of nodes detailing the steps for the recipe (text/image)
+  stepsIDs: string[]; // list of nodes detailing the steps for the recipe (text/image)
   serving: number; // number of people the recipe serves
   cuisine: Cuisine; // the cuisine that the recipe falls into
   time: number; // the amount of time the recipe takes to complete
