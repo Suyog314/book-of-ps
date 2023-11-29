@@ -97,7 +97,7 @@ export const alertMessageState = atom<string>({
   default: "",
 });
 
-export const availCuisinesState = atom<Cuisine[]>({
+export const availCuisinesState = atom<Set<Cuisine>>({
   key: "availCuisinesState",
-  default: [],
+  default: new Set(),
 });
