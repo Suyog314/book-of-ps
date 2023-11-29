@@ -9,6 +9,11 @@ import {
   ModalOverlay,
   Select,
   Textarea,
+  NumberInput,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  NumberInputStepper,
+  NumberInputField,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import {
@@ -141,6 +146,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
 
   const isImage: boolean = selectedType === "image";
   const isText: boolean = selectedType === "text";
+  const isRecipe: boolean = selectedType === "recipe";
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
@@ -193,6 +199,20 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
                   onChange={handleImageUpload}
                   placeholder={contentInputPlaceholder}
                 />
+              </div>
+            )}
+            {selectedType && isRecipe && (
+              <div className="modal-input">
+                <div className="recipe-nontext">
+                  <NumberInput size="lg" maxW={32} defaultValue={15} min={10}>
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </div>
+                <div className="recipe-text"></div>
               </div>
             )}
             <div className="modal-section">
