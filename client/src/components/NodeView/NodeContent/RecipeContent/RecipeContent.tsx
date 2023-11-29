@@ -240,7 +240,14 @@ export const RecipeContent = (props: RecipeContentProps) => {
             />
           </div>
         </div>
-        <div className="recipe-ingredients-container"></div>
+        <div className="recipe-ingredients-container">
+          <b style={{ fontSize: 30 }}>Ingredients</b>
+          <div>
+            {(currentNode as IRecipeNode).ingredients.map((ingredient) => {
+              <p>{ingredient}</p>;
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
