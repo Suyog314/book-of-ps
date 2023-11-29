@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { TextContent } from "../TextContent";
 import { FrontendNodeGateway } from "~/nodes";
+import { RecipeTimer } from "./RecipeTimer";
 
 export interface RecipeContentProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
@@ -34,6 +35,9 @@ export const RecipeContent = (props: RecipeContentProps) => {
   const [leftUnitValue, setLeftUnitValue] = useState<number>(0);
   const [rightUnitValue, setRightUnitValue] = useState<number>(0);
   const [descriptionNode, setDescriptionNode] = useState<INode>();
+  const [ingredientsNode, setIngredientsNode] = useState<INode>();
+  const [stepsNode, setStepsNode] = useState<INode>();
+
   useEffect(() => {
     console.log(convert(2, "tsp").to("fl oz"));
     console.log(selectedUnitType);
@@ -62,8 +66,31 @@ export const RecipeContent = (props: RecipeContentProps) => {
         console.log(descriptionNodeResp.message);
       }
     };
+    const getIngredientsNode = async () => {
+      const ingredientsNodeResp = await FrontendNodeGateway.getNode(
+        (currentNode as IRecipeNode).ingredientsID
+      );
+      if (ingredientsNodeResp.success) {
+        setIngredientsNode(ingredientsNodeResp.payload);
+      } else {
+        console.log(ingredientsNodeResp.message);
+      }
+    };
+    const getStepsNode = async () => {
+      const stepsNodeResp = await FrontendNodeGateway.getNode(
+        (currentNode as IRecipeNode).stepsID
+      );
+      if (stepsNodeResp.success) {
+        setStepsNode(stepsNodeResp.payload);
+      } else {
+        console.log(stepsNodeResp.message);
+      }
+    };
     getDescriptionNode();
+    getIngredientsNode();
+    getStepsNode();
   }, [currentNode]);
+
   const handleUnitTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -229,6 +256,7 @@ export const RecipeContent = (props: RecipeContentProps) => {
             </div>
           </div>
         </div>
+        {/* <RecipeTimer /> */}
       </div>
       <div className="recipe-right">
         <div className="recipe-description-container">
@@ -242,11 +270,22 @@ export const RecipeContent = (props: RecipeContentProps) => {
         </div>
         <div className="recipe-ingredients-container">
           <b style={{ fontSize: 30 }}>Ingredients</b>
-          <div>
-            {(currentNode as IRecipeNode).ingredients.map((ingredient) => {
-              <p>{ingredient}</p>;
-            })}
+          <div className="ingredients">
+            {
+              <TextContent
+                nodeIdsToNodesMap={nodeIdsToNodesMap}
+                currentNode={ingredientsNode}
+              />
+            }
           </div>
+        </div>
+        <div className="recipe-steps-container">
+          {
+            <TextContent
+              nodeIdsToNodesMap={nodeIdsToNodesMap}
+              currentNode={stepsNode}
+            />
+          }
         </div>
       </div>
     </div>

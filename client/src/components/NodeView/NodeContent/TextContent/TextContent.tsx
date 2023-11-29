@@ -32,6 +32,9 @@ import Underline from "@tiptap/extension-underline";
 import { loadAnchorToLinksMap } from "../../NodeLinkMenu";
 import TextAlign from "@tiptap/extension-text-align";
 import { join } from "path";
+import BulletList from "@tiptap/extension-bullet-list";
+import ListItem from "@tiptap/extension-list-item";
+import OrderedList from "@tiptap/extension-ordered-list";
 
 export interface INodeLinkMenuProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
@@ -66,6 +69,9 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       }),
       Highlight,
       Underline,
+      BulletList,
+      ListItem,
+      OrderedList,
     ],
     content: currentNode?.content,
   });
@@ -79,7 +85,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       return failureServiceResponse("no editor");
     }
     const anchorResponse = await FrontendAnchorGateway.getAnchorsByNodeId(
-      currentNode.nodeId
+      currentNode?.nodeId
     );
     console.log(anchorResponse.payload, "payload");
     if (!anchorResponse || !anchorResponse.success) {
@@ -257,6 +263,9 @@ export const TextContent = (props: INodeLinkMenuProps) => {
 
   return (
     <div
+      onFocus={() => {
+        setEditing(true);
+      }}
       onBlur={() => {
         // setEditing(false);
       }}
@@ -264,13 +273,9 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     >
       {editing && <TextMenu editor={editor} save={handleContentChange} />}
       <EditorContent
-        style={{ padding: 10, whiteSpace: "pre-line" }}
-        className="editor-content"
+        className="editorContent"
         editor={editor}
         onPointerUp={onPointerUp}
-        onFocus={() => {
-          setEditing(true);
-        }}
       />
     </div>
   );
