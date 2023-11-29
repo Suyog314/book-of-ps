@@ -6,7 +6,7 @@ import { LuUtensils } from "react-icons/lu";
 import { useRecoilState } from "recoil";
 import { currentNodeState } from "~/global/Atoms";
 import "./RecipeContent.scss";
-import { IRecipeNode, NodeIdsToNodesMap } from "~/types";
+import { INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
 import {
   NumberDecrementStepper,
@@ -17,6 +17,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { TextContent } from "../TextContent";
+import { FrontendNodeGateway } from "~/nodes";
 
 export interface RecipeContentProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
@@ -32,6 +33,7 @@ export const RecipeContent = (props: RecipeContentProps) => {
   const [rightSelectedUnit, setRightSelectedUnit] = useState("");
   const [leftUnitValue, setLeftUnitValue] = useState<number>(0);
   const [rightUnitValue, setRightUnitValue] = useState<number>(0);
+  const [descriptionNode, setDescriptionNode] = useState<INode>();
   useEffect(() => {
     console.log(convert(2, "tsp").to("fl oz"));
     console.log(selectedUnitType);
@@ -49,6 +51,19 @@ export const RecipeContent = (props: RecipeContentProps) => {
     rightUnitValue,
   ]);
 
+  useEffect(() => {
+    const getDescriptionNode = async () => {
+      const descriptionNodeResp = await FrontendNodeGateway.getNode(
+        (currentNode as IRecipeNode).descriptionID
+      );
+      if (descriptionNodeResp.success) {
+        setDescriptionNode(descriptionNodeResp.payload);
+      } else {
+        console.log(descriptionNodeResp.message);
+      }
+    };
+    getDescriptionNode();
+  }, [currentNode]);
   const handleUnitTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -219,12 +234,10 @@ export const RecipeContent = (props: RecipeContentProps) => {
         <div className="recipe-description-container">
           <b style={{ fontSize: 30 }}>Description</b>
           <div>
-            {/* <TextContent
+            <TextContent
               nodeIdsToNodesMap={nodeIdsToNodesMap}
-              currentNode={currentNode}
-              isRecipe={true}
-            /> */}
-            {(currentNode as IRecipeNode).description.node.content}
+              currentNode={descriptionNode}
+            />
           </div>
         </div>
         <div className="recipe-ingredients-container"></div>

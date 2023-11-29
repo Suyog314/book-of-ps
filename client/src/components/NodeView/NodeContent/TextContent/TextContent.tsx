@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { FrontendAnchorGateway } from "../../../../anchors";
 import {
@@ -31,21 +31,26 @@ import Highlight from "@tiptap/extension-highlight";
 import Underline from "@tiptap/extension-underline";
 import { loadAnchorToLinksMap } from "../../NodeLinkMenu";
 import TextAlign from "@tiptap/extension-text-align";
+import { join } from "path";
 
 export interface INodeLinkMenuProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
   currentNode: INode;
-  isRecipe: boolean;
 }
 
 /** The content of an text node, including all its anchors */
 export const TextContent = (props: INodeLinkMenuProps) => {
-  const { currentNode, isRecipe } = props;
+  const { currentNode } = props;
   const [refresh] = useRecoilState(refreshState);
   const [anchorRefresh, setAnchorRefresh] = useRecoilState(refreshAnchorState);
   const [linkMenuRefresh, setLinkMenuRefresh] =
     useRecoilState(refreshLinkListState);
+  const [editing, setEditing] = useState(false);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
+
+  useEffect(() => {
+    console.log(editing);
+  }, [editing]);
 
   //editor and all extensions are added here
   const editor = useEditor({
@@ -62,9 +67,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       Highlight,
       Underline,
     ],
-    content: isRecipe
-      ? (currentNode as IRecipeNode).description.node.content
-      : currentNode.content,
+    content: currentNode?.content,
   });
 
   // TODO: Add all of the functionality for a rich text editor!
@@ -116,19 +119,10 @@ export const TextContent = (props: INodeLinkMenuProps) => {
   // Set the content and add anchor marks when this component loads
   useEffect(() => {
     if (editor) {
-      if (isRecipe) {
-        editor.commands.setContent(
-          (currentNode as IRecipeNode).description.content
-        );
-      } else {
-        editor.commands.setContent(currentNode.content);
-      }
+      editor.commands.setContent(currentNode?.content);
+
       addAnchorMarks();
     }
-    console.log((currentNode as IRecipeNode).description);
-    console.log(
-      ((currentNode as IRecipeNode).description as INode).node.content
-    );
   }, [currentNode, editor, refresh]);
 
   // Set the selected extent to null when this component loads
@@ -180,7 +174,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     findAnchorMarks(anchorIDToExtent, editorAnchorIds);
 
     const nodeAnchorIdsResp = await FrontendAnchorGateway.getAnchorsByNodeId(
-      currentNode.nodeId
+      currentNode?.nodeId
     );
     let anchorsToDelete: string[] = [];
     const linksToDelete: any[] = [];
@@ -229,12 +223,8 @@ export const TextContent = (props: INodeLinkMenuProps) => {
 
     //update content and re-add the anchor marks
     const content = editor?.getHTML();
-    let nodeProperty: INodeProperty;
-    if (isRecipe) {
-      nodeProperty = makeINodeProperty("description", content);
-    } else {
-      nodeProperty = makeINodeProperty("content", content);
-    }
+    const nodeProperty = makeINodeProperty("content", content);
+
     await FrontendNodeGateway.updateNode(currentNode.nodeId, [nodeProperty]);
     addAnchorMarks();
     setLinkMenuRefresh(!linkMenuRefresh);
@@ -262,17 +252,25 @@ export const TextContent = (props: INodeLinkMenuProps) => {
   };
 
   if (!editor) {
-    return <div className="text-content">{currentNode.content}</div>;
+    return <div className="text-content">{currentNode?.content}</div>;
   }
 
   return (
-    <div>
-      <TextMenu editor={editor} save={handleContentChange} />
+    <div
+      onBlur={() => {
+        // setEditing(false);
+      }}
+      className="editor-container"
+    >
+      {editing && <TextMenu editor={editor} save={handleContentChange} />}
       <EditorContent
         style={{ padding: 10, whiteSpace: "pre-line" }}
         className="editor-content"
         editor={editor}
         onPointerUp={onPointerUp}
+        onFocus={() => {
+          setEditing(true);
+        }}
       />
     </div>
   );

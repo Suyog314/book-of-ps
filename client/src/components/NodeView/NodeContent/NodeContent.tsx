@@ -32,7 +32,6 @@ export const NodeContent = (props: INodeContentProps) => {
         <TextContent
           nodeIdsToNodesMap={nodeIdsToNodesMap}
           currentNode={currentNode}
-          isRecipe={false}
         />
       );
     case "recipe":
