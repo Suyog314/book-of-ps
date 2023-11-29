@@ -9,6 +9,12 @@ $input-margin: 10px;
   margin-top: 12px;
   max-height: 70vh;
   .filters {
+    .time-section,
+    .serving-section {
+      display: flex;
+      flex-direction: column;
+      padding: 5px;
+    }
     .filter-button,
     .sort-button {
       background-color: white;

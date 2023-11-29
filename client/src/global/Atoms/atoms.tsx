@@ -1,5 +1,11 @@
 import { atom } from "recoil";
-import { INode, IAnchor, Extent, RecursiveNodeTree } from "../../types";
+import {
+  INode,
+  IAnchor,
+  Extent,
+  RecursiveNodeTree,
+  Cuisine,
+} from "../../types";
 import { emptyNode } from "~/components/MainView/mainViewUtils";
 
 // whether the app is loaded
@@ -89,4 +95,9 @@ export const alertTitleState = atom<string>({
 export const alertMessageState = atom<string>({
   key: "alertMessageState",
   default: "",
+});
+
+export const availCuisinesState = atom<Cuisine[]>({
+  key: "availCuisinesState",
+  default: [],
 });

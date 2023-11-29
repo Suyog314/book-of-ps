@@ -46,8 +46,9 @@ export interface INode {
   width?: number[];
 }
 export interface IRecipeNode extends INode {
+  descriptionID: string;
   ingredients: string[]; // a list of ingredients to make the recipe
-  steps: INode[]; // list of nodes detailing the steps for the recipe (text/image)
+  stepsIDs: string[]; // list of nodes detailing the steps for the recipe (text/image)
   serving: number; // number of people the recipe serves
   cuisine: Cuisine; // the cuisine that the recipe falls into
   time: number; // the amount of time the recipe takes to complete
@@ -58,7 +59,7 @@ export interface IFolderNode extends INode {
   viewType: FolderContentType;
 }
 
-export type NodeFields = keyof INode | keyof IFolderNode;
+export type NodeFields = keyof INode | keyof IFolderNode | keyof IRecipeNode;
 
 export const allNodeFields: string[] = [
   "nodeId",
@@ -69,6 +70,12 @@ export const allNodeFields: string[] = [
   "viewType",
   "height",
   "width",
+  "description",
+  "ingredients",
+  "steps",
+  "serving",
+  "cuisine",
+  "time",
 ];
 
 // Type declaration for map from nodeId --> INode
@@ -105,6 +112,39 @@ export function makeINode(
     type: type ?? "text",
     height: height ?? [],
     width: width ?? [],
+  };
+}
+
+export function makeIRecipeNode(
+  nodeId: any,
+  path: any,
+  description: any,
+  ingredients: any,
+  steps: any,
+  serving: any,
+  cuisine: any,
+  time: any,
+  children?: any,
+  type?: any,
+  title?: any,
+  content?: any,
+  height?: any,
+  width?: any
+): IRecipeNode {
+  return {
+    content: content ?? "content" + nodeId,
+    filePath: makeINodePath(path, children),
+    nodeId: nodeId,
+    title: title ?? "node" + nodeId,
+    type: type ?? "text",
+    height: height ?? [],
+    width: width ?? [],
+    descriptionID: description,
+    ingredients: ingredients,
+    stepsIDs: steps,
+    serving: serving,
+    cuisine: cuisine,
+    time: time,
   };
 }
 

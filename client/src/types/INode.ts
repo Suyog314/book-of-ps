@@ -45,8 +45,9 @@ export interface INode {
   width?: number[];
 }
 export interface IRecipeNode extends INode {
+  descriptionID: string;
   ingredients: string[]; // a list of ingredients to make the recipe
-  steps: INode[]; // list of nodes detailing the steps for the recipe (text/image)
+  stepsIDs: string[]; // list of nodes detailing the steps for the recipe (text/image)
   serving: number; // number of people the recipe serves
   cuisine: Cuisine; // the cuisine that the recipe falls into
   time: number; // the amount of time the recipe takes to complete
@@ -58,7 +59,7 @@ export interface IFolderNode extends INode {
   viewType: FolderContentType;
 }
 
-export type NodeFields = keyof INode | keyof IFolderNode;
+export type NodeFields = keyof INode | keyof IFolderNode | keyof IRecipeNode;
 
 // Type declaration for map from nodeId --> INode
 export type NodeIdsToNodesMap = { [nodeId: string]: INode };

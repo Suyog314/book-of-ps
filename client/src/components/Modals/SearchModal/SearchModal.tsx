@@ -6,7 +6,6 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  InputRightElement,
   Menu,
   MenuButton,
   MenuItem,
@@ -15,10 +14,16 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  Tooltip,
 } from "@chakra-ui/react";
 import { FrontendNodeGateway } from "~/nodes";
-import "./SearchModal.scss";
+import { LuUtensils } from "react-icons/lu";
 import { SearchResultItem } from "./SearchResultItem";
+import "./SearchModal.scss";
 
 export interface ISearchModalProps {
   isOpen: boolean;
@@ -31,10 +36,12 @@ export const SearchModal = (props: ISearchModalProps) => {
   const [searchResults, setSearchResults] = useState<any>([]);
   const [filteredResults, setFilteredResults] = useState<any>([]);
   const [sortingOrder, setSortingOrder] = useState<string>("relevance");
+  const [timeValue, setTimeValue] = useState(1);
+  const [servingValue, setServingValue] = useState(8);
+  const [showTimeTooltip, setShowTimeTooltip] = React.useState(false);
+  const [showServingTooltip, setShowServingTooltip] = React.useState(false);
 
-  useEffect(() => {
-    console.log(searchInput);
-  }, [searchInput]);
+  const cuisines = ["American", "Korean", "Chinese", "Mexican"];
 
   const handleInputChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -194,6 +201,85 @@ export const SearchModal = (props: ISearchModalProps) => {
                       </MenuItem>
                     </MenuList>
                   </Menu>
+                  <Menu>
+                    <MenuButton
+                      as={Button}
+                      leftIcon={<LuUtensils />}
+                      rightIcon={<ri.RiArrowDropDownLine />}
+                      className="filter-button"
+                    >
+                      Cuisine
+                    </MenuButton>
+
+                    <MenuList>
+                      {cuisines.map((cuisine, index) => (
+                        <MenuItem
+                          key={index}
+                          onClick={() => handleFiltering("text")}
+                        >
+                          {cuisine}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                  <div className="time-section">
+                    <div style={{ padding: "0px 10px 0px 0px" }}>Time:</div>
+                    <Slider
+                      className="time-slider"
+                      defaultValue={1}
+                      min={0}
+                      max={6}
+                      colorScheme="blue"
+                      onChange={(v) => setTimeValue(v)}
+                      onMouseEnter={() => setShowTimeTooltip(true)}
+                      onMouseLeave={() => setShowTimeTooltip(false)}
+                    >
+                      <SliderTrack>
+                        <SliderFilledTrack />
+                      </SliderTrack>
+                      <Tooltip
+                        hasArrow
+                        bg="blue.500"
+                        color="white"
+                        placement="top"
+                        isOpen={showTimeTooltip}
+                        label={`${timeValue}hr`}
+                      >
+                        <SliderThumb />
+                      </Tooltip>
+                    </Slider>
+                  </div>
+                  <div className="serving-section">
+                    <div style={{ display: "inline-block" }}>Serving Size:</div>
+                    <Slider
+                      className="serving-slider"
+                      defaultValue={8}
+                      min={1}
+                      max={16}
+                      colorScheme="blue"
+                      onChange={(v) => setServingValue(v)}
+                      onMouseEnter={() => setShowServingTooltip(true)}
+                      onMouseLeave={() => setShowServingTooltip(false)}
+                    >
+                      <SliderTrack>
+                        <SliderFilledTrack />
+                      </SliderTrack>
+                      <Tooltip
+                        hasArrow
+                        bg="blue.500"
+                        color="white"
+                        placement="top"
+                        isOpen={showServingTooltip}
+                        label={
+                          servingValue == 1
+                            ? "1 person"
+                            : `${servingValue} people`
+                        }
+                      >
+                        <SliderThumb />
+                      </Tooltip>
+                    </Slider>
+                  </div>
                 </div>
                 {filteredResults.map(
                   (

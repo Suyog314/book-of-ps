@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { FrontendAnchorGateway } from "../../../../anchors";
 import {
@@ -12,7 +12,9 @@ import { FrontendLinkGateway } from "../../../../links";
 import { FrontendNodeGateway } from "../../../../nodes";
 import {
   Extent,
+  INode,
   INodeProperty,
+  IRecipeNode,
   IServiceResponse,
   NodeIdsToNodesMap,
   failureServiceResponse,
@@ -29,19 +31,26 @@ import Highlight from "@tiptap/extension-highlight";
 import Underline from "@tiptap/extension-underline";
 import { loadAnchorToLinksMap } from "../../NodeLinkMenu";
 import TextAlign from "@tiptap/extension-text-align";
+import { join } from "path";
 
 export interface INodeLinkMenuProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
+  currentNode: INode;
 }
 
 /** The content of an text node, including all its anchors */
 export const TextContent = (props: INodeLinkMenuProps) => {
+  const { currentNode } = props;
   const [refresh] = useRecoilState(refreshState);
   const [anchorRefresh, setAnchorRefresh] = useRecoilState(refreshAnchorState);
   const [linkMenuRefresh, setLinkMenuRefresh] =
     useRecoilState(refreshLinkListState);
+  const [editing, setEditing] = useState(false);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
-  const [currentNode] = useRecoilState(currentNodeState);
+
+  useEffect(() => {
+    console.log(editing);
+  }, [editing]);
 
   //editor and all extensions are added here
   const editor = useEditor({
@@ -58,7 +67,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       Highlight,
       Underline,
     ],
-    content: currentNode.content,
+    content: currentNode?.content,
   });
 
   // TODO: Add all of the functionality for a rich text editor!
@@ -110,9 +119,8 @@ export const TextContent = (props: INodeLinkMenuProps) => {
   // Set the content and add anchor marks when this component loads
   useEffect(() => {
     if (editor) {
-      editor.commands.setContent(currentNode.content);
-      // editor?.commands.selectAll();
-      // editor?.commands.unsetLink();
+      editor.commands.setContent(currentNode?.content);
+
       addAnchorMarks();
     }
   }, [currentNode, editor, refresh]);
@@ -166,7 +174,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     findAnchorMarks(anchorIDToExtent, editorAnchorIds);
 
     const nodeAnchorIdsResp = await FrontendAnchorGateway.getAnchorsByNodeId(
-      currentNode.nodeId
+      currentNode?.nodeId
     );
     let anchorsToDelete: string[] = [];
     const linksToDelete: any[] = [];
@@ -215,7 +223,8 @@ export const TextContent = (props: INodeLinkMenuProps) => {
 
     //update content and re-add the anchor marks
     const content = editor?.getHTML();
-    const nodeProperty: INodeProperty = makeINodeProperty("content", content);
+    const nodeProperty = makeINodeProperty("content", content);
+
     await FrontendNodeGateway.updateNode(currentNode.nodeId, [nodeProperty]);
     addAnchorMarks();
     setLinkMenuRefresh(!linkMenuRefresh);
@@ -243,17 +252,25 @@ export const TextContent = (props: INodeLinkMenuProps) => {
   };
 
   if (!editor) {
-    return <div className="text-content">{currentNode.content}</div>;
+    return <div className="text-content">{currentNode?.content}</div>;
   }
 
   return (
-    <div>
-      <TextMenu editor={editor} save={handleContentChange} />
+    <div
+      onBlur={() => {
+        // setEditing(false);
+      }}
+      className="editor-container"
+    >
+      {editing && <TextMenu editor={editor} save={handleContentChange} />}
       <EditorContent
         style={{ padding: 10, whiteSpace: "pre-line" }}
         className="editor-content"
         editor={editor}
         onPointerUp={onPointerUp}
+        onFocus={() => {
+          setEditing(true);
+        }}
       />
     </div>
   );

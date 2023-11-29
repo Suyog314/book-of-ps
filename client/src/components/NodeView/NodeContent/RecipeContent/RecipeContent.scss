@@ -1,0 +1,94 @@
+@import "../../../../global/globalCssVariables";
+
+.recipe-container {
+  display: flex;
+  .recipe-left {
+    width: 30%;
+    padding: 16px;
+    .image-container {
+      width: 100%;
+      height: 60%;
+    }
+    .recipe-image {
+      width: 100%;
+      height: 100%;
+      border-radius: 15px;
+      object-fit: cover;
+    }
+    .cooking-stats {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 16px;
+
+      .serving {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .serving-icon {
+          margin-right: 8px;
+        }
+        .serving-number {
+          // font-weight: bold;
+        }
+        margin-right: 8px;
+      }
+      .time {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-right: 8px;
+        .time-icon {
+          margin-right: 8px;
+        }
+        .time-number {
+          // font-weight: bold;
+        }
+      }
+      .cuisine {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .cuisine-logo {
+          margin-right: 8px;
+        }
+        .cuisine-type {
+        }
+      }
+    }
+    .unit-converter {
+      .input-section {
+        display: flex;
+        margin-top: 16px;
+        align-items: center;
+        .left-input {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .right-input {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+        }
+      }
+      .unit-section {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        .left-unit,
+        .right-unit {
+          display: flex;
+          width: 44%;
+        }
+      }
+    }
+  }
+  .recipe-right {
+    padding: 16px;
+    .recipe-description {
+    }
+  }
+}

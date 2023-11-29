@@ -10,6 +10,7 @@ import {
 import uniqid from "uniqid";
 import { NodeType } from "../types";
 import { INodePath } from "../types";
+import { LuUtensils } from "react-icons/lu";
 
 export const nodeTypeIcon = (type: NodeType): JSX.Element => {
   switch (type) {
@@ -23,6 +24,8 @@ export const nodeTypeIcon = (type: NodeType): JSX.Element => {
       return <RiImageLine />;
     case "pdf":
       return <RiFilePdfLine />;
+    case "recipe":
+      return <LuUtensils />;
     default:
       return <RiQuestionLine />;
   }
