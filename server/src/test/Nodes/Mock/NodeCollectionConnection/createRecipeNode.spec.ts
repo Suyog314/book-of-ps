@@ -38,30 +38,23 @@ describe("Unit Test: createRecipeNode", () => {
   });
 
   test("successfully creates recipe node", async () => {
-    const description: INode = makeINode(
-      "1",
-      ["1"],
-      null,
-      null,
-      null,
-      "test description"
-    );
-    const step1: INode = makeINode("2", ["2"], null, null, "step1");
-    const step2: INode = makeINode("3", ["3"], null, null, "step2");
-    const steps: INode[] = [step1, step2];
-    const ingredients: string[] = ["ing1", "ing2"];
+    const descriptionId: string = "descriptionId";
+    const stepsId: string = "stepId";
+    const ingredientsId: string = "ing1";
     const serving: number = 4;
     const cuisine: Cuisine = "Korean";
     const time: number = 9;
+    const authorId: string = "authorId";
     const recipeNode: IRecipeNode = makeIRecipeNode(
       "4",
       ["4"],
-      description,
-      ingredients,
-      steps,
+      descriptionId,
+      ingredientsId,
+      stepsId,
       serving,
       cuisine,
-      time
+      time,
+      authorId
     );
     const createResponse = await nodeCollectionConnection.insertNode(
       recipeNode
@@ -70,20 +63,20 @@ describe("Unit Test: createRecipeNode", () => {
     const findNodeResp = await nodeCollectionConnection.findNodeById("4");
     expect(findNodeResp.success).toBeTruthy();
     const nodeQuery: IRecipeNode = findNodeResp.payload as IRecipeNode;
-    expect(nodeQuery.description.content).toEqual("test description");
-    expect(nodeQuery.ingredients.length).toEqual(2);
-    expect(nodeQuery.ingredients[0]).toEqual("ing1");
-    expect(nodeQuery.steps.length).toEqual(2);
-    expect(nodeQuery.steps[1].title).toEqual("step2");
+    expect(nodeQuery.descriptionID).toEqual("descriptionId");
+    expect(nodeQuery.ingredientsID).toEqual("ing1");
+    expect(nodeQuery.stepsID).toEqual("stepId");
     expect(nodeQuery.serving).toEqual(4);
     expect(nodeQuery.cuisine).toEqual("Korean");
     expect(nodeQuery.time).toEqual(9);
+    expect(nodeQuery.authorId).toEqual("authorId");
   });
 
   test("successfully creates recipe node with all empty fields", async () => {
     const recipeNode: IRecipeNode = makeIRecipeNode(
       "1",
       ["1"],
+      null,
       null,
       null,
       null,
@@ -98,11 +91,12 @@ describe("Unit Test: createRecipeNode", () => {
     const findNodeResp = await nodeCollectionConnection.findNodeById("1");
     expect(findNodeResp.success).toBeTruthy();
     const nodeQuery: IRecipeNode = findNodeResp.payload as IRecipeNode;
-    expect(nodeQuery.description).toBeNull();
-    expect(nodeQuery.ingredients).toBeNull();
-    expect(nodeQuery.steps).toBeNull();
+    expect(nodeQuery.descriptionID).toBeNull();
+    expect(nodeQuery.ingredientsID).toBeNull();
+    expect(nodeQuery.stepsID).toBeNull();
     expect(nodeQuery.serving).toBeNull();
     expect(nodeQuery.cuisine).toBeNull();
     expect(nodeQuery.time).toBeNull();
+    expect(nodeQuery.authorId).toBeNull();
   });
 });
