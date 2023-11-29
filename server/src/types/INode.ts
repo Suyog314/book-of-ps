@@ -2,10 +2,28 @@ import { isSameFilePath } from ".";
 import INodePath, { makeINodePath } from "./INodePath";
 
 // nodeTypes returns a string array of the types available
-export const nodeTypes: string[] = ["text", "image", "folder"];
+export const nodeTypes: string[] = ["text", "image", "folder", "recipe"];
 
 // Supported nodeTypes for file browser
-export type NodeType = "text" | "image" | "folder" | "pdf" | "audio" | "video";
+export type NodeType =
+  | "text"
+  | "image"
+  | "folder"
+  | "pdf"
+  | "audio"
+  | "video"
+  | "recipe";
+
+// type representing valid cuisines in our applicaiton
+export type Cuisine =
+  | "American"
+  | "Italian"
+  | "Chinese"
+  | "Korean"
+  | "French"
+  | "Mexican"
+  | "Japanese"
+  | "British";
 
 /**
  * // TODO [Editable]: Since we want to store new metadata for images we should add
@@ -27,7 +45,13 @@ export interface INode {
   height?: number[];
   width?: number[];
 }
-
+export interface IRecipeNode extends INode {
+  ingredients: string[]; // a list of ingredients to make the recipe
+  steps: INode[]; // list of nodes detailing the steps for the recipe (text/image)
+  serving: number; // number of people the recipe serves
+  cuisine: Cuisine; // the cuisine that the recipe falls into
+  time: number; // the amount of time the recipe takes to complete
+}
 export type FolderContentType = "list" | "grid";
 
 export interface IFolderNode extends INode {
