@@ -126,7 +126,6 @@ export const TextContent = (props: INodeLinkMenuProps) => {
   useEffect(() => {
     if (editor) {
       editor.commands.setContent(currentNode?.content);
-
       addAnchorMarks();
     }
   }, [currentNode, editor, refresh]);

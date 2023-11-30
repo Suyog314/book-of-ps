@@ -62,6 +62,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   const [serving, setServing] = useState(0);
   const [cookTime, setCookTime] = useState(new Date());
   const [cuisine, setCuisine] = useState("");
+  const [description, setDescription] = useState("");
   const [selectedType, setSelectedType] = useState<NodeType>("" as NodeType);
   const [error, setError] = useState<string>("");
 
@@ -106,6 +107,13 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   const handleCuisineChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCuisine(event.target.value);
   };
+
+  const handleDescriptionchange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setDescription(event.target.value);
+  };
+
   const displayCuisines = () => {
     return allCuisines.map((cuisine) => (
       <option key={cuisine}>{cuisine}</option>
@@ -115,7 +123,8 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   useEffect(() => {
     console.log(serving);
     console.log(cuisine);
-  }, [serving, cuisine]);
+    console.log(description);
+  }, [serving, cuisine, description]);
 
   // called when the "Create" button is clicked
   const handleSubmit = async () => {
@@ -193,7 +202,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   const isRecipe: boolean = selectedType === "recipe";
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose}>
+    <Modal isOpen={isOpen} onClose={handleClose} size={"4xl"}>
       <div className="modal-font">
         <ModalOverlay />
         <ModalContent>
@@ -270,14 +279,39 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
                       </NumberInputStepper>
                     </NumberInput>
                     <CookTimeInput onChange={handleRecipeTimeChange} />
+                    <Select
+                      value={cuisine}
+                      placeholder="Cuisine"
+                      onChange={handleCuisineChange}
+                      className="cuisine-select"
+                    >
+                      {displayCuisines()}
+                    </Select>
                   </div>
-                  <Select
-                    value={cuisine}
-                    placeholder="Cuisine"
-                    onChange={handleCuisineChange}
-                  >
-                    {displayCuisines()}
-                  </Select>
+                  <div className="recipe-type-inputs">
+                    <Textarea
+                      style={{ width: "90%" }}
+                      value={description}
+                      onChange={handleDescriptionchange}
+                      placeholder={"Description..."}
+                    />
+                    <Textarea
+                      style={{
+                        width: "75%",
+                        marginLeft: "10px",
+                        marginRight: "10px",
+                      }}
+                      value={description}
+                      onChange={handleDescriptionchange}
+                      placeholder="Ingredients.."
+                    />
+                    <Textarea
+                      style={{ width: "90%" }}
+                      value={description}
+                      onChange={handleDescriptionchange}
+                      placeholder="Steps..."
+                    />
+                  </div>
 
                   <div></div>
                 </div>

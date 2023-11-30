@@ -135,7 +135,6 @@ export const RecipeContent = (props: RecipeContentProps) => {
   };
 
   const displayUnits = () => {
-    console.log("displayUnits");
     switch (selectedUnitType) {
       case "Temperature":
         return tempUnits.map((tempUnit) => (
