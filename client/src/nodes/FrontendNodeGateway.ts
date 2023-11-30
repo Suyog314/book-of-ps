@@ -166,14 +166,22 @@ export const FrontendNodeGateway = {
     }
   },
 
-  searchNodes: async (query: string): Promise<IServiceResponse<any>> => {
+  searchNodes: async (
+    query: string,
+    sortType: string
+  ): Promise<IServiceResponse<INode[]>> => {
     try {
-      return await post<IServiceResponse<any>>(
-        baseEndpoint + servicePath + "search/",
-        { query: query }
+      return await post<IServiceResponse<INode[]>>(
+        baseEndpoint + servicePath + "search",
+        {
+          query: query,
+          sortType: sortType,
+        }
       );
     } catch (exception) {
-      return failureServiceResponse("[searchNodes] Unable to access backend");
+      return failureServiceResponse(
+        "[searchForNodes] Unable to access backend"
+      );
     }
   },
 };

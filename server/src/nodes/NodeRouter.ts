@@ -57,12 +57,10 @@ export class NodeRouter {
     NodeExpressRouter.post("/search", async (req: Request, res: Response) => {
       try {
         const query = req.body.query;
-        if (!(typeof query === "string")) {
-          res.status(400).send("query not a string!");
-        } else {
-          const response = await this.BackendNodeGateway.searchNodes(query);
-          res.status(200).send(response);
-        }
+        const sortType = req.body.sortType;
+        const response: IServiceResponse<INode[]> =
+          await this.BackendNodeGateway.searchNodes(query, sortType);
+        res.status(200).send(response);
       } catch (e) {
         res.status(500).send(e.message);
       }

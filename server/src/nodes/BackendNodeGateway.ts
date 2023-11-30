@@ -94,8 +94,11 @@ export class BackendNodeGateway {
    * @param query
    * @returns IServiceResponse<INode[]>
    */
-  async searchNodes(query: string): Promise<IServiceResponse<any>> {
-    return this.nodeCollectionConnection.searchNodes(query);
+  async searchNodes(
+    query: string,
+    sortType: string
+  ): Promise<IServiceResponse<any>> {
+    return this.nodeCollectionConnection.searchNodes(query, sortType);
   }
   /**
    * Method to retrieve node with a given nodeId.

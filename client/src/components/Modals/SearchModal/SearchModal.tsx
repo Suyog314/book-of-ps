@@ -32,12 +32,12 @@ export interface ISearchModalProps {
 export const SearchModal = (props: ISearchModalProps) => {
   const { isOpen, onClose } = props;
   const [searchInput, setSearchInput] = useState("");
-  const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any>([]);
-  const [filteredResults, setFilteredResults] = useState<any>([]);
-  const [sortingOrder, setSortingOrder] = useState<string>("relevance");
+  const [filterType, setFilterType] = useState("");
+  const [sortType, setSortType] = useState("");
+  const [cuisineType, setCuisineType] = useState("");
   const [timeValue, setTimeValue] = useState(1);
-  const [servingValue, setServingValue] = useState(8);
+  const [servingValue, setServingValue] = useState(4);
   const [showTimeTooltip, setShowTimeTooltip] = React.useState(false);
   const [showServingTooltip, setShowServingTooltip] = React.useState(false);
 
@@ -50,79 +50,42 @@ export const SearchModal = (props: ISearchModalProps) => {
   };
 
   const onSearch = async () => {
-    const searchResp = await FrontendNodeGateway.searchNodes(searchInput);
-    if (searchResp.success) {
-      setSearchResults(searchResp.payload);
-      setFilteredResults(searchResp.payload);
-    } else {
-      console.log(searchResp.message);
-      setSearchResults([]);
-      setFilteredResults([]);
+    const searchRes = await FrontendNodeGateway.searchNodes(
+      searchInput,
+      sortType
+    );
+    if (!searchRes.success) {
+      console.error(searchRes.message);
+      return;
     }
+
+    let searchNodes = searchRes.payload;
+    if (filterType != "") {
+      searchNodes = searchNodes.filter((node) => {
+        return filterType.toLowerCase() == node.type;
+      });
+    }
+    if (cuisineType != "") {
+      searchNodes = searchNodes.filter((node) => {
+        return;
+      });
+    }
+    setSearchResults(searchNodes);
   };
 
   useEffect(() => {
-    console.log(searchResults);
-  }, [searchResults]);
-
-  useEffect(() => {
     onSearch();
-  }, [searchInput]);
-
-  useEffect(() => {
-    console.log(searching);
-  }, [searching]);
+  }, [searchInput, filterType, sortType, timeValue, servingValue]);
 
   const handleClose = () => {
     setSearchInput("");
     setSearchResults([]);
+    setFilterType("");
+    setSortType("");
+    setCuisineType("");
+    setTimeValue(1);
+    setServingValue(4);
     onClose();
-  };
-
-  useEffect(() => {
-    console.log(filteredResults);
-  }, [filteredResults]);
-
-  const handleFiltering = (type: string) => {
-    if (type === "all") {
-      setFilteredResults(searchResults);
-      handleSorting(sortingOrder, searchResults);
-    } else {
-      const newSearchResults = searchResults.filter(
-        (result: { type: string }) => {
-          return result.type === type;
-        }
-      );
-      setFilteredResults(newSearchResults);
-      handleSorting(sortingOrder, newSearchResults);
-    }
-  };
-
-  const handleSorting = (order: string, results = filteredResults) => {
-    setSortingOrder(order);
-    const newSearchResults = [...results];
-    console.log(newSearchResults);
-
-    if (order === "oldest") {
-      newSearchResults.sort((a, b) => {
-        const dateATime = new Date(a.dateCreated).getTime();
-        const dateBTime = new Date(b.dateCreated).getTime();
-        return dateATime - dateBTime;
-      });
-    } else if (order === "newest") {
-      newSearchResults.sort((a, b) => {
-        const dateATime = new Date(a.dateCreated).getTime();
-        const dateBTime = new Date(b.dateCreated).getTime();
-        return dateBTime - dateATime;
-      });
-    } else if (order === "relevance") {
-      newSearchResults.sort((a, b) => {
-        const scoreA = a.score;
-        const scoreB = b.score;
-        return scoreB - scoreA;
-      });
-    }
-    setFilteredResults(newSearchResults);
   };
 
   return (
@@ -145,8 +108,6 @@ export const SearchModal = (props: ISearchModalProps) => {
                 value={searchInput}
                 border="0px"
                 onChange={handleInputChange}
-                onFocus={() => setSearching(true)}
-                onBlur={() => setSearching(false)}
                 focusBorderColor="white"
                 variant={"unstyled"}
                 height={"60px"}
@@ -162,20 +123,18 @@ export const SearchModal = (props: ISearchModalProps) => {
                       rightIcon={<ri.RiArrowDropDownLine />}
                       className="filter-button"
                     >
-                      Filter by
+                      {filterType == "" ? "Filter By:" : filterType}
                     </MenuButton>
 
                     <MenuList>
-                      <MenuItem onClick={() => handleFiltering("all")}>
-                        All
-                      </MenuItem>
-                      <MenuItem onClick={() => handleFiltering("text")}>
+                      <MenuItem onClick={() => setFilterType("")}>All</MenuItem>
+                      <MenuItem onClick={() => setFilterType("Text")}>
                         Text
                       </MenuItem>
-                      <MenuItem onClick={() => handleFiltering("image")}>
+                      <MenuItem onClick={() => setFilterType("Image")}>
                         Image
                       </MenuItem>
-                      <MenuItem onClick={() => handleFiltering("folder")}>
+                      <MenuItem onClick={() => setFilterType("Folder")}>
                         Folder
                       </MenuItem>
                     </MenuList>
@@ -187,16 +146,16 @@ export const SearchModal = (props: ISearchModalProps) => {
                       rightIcon={<ri.RiArrowDropDownLine />}
                       className="sort-button"
                     >
-                      Sort
+                      {sortType == "" ? "Sort" : sortType}
                     </MenuButton>
                     <MenuList>
-                      <MenuItem onClick={() => handleSorting("relevance")}>
+                      <MenuItem onClick={() => setSortType("")}>
                         Relevance
                       </MenuItem>
-                      <MenuItem onClick={() => handleSorting("newest")}>
+                      <MenuItem onClick={() => setSortType("Newest")}>
                         Created: Newest First
                       </MenuItem>
-                      <MenuItem onClick={() => handleSorting("oldest")}>
+                      <MenuItem onClick={() => setSortType("Oldest")}>
                         Created: Oldest First
                       </MenuItem>
                     </MenuList>
@@ -212,10 +171,13 @@ export const SearchModal = (props: ISearchModalProps) => {
                     </MenuButton>
 
                     <MenuList>
+                      <MenuItem onClick={() => setCuisineType("")}>
+                        All
+                      </MenuItem>
                       {cuisines.map((cuisine, index) => (
                         <MenuItem
                           key={index}
-                          onClick={() => handleFiltering("text")}
+                          onClick={() => setCuisineType(cuisine)}
                         >
                           {cuisine}
                         </MenuItem>
@@ -253,7 +215,7 @@ export const SearchModal = (props: ISearchModalProps) => {
                     <div style={{ display: "inline-block" }}>Serving Size:</div>
                     <Slider
                       className="serving-slider"
-                      defaultValue={8}
+                      defaultValue={4}
                       min={1}
                       max={16}
                       colorScheme="blue"
@@ -281,7 +243,7 @@ export const SearchModal = (props: ISearchModalProps) => {
                     </Slider>
                   </div>
                 </div>
-                {filteredResults.map(
+                {searchResults.map(
                   (
                     result: {
                       type: string;

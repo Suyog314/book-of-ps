@@ -32,35 +32,39 @@ export class NodeCollectionConnection {
     this.collectionName = collectionName ?? "nodes";
   }
 
-  async searchNodes(string: string): Promise<any> {
-    await this.client
-      .db()
-      .collection(this.collectionName)
-      .createIndex({ title: "text", content: "text" });
+  async searchNodes(query: string, sortType: string): Promise<any> {
+    const collection = this.client.db().collection(this.collectionName);
 
-    const query = { $text: { $search: string } };
-    console.log(query);
+    //create text indices for title and content fields
+    collection.createIndex({ title: "text", content: "text" });
 
-    const sort: { score: { $meta: "textScore" } } = {
-      score: { $meta: "textScore" },
-    };
+    const myquery = { $text: { $search: query } };
     const projection = {
       _id: 0,
       title: 1,
-      nodeId: 1,
       type: 1,
+      nodeId: 1,
       dateCreated: 1,
       score: { $meta: "textScore" },
     };
 
-    const nodes = await this.client.db().collection(this.collectionName);
-    const cursor = nodes.find(query).sort(sort).project(projection);
-    const documents = await cursor.toArray();
-    if (documents.length == 0) {
-      return failureServiceResponse("No Search Results Found");
+    const nodes: INode[] = [];
+    let sort = {};
+    if (sortType == "Newest") {
+      sort = { dateCreated: -1 };
+    } else if (sortType == "Oldest") {
+      sort = { dateCreated: 1 };
     } else {
-      return successfulServiceResponse(documents);
+      sort = { score: { $meta: "textScore" } };
     }
+    await collection
+      .find(myquery)
+      .sort(sort)
+      .project(projection)
+      .forEach(function (node) {
+        nodes.push(node);
+      });
+    return successfulServiceResponse(nodes);
   }
 
   /**
