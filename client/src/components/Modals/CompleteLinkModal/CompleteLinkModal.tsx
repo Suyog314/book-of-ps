@@ -63,6 +63,7 @@ export const CompleteLinkModal = (props: ICompleteLinkModalProps) => {
   // Called when the "Submit" button is clicked
   const handleSubmit = async () => {
     // create link from modal
+    console.log(startAnchor, endAnchor);
     if (startAnchor && endAnchor) {
       let link: ILink | null = null;
 

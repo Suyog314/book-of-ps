@@ -45,6 +45,7 @@ export interface INodeLinkMenuProps {
 export const TextContent = (props: INodeLinkMenuProps) => {
   const { currentNode } = props;
   const [refresh] = useRecoilState(refreshState);
+  const setCurrentNode = useSetRecoilState(currentNodeState);
   const [anchorRefresh, setAnchorRefresh] = useRecoilState(refreshAnchorState);
   const [linkMenuRefresh, setLinkMenuRefresh] =
     useRecoilState(refreshLinkListState);
@@ -53,6 +54,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
 
   useEffect(() => {
     console.log(editing);
+    console.log(currentNode?.title);
   }, [editing]);
 
   //editor and all extensions are added here
@@ -100,6 +102,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       const linkResponse = await FrontendLinkGateway.getLinksByAnchorId(
         anchor.anchorId
       );
+      console.log(linkResponse.payload);
       if (!linkResponse.success) {
         return failureServiceResponse("failed to get link");
       }
@@ -264,6 +267,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     <div
       onFocus={() => {
         setEditing(true);
+        setCurrentNode(currentNode);
       }}
       onBlur={() => {
         // setEditing(false);
