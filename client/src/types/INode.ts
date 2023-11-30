@@ -64,6 +64,16 @@ export type NodeFields = keyof INode | keyof IFolderNode | keyof IRecipeNode;
 // Type declaration for map from nodeId --> INode
 export type NodeIdsToNodesMap = { [nodeId: string]: INode };
 
+export const allCuisines: string[] = [
+  "American",
+  "Italian",
+  "Chinese",
+  "Korean",
+  "French",
+  "Mexican",
+  "Japanese",
+  "British",
+];
 /**
  * Function that creates an INode given relevant inputs
  * @param nodeId

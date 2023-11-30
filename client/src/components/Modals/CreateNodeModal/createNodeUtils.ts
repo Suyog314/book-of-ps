@@ -30,7 +30,7 @@ export interface ICreateNodeModalAttributes {
   stepsID?: string;
   serving?: number;
   cuisine?: Cuisine;
-  time?: number;
+  time?: Date;
 }
 
 /**

@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import "./CookTimeInput.scss";
 
 export interface CookTimeInputProps {
-  onChange: () => void;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 export const CookTimeInput = (props: CookTimeInputProps) => {
   const { onChange } = props;
