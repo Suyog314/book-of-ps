@@ -14,6 +14,9 @@ import {
   NumberDecrementStepper,
   NumberInputStepper,
   NumberInputField,
+  PinInput,
+  PinInputField,
+  HStack,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import {
@@ -29,6 +32,7 @@ import "./CreateNodeModal.scss";
 import { createNodeFromModal, getMeta, uploadImage } from "./createNodeUtils";
 import { useSetRecoilState } from "recoil";
 import { selectedNodeState } from "../../../global/Atoms";
+import { CookTimeInput } from "./CookTimeInput";
 
 export interface ICreateNodeModalProps {
   isOpen: boolean;
@@ -204,13 +208,17 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
             {selectedType && isRecipe && (
               <div className="modal-input">
                 <div className="recipe-nontext">
-                  <NumberInput size="lg" maxW={32} defaultValue={15} min={10}>
-                    <NumberInputField />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
+                  <div className="inputs">
+                    <NumberInput size="md" maxW={32} defaultValue={4}>
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                    <CookTimeInput />
+                  </div>
+                  <div></div>
                 </div>
                 <div className="recipe-text"></div>
               </div>
