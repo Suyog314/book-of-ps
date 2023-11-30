@@ -1,11 +1,14 @@
 import React, { useState, useRef } from "react";
 import "./CookTimeInput.scss";
 
-export const CookTimeInput = () => {
+export interface CookTimeInputProps {
+  onChange: () => void;
+}
+export const CookTimeInput = (props: CookTimeInputProps) => {
+  const { onChange } = props;
   const [hours, setHours] = useState("");
   const [minutes, setMinutes] = useState("");
   const [seconds, setSeconds] = useState("");
-  const [inputInFocus, setInputInFocus] = useState(null);
 
   const hoursInputRef = useRef(null);
   const minutesInputRef = useRef(null);

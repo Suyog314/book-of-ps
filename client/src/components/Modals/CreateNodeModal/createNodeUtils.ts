@@ -8,6 +8,8 @@ import {
   makeINodePath,
   NodeIdsToNodesMap,
   NodeType,
+  IRecipeNode,
+  Cuisine,
 } from "../../../types";
 
 export async function http<T>(request: AxiosRequestConfig): Promise<T> {
@@ -23,6 +25,12 @@ export interface ICreateNodeModalAttributes {
   type: NodeType; // if null, add node as a root
   height: number[];
   width: number[];
+  descriptionID?: string;
+  ingredientsID?: string;
+  stepsID?: string;
+  serving?: number;
+  cuisine?: Cuisine;
+  time?: number;
 }
 
 /**
@@ -77,6 +85,12 @@ export async function createNodeFromModal({
   nodeIdsToNodesMap,
   height,
   width,
+  descriptionID,
+  ingredientsID,
+  stepsID,
+  serving,
+  cuisine,
+  time,
 }: ICreateNodeModalAttributes): Promise<INode | null> {
   const nodeId = generateObjectId(type);
   // Initial filePath value: create node as a new root
@@ -92,7 +106,7 @@ export async function createNodeFromModal({
     }
   }
 
-  let newNode: INode | IFolderNode = {
+  let newNode: INode | IFolderNode | IRecipeNode = {
     content: content,
     dateCreated: new Date(),
     filePath: filePath,
@@ -110,6 +124,16 @@ export async function createNodeFromModal({
         viewType: "grid",
       };
       break;
+    case "recipe":
+      newNode = {
+        ...newNode,
+        descriptionID: descriptionID,
+        ingredientsID: ingredientsID,
+        stepsID: stepsID,
+        serving: serving,
+        cuisine: cuisine,
+        time: time,
+      };
   }
 
   const nodeResponse = await FrontendNodeGateway.createNode(newNode);

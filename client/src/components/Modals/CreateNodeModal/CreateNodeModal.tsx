@@ -57,6 +57,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   );
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [serving, setServing] = useState(0);
   const [selectedType, setSelectedType] = useState<NodeType>("" as NodeType);
   const [error, setError] = useState<string>("");
 
@@ -84,6 +85,16 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     setContent(event.target.value);
   };
 
+  const handleRecipeServingChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setServing(Number(event.target.value));
+  };
+
+  const handleRecipeTimeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {};
+
   // called when the "Create" button is clicked
   const handleSubmit = async () => {
     if (!nodeTypes.includes(selectedType)) {
@@ -102,7 +113,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       height = [getMetaRes.normalizedHeight, getMetaRes.normalizedHeight];
     }
 
-    const attributes = {
+    let attributes = {
       content,
       nodeIdsToNodesMap,
       parentNodeId: selectedParentNode ? selectedParentNode.nodeId : null,
@@ -111,6 +122,12 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       height,
       width,
     };
+
+    if (selectedType == "recipe") {
+      attributes = {
+        ...attributes,
+      };
+    }
     const node = await createNodeFromModal(attributes);
     node && setSelectedNode(node);
     onSubmit();
@@ -209,14 +226,25 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
               <div className="modal-input">
                 <div className="recipe-nontext">
                   <div className="inputs">
-                    <NumberInput size="md" maxW={32} defaultValue={4}>
-                      <NumberInputField />
+                    <NumberInput
+                      size="md"
+                      maxW={32}
+                      defaultValue={4}
+                      onChange={(valueString: string) => {
+                        setServing(Number(valueString));
+                      }}
+                    >
+                      <NumberInputField
+                        onChange={(event) => {
+                          handleRecipeServingChange(event);
+                        }}
+                      />
                       <NumberInputStepper>
                         <NumberIncrementStepper />
                         <NumberDecrementStepper />
                       </NumberInputStepper>
                     </NumberInput>
-                    <CookTimeInput />
+                    <CookTimeInput onChange={} />
                   </div>
                   <div></div>
                 </div>
