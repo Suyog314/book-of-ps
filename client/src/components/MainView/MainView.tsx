@@ -17,6 +17,7 @@ import {
   alertMessageState,
   isAppLoadedState,
   rootNodesState,
+  isLoggedIn,
 } from "../../global/Atoms";
 import { useRouter } from "next/router";
 import { FrontendNodeGateway } from "../../nodes";

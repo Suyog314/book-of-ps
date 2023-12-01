@@ -39,7 +39,6 @@ export class NodeCollectionConnection {
       .createIndex({ title: "text", content: "text" });
 
     const query = { $text: { $search: string } };
-    console.log(query);
 
     const sort: { score: { $meta: "textScore" } } = {
       score: { $meta: "textScore" },

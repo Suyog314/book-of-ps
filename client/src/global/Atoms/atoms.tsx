@@ -101,3 +101,18 @@ export const availCuisinesState = atom<Set<Cuisine>>({
   key: "availCuisinesState",
   default: new Set(),
 });
+
+export const isLoggedIn = atom<boolean>({
+  key: "isLogginIn",
+  default: false,
+});
+
+export const userName = atom<string>({
+  key: "userName",
+  default: "",
+});
+
+export const userId = atom<string>({
+  key: "userId",
+  default: "",
+});
