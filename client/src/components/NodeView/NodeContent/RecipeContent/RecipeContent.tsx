@@ -9,6 +9,7 @@ import "./RecipeContent.scss";
 import { INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
 import {
+  Link,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -26,6 +27,7 @@ export interface RecipeContentProps {
 export const RecipeContent = (props: RecipeContentProps) => {
   const { nodeIdsToNodesMap } = props;
   const [currentNode] = useRecoilState(currentNodeState);
+  const [editingNodeID, setEditingNodeID] = useState("");
   const [tempUnits] = useState(["celsius", "fahrenheit", "kelvin"]);
   const [volumeUnits] = useState(["ml", "l", "fl oz", "cup", "tsp"]);
   const [weightUnits] = useState(["oz", "lb", "g", "kg"]);
@@ -135,7 +137,6 @@ export const RecipeContent = (props: RecipeContentProps) => {
   };
 
   const displayUnits = () => {
-    console.log("displayUnits");
     switch (selectedUnitType) {
       case "Temperature":
         return tempUnits.map((tempUnit) => (
@@ -262,20 +263,26 @@ export const RecipeContent = (props: RecipeContentProps) => {
         <div className="recipe-description-container">
           <b style={{ fontSize: 30 }}>Description</b>
           <div>
-            <TextContent
-              nodeIdsToNodesMap={nodeIdsToNodesMap}
-              currentNode={descriptionNode}
-            />
+            <Link href={`/${descriptionNode?.nodeId}`}>
+              <TextContent
+                nodeIdsToNodesMap={nodeIdsToNodesMap}
+                currentNode={descriptionNode}
+                setEditingID={setEditingNodeID}
+              />
+            </Link>
           </div>
         </div>
         <div className="recipe-ingredients-container">
           <b style={{ fontSize: 30 }}>Ingredients</b>
           <div className="ingredients">
             {
-              <TextContent
-                nodeIdsToNodesMap={nodeIdsToNodesMap}
-                currentNode={ingredientsNode}
-              />
+              <Link href={`/${ingredientsNode?.nodeId}`}>
+                <TextContent
+                  nodeIdsToNodesMap={nodeIdsToNodesMap}
+                  currentNode={ingredientsNode}
+                  setEditingID={setEditingNodeID}
+                />
+              </Link>
             }
           </div>
         </div>

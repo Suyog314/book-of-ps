@@ -9,21 +9,32 @@ import {
   ModalOverlay,
   Select,
   Textarea,
+  NumberInput,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  NumberInputStepper,
+  NumberInputField,
+  PinInput,
+  PinInputField,
+  HStack,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   INode,
   NodeIdsToNodesMap,
   NodeType,
   nodeTypes,
   RecursiveNodeTree,
+  allCuisines,
 } from "../../../types";
+
 import { Button } from "../../Button";
 import { TreeView } from "../../TreeView";
 import "./CreateNodeModal.scss";
 import { createNodeFromModal, getMeta, uploadImage } from "./createNodeUtils";
 import { useSetRecoilState } from "recoil";
 import { selectedNodeState } from "../../../global/Atoms";
+import { CookTimeInput } from "./CookTimeInput";
 
 export interface ICreateNodeModalProps {
   isOpen: boolean;
@@ -48,6 +59,10 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   );
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [serving, setServing] = useState(0);
+  const [cookTime, setCookTime] = useState(new Date());
+  const [cuisine, setCuisine] = useState("");
+  const [description, setDescription] = useState("");
   const [selectedType, setSelectedType] = useState<NodeType>("" as NodeType);
   const [error, setError] = useState<string>("");
 
@@ -75,6 +90,42 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     setContent(event.target.value);
   };
 
+  const handleRecipeServingChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setServing(Number(event.target.value));
+  };
+
+  const handleRecipeTimeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const str = event.target.value;
+    const time = new Date();
+    setCookTime(time);
+  };
+
+  const handleCuisineChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setCuisine(event.target.value);
+  };
+
+  const handleDescriptionchange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setDescription(event.target.value);
+  };
+
+  const displayCuisines = () => {
+    return allCuisines.map((cuisine) => (
+      <option key={cuisine}>{cuisine}</option>
+    ));
+  };
+
+  useEffect(() => {
+    console.log(serving);
+    console.log(cuisine);
+    console.log(description);
+  }, [serving, cuisine, description]);
+
   // called when the "Create" button is clicked
   const handleSubmit = async () => {
     if (!nodeTypes.includes(selectedType)) {
@@ -93,7 +144,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       height = [getMetaRes.normalizedHeight, getMetaRes.normalizedHeight];
     }
 
-    const attributes = {
+    let attributes = {
       content,
       nodeIdsToNodesMap,
       parentNodeId: selectedParentNode ? selectedParentNode.nodeId : null,
@@ -102,6 +153,13 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       height,
       width,
     };
+
+    if (selectedType == "recipe") {
+      attributes = {
+        ...attributes,
+      };
+      //add checking if statment so that they fill out all of the necessary fields
+    }
     const node = await createNodeFromModal(attributes);
     node && setSelectedNode(node);
     onSubmit();
@@ -141,9 +199,10 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
 
   const isImage: boolean = selectedType === "image";
   const isText: boolean = selectedType === "text";
+  const isRecipe: boolean = selectedType === "recipe";
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose}>
+    <Modal isOpen={isOpen} onClose={handleClose} size={"4xl"}>
       <div className="modal-font">
         <ModalOverlay />
         <ModalContent>
@@ -193,6 +252,70 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
                   onChange={handleImageUpload}
                   placeholder={contentInputPlaceholder}
                 />
+              </div>
+            )}
+            {selectedType && isRecipe && (
+              <div className="modal-input">
+                <div className="recipe-nontext">
+                  <div className="inputs">
+                    <NumberInput
+                      size="md"
+                      maxW={32}
+                      defaultValue={4}
+                      onChange={(valueString: string) => {
+                        setServing(Number(valueString));
+                      }}
+                      value={serving}
+                    >
+                      <NumberInputField
+                        onChange={(event) => {
+                          handleRecipeServingChange(event);
+                        }}
+                        value={serving}
+                      />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                    <CookTimeInput onChange={handleRecipeTimeChange} />
+                    <Select
+                      value={cuisine}
+                      placeholder="Cuisine"
+                      onChange={handleCuisineChange}
+                      className="cuisine-select"
+                    >
+                      {displayCuisines()}
+                    </Select>
+                  </div>
+                  <div className="recipe-type-inputs">
+                    <Textarea
+                      style={{ width: "90%" }}
+                      value={description}
+                      onChange={handleDescriptionchange}
+                      placeholder={"Description..."}
+                    />
+                    <Textarea
+                      style={{
+                        width: "75%",
+                        marginLeft: "10px",
+                        marginRight: "10px",
+                      }}
+                      value={description}
+                      onChange={handleDescriptionchange}
+                      placeholder="Ingredients.."
+                    />
+                    <Textarea
+                      style={{ width: "90%" }}
+                      value={description}
+                      onChange={handleDescriptionchange}
+                      placeholder="Steps..."
+                    />
+                  </div>
+
+                  <div></div>
+                </div>
+                <div className="recipe-text"></div>
               </div>
             )}
             <div className="modal-section">

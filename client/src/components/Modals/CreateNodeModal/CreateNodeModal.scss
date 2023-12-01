@@ -14,10 +14,21 @@ $input-margin: 10px;
   margin-top: $input-margin;
 }
 
+.inputs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px;
+}
 .modal-section {
   border-top: solid 1px $secondary-background-color;
   margin-top: 15px;
   padding-top: 10px;
+}
+
+.recipe-type-inputs {
+  display: flex;
+  flex-direction: row;
 }
 
 .modal-title {

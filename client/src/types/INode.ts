@@ -50,7 +50,7 @@ export interface IRecipeNode extends INode {
   stepsID: string; // list of nodes detailing the steps for the recipe (text/image)
   serving: number; // number of people the recipe serves
   cuisine: Cuisine; // the cuisine that the recipe falls into
-  time: number; // the amount of time the recipe takes to complete
+  time: Date; // the amount of time the recipe takes to complete
 }
 
 export type FolderContentType = "list" | "grid";
@@ -64,6 +64,16 @@ export type NodeFields = keyof INode | keyof IFolderNode | keyof IRecipeNode;
 // Type declaration for map from nodeId --> INode
 export type NodeIdsToNodesMap = { [nodeId: string]: INode };
 
+export const allCuisines: string[] = [
+  "American",
+  "Italian",
+  "Chinese",
+  "Korean",
+  "French",
+  "Mexican",
+  "Japanese",
+  "British",
+];
 /**
  * Function that creates an INode given relevant inputs
  * @param nodeId
