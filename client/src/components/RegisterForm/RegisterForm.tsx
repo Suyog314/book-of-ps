@@ -4,17 +4,18 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import "./RegisterForm.scss";
 import { ChangeEvent, FormEvent, useState } from "react";
+import { Input } from "@chakra-ui/react";
+import { Button } from "../Button";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [verifyPassword, setVerifyPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!name || !email || !password) {
+  const handleSubmit = async () => {
+    if (!name || !email || !password || !verifyPassword) {
       setError("All fields are required.");
       return;
     }
@@ -32,12 +33,16 @@ export default function Register() {
         }),
       });
 
-      if (res.ok) {
-        const form = e.target as HTMLFormElement;
-        form.reset();
-      } else {
+      if (!res.ok) {
         console.log("User registration failed.");
       }
+
+      // clear the variables
+      setName("");
+      setEmail("");
+      setPassword("");
+      setVerifyPassword("");
+      setError("");
     } catch (error) {
       console.log("Error during registration: ", error);
     }
@@ -46,25 +51,31 @@ export default function Register() {
   return (
     <div className="register-wrapper">
       <h1 className="register-header">Register</h1>
-      <form className="register-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
+      <div className="register-form">
+        <Input
+          value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Full Name"
         />
-        <input
-          type="text"
+        <Input
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
         />
-        <input
-          type="password"
+        <Input
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
+          type="password"
         />
-        <input type="password" placeholder="Retype Password" />
+        <Input
+          value={verifyPassword}
+          onChange={(e) => setVerifyPassword(e.target.value)}
+          placeholder="Retype Password"
+          type="password"
+        />
 
-        <button className="register-submit-button">Register</button>
+        <Button text="Register" onClick={handleSubmit} />
 
         {error && <div className="register-error-message">{error}</div>}
 
@@ -72,7 +83,7 @@ export default function Register() {
           Already have an account?{" "}
           <span className="register-back-to-login">Login</span>
         </Link>
-      </form>
+      </div>
     </div>
   );
 }
