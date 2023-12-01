@@ -49,7 +49,33 @@ export class BackendUserGateway {
       return failureServiceResponse("User already exist in database.");
     }
     // if everything checks out, insert node
-    const insertUserResp = await this.userCollectionConnection.createUser(user);
+    const insertUserResp = await this.userCollectionConnection.insertUser(user);
     return insertUserResp;
+  }
+
+  /**
+   * Method to find a user
+   *
+   * @param userId - The userId of the user to get.
+   */
+  async getUserById(userId: string): Promise<IServiceResponse<IUser>> {
+    return this.userCollectionConnection.findUserById(userId);
+  }
+
+  /**
+   * Method to find a list of users
+   *
+   * @param userId[] - The userId's of the user to get.
+   */
+  async getUsersById(userIds: string[]): Promise<IServiceResponse<IUser[]>> {
+    return this.userCollectionConnection.findUsersById(userIds);
+  }
+
+  /**
+   * Method to delete all users from the collection
+   *
+   */
+  async deleteAll(): Promise<IServiceResponse<null>> {
+    return await this.userCollectionConnection.clearUserCollection();
   }
 }
