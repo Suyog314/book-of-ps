@@ -39,6 +39,7 @@
     "mongo-mock": "^4.1.0",
     "mongodb": "^3.5.27",
     "mongodb-memory-server": "^7.3.6",
+    "next-auth": "^4.24.5",
     "nodemon": "^3.0.1",
     "prettier": "2.3.2",
     "react-flow-renderer": "^10.3.17",

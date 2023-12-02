@@ -6,6 +6,9 @@ import "./RegisterForm.scss";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "@chakra-ui/react";
 import { Button } from "../Button";
+import { makeIUser } from "~/types";
+import bycrpt from "bcryptjs";
+import { FrontendUserGateway } from "~/users";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -14,38 +17,37 @@ export default function Register() {
   const [verifyPassword, setVerifyPassword] = useState("");
   const [error, setError] = useState("");
 
+  const router = useRouter();
+
+  // handles creation of a new user
   const handleSubmit = async () => {
+    // errors if all fields are not filled out
     if (!name || !email || !password || !verifyPassword) {
       setError("All fields are required.");
       return;
     }
-
-    try {
-      const res = await fetch("api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
-      });
-
-      if (!res.ok) {
-        console.log("User registration failed.");
-      }
-
-      // clear the variables
-      setName("");
-      setEmail("");
-      setPassword("");
-      setVerifyPassword("");
-      setError("");
-    } catch (error) {
-      console.log("Error during registration: ", error);
+    // errors if passwords don't match each other
+    if (password != verifyPassword) {
+      setError("Passwords do not match.");
+      return;
     }
+    // else, create new user
+    const hashedPassword = await bycrpt.hash(password, 10);
+    const newUser = makeIUser(name, email, hashedPassword);
+    const createUserResp = await FrontendUserGateway.createUser(newUser);
+    if (!createUserResp.success) {
+      setError(createUserResp.message);
+      return;
+    }
+
+    // clear the variables
+    setName("");
+    setEmail("");
+    setPassword("");
+    setVerifyPassword("");
+    setError("");
+    // redirect to login page
+    router.push("/login");
   };
 
   return (
