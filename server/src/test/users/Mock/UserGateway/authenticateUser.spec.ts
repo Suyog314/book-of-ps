@@ -1,7 +1,8 @@
 import { MongoClient } from "mongodb";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { INode, makeINode, IUser, makeIUser } from "../../../../types";
+import { IUser, makeIUser } from "../../../../types";
 import { BackendUserGateway } from "../../../../users";
+import bcrypt from "bcryptjs";
 
 describe("Unit Test: Authenticate User", () => {
   let uri: string;
@@ -36,46 +37,49 @@ describe("Unit Test: Authenticate User", () => {
   });
 
   test("Authenticates valid user", async () => {
+    const hashedPassword = await bcrypt.hash(testPassword, 10);
     const validUser: IUser = makeIUser(
       testUserName,
       testUserEmail,
-      testPassword,
+      hashedPassword,
       testId
     );
+
     const response = await backendUserGateway.createUser(validUser);
     expect(response.success).toBeTruthy();
     const authResp = await backendUserGateway.authenticateUser(
       validUser.email,
-      validUser.password
+      testPassword
     );
-    console.log(authResp.message);
     expect(authResp.success).toBeTruthy();
     expect(authResp.payload.name).toEqual(testUserName);
-    expect(authResp.payload.name).toEqual(testUserEmail);
+    expect(authResp.payload.email).toEqual(testUserEmail);
     expect(authResp.payload.backendTokens).toBeDefined();
   });
 
   test("Fails authentication for invalid email", async () => {
+    const hashedPassword = await bcrypt.hash(testPassword, 10);
     const validUser: IUser = makeIUser(
       testUserName,
       testUserEmail,
-      testPassword,
+      hashedPassword,
       testId
     );
     const response = await backendUserGateway.createUser(validUser);
     expect(response.success).toBeTruthy();
     const authResp = await backendUserGateway.authenticateUser(
       "1",
-      validUser.password
+      testPassword
     );
     expect(authResp.success).toBeFalsy();
   });
 
   test("Fails authentication for invalid password", async () => {
+    const hashedPassword = await bcrypt.hash(testPassword, 10);
     const validUser: IUser = makeIUser(
       testUserName,
       testUserEmail,
-      testPassword,
+      hashedPassword,
       testId
     );
     const response = await backendUserGateway.createUser(validUser);
@@ -88,10 +92,11 @@ describe("Unit Test: Authenticate User", () => {
   });
 
   test("Fails authentication for invalid email and password", async () => {
+    const hashedPassword = await bcrypt.hash(testPassword, 10);
     const validUser: IUser = makeIUser(
       testUserName,
       testUserEmail,
-      testPassword,
+      hashedPassword,
       testId
     );
     const response = await backendUserGateway.createUser(validUser);

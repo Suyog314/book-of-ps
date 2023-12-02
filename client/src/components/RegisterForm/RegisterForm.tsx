@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import "./RegisterForm.scss";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { useState } from "react";
 import { Input } from "@chakra-ui/react";
 import { Button } from "../Button";
 import { makeIUser } from "~/types";
