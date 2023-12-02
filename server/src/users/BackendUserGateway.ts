@@ -5,8 +5,12 @@ import {
   successfulServiceResponse,
   IUser,
   isIUser,
+  makeIUserSession,
+  IUserSession,
 } from "../types";
 import { UserCollectionConnection } from "./UserCollectionConnection";
+import bcrypt from "bcryptjs";
+import { JwtService } from "@nestjs/jwt";
 
 /**
  * BackendNodeGateway handles requests from NodeRouter, and calls on methods
@@ -60,6 +64,57 @@ export class BackendUserGateway {
   }
 
   /**
+   * Method to authenticate a user
+   *
+   * @param userEmail - The email of the user to be authenticated.
+   * @param userPassword - The password of the user to be authenticated.
+   */
+  async authenticateUser(
+    email: any,
+    password: any
+  ): Promise<IServiceResponse<IUserSession>> {
+    if (typeof email !== "string" || typeof password !== "string") {
+      return failureServiceResponse("Email and password provided not strings.");
+    }
+    // check whether already in database
+    const userResponse = await this.userCollectionConnection.findUserByEmail(
+      email
+    );
+    if (!userResponse.success) {
+      return failureServiceResponse("User not in database.");
+    }
+    // const hashedPassword = await bcrypt.hash(password, 10);
+    // make sure passwords match
+    const passwordsMatch = await bcrypt.compare(
+      password,
+      userResponse.payload.password
+    );
+    if (!passwordsMatch) {
+      return failureServiceResponse("Passwords do not match.");
+    }
+    const jwtService = new JwtService();
+    const backendTokens = {
+      accessToken: await jwtService.signAsync(userResponse.payload, {
+        expiresIn: "1h",
+        secret: process.env.JWTSECRETKEY,
+      }),
+      refreshToken: await jwtService.signAsync(userResponse.payload, {
+        expiresIn: "7d",
+        secret: process.env.JWTREFRESHTOKENKEY,
+      }),
+    };
+    const user = userResponse.payload;
+    const userSession = makeIUserSession(
+      user.name,
+      user.email,
+      user.password,
+      user.userId,
+      backendTokens
+    );
+    return successfulServiceResponse(userSession);
+  }
+
+  /**
    * Method to find a user
    *
    * @param userId - The userId of the user to get.
@@ -75,6 +130,15 @@ export class BackendUserGateway {
    */
   async getUsersById(userIds: string[]): Promise<IServiceResponse<IUser[]>> {
     return this.userCollectionConnection.findUsersById(userIds);
+  }
+
+  /**
+   * Method to find a user by email
+   *
+   * @param userEmail - The email of the user to look for
+   */
+  async getUserByEmail(userEmail: string): Promise<IServiceResponse<IUser>> {
+    return this.userCollectionConnection.findUserByEmail(userEmail);
   }
 
   /**

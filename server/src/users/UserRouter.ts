@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from "express";
 import { MongoClient } from "mongodb";
-import { isIUser } from "../types";
+import { IServiceResponse, IUser, IUserSession, isIUser } from "../types";
 import { BackendUserGateway } from "./BackendUserGateway";
 import { json } from "body-parser";
 const bodyJsonParser = json();
@@ -41,6 +41,50 @@ export class UserRouter {
         res.status(500).send(e.message);
       }
     });
+
+    /**
+     * Request to find user by email
+     *
+     * @param req request object coming from client
+     * @param res response object to send to client
+     */
+    UserExpressRouter.post(
+      "/getByEmail",
+      async (req: Request, res: Response) => {
+        try {
+          const userEmail = req.body.email;
+          const response: IServiceResponse<IUser> =
+            await this.BackendUserGateway.getUserByEmail(userEmail);
+          res.status(200).send(response);
+        } catch (e) {
+          res.status(500).send(e.message);
+        }
+      }
+    );
+
+    /**
+     * Request to authenticate user
+     *
+     * @param req request object coming from client
+     * @param res response object to send to client
+     */
+    UserExpressRouter.post(
+      "/authenticate",
+      async (req: Request, res: Response) => {
+        try {
+          const userEmail = req.body.email;
+          const userPassword = req.body.password;
+          const response: IServiceResponse<IUserSession> =
+            await this.BackendUserGateway.authenticateUser(
+              userEmail,
+              userPassword
+            );
+          res.status(200).send(response);
+        } catch (e) {
+          res.status(500).send(e.message);
+        }
+      }
+    );
   }
 
   /**

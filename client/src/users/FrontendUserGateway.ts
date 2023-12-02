@@ -3,6 +3,7 @@ import {
   INode,
   IServiceResponse,
   IUser,
+  IUserSession,
 } from "../types";
 import { endpoint, get, post, put, remove } from "../global";
 
@@ -13,7 +14,6 @@ const baseEndpoint = endpoint;
 const servicePath = "user/";
 
 /**
- * [FRONTEND NODE GATEWAY]
  * FrontendRegisterGateway handles HTTP requests to the host, which is located on
  * the server. This FrontendRegisterGateway object uses the baseEndpoint, and
  * additional server information to access the requested information.
@@ -32,6 +32,40 @@ export const FrontendUserGateway = {
       );
     } catch (exception) {
       return failureServiceResponse("[createUser] Unable to access backend");
+    }
+  },
+
+  findUserByEmail: async (email: string): Promise<IServiceResponse<IUser>> => {
+    try {
+      return await post<IServiceResponse<IUser>>(
+        baseEndpoint + servicePath + "getByEmail",
+        {
+          email: email,
+        }
+      );
+    } catch (exception) {
+      return failureServiceResponse(
+        "[findUserByEmail] Unable to access backend"
+      );
+    }
+  },
+
+  authenticateUser: async (
+    email: string,
+    password: string
+  ): Promise<IServiceResponse<IUserSession>> => {
+    try {
+      return await post<IServiceResponse<IUserSession>>(
+        baseEndpoint + servicePath + "authenticate",
+        {
+          email: email,
+          password: password,
+        }
+      );
+    } catch (exception) {
+      return failureServiceResponse(
+        "[findUserByEmail] Unable to access backend"
+      );
     }
   },
 };
