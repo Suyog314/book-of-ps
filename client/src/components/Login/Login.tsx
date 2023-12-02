@@ -37,7 +37,7 @@ export default function Login() {
       setEmail("");
       setPassword("");
       setError("");
-      router.replace("");
+      router.replace("/");
     } catch (error) {
       console.error(error);
     }

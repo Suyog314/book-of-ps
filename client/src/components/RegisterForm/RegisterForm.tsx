@@ -7,7 +7,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "@chakra-ui/react";
 import { Button } from "../Button";
 import { makeIUser } from "~/types";
-import bycrpt from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { FrontendUserGateway } from "~/users";
 
 export default function Register() {
@@ -32,7 +32,7 @@ export default function Register() {
       return;
     }
     // else, create new user
-    const hashedPassword = await bycrpt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = makeIUser(name, email, hashedPassword);
     const createUserResp = await FrontendUserGateway.createUser(newUser);
     if (!createUserResp.success) {

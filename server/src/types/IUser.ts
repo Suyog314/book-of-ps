@@ -5,6 +5,13 @@ export interface IUser {
   userId: string;
 }
 
+export interface IUserSession extends IUser {
+  backendTokens: {
+    accessToken: string;
+    refreshToken: string;
+  };
+}
+
 export function makeIUser(
   name: string,
   email: string,
@@ -16,6 +23,25 @@ export function makeIUser(
     email: email,
     password: password,
     userId: userId,
+  };
+}
+
+export function makeIUserSession(
+  name: string,
+  email: string,
+  password: string,
+  userId: string,
+  backendTokens: {
+    accessToken: string;
+    refreshToken: string;
+  }
+): IUserSession {
+  return {
+    name: name,
+    email: email,
+    password: password,
+    userId: userId,
+    backendTokens: backendTokens,
   };
 }
 
