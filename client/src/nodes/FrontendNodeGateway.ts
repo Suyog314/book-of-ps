@@ -1,4 +1,5 @@
 import {
+  Cuisine,
   failureServiceResponse,
   IAnchor,
   ILink,
@@ -182,6 +183,36 @@ export const FrontendNodeGateway = {
       return failureServiceResponse(
         "[searchForNodes] Unable to access backend"
       );
+    }
+  },
+
+  getCuisines: async (): Promise<IServiceResponse<Cuisine[]>> => {
+    try {
+      return await get<IServiceResponse<Cuisine[]>>(
+        baseEndpoint + servicePath + "cuisines"
+      );
+    } catch (exception) {
+      return failureServiceResponse("[getCuisines] Unable to access backend");
+    }
+  },
+
+  getMaxTime: async (): Promise<IServiceResponse<number>> => {
+    try {
+      return await get<IServiceResponse<number>>(
+        baseEndpoint + servicePath + "time"
+      );
+    } catch (exception) {
+      return failureServiceResponse("[getMaxTime] Unable to access backend");
+    }
+  },
+
+  getMaxServing: async (): Promise<IServiceResponse<number>> => {
+    try {
+      return await get<IServiceResponse<number>>(
+        baseEndpoint + servicePath + "serving"
+      );
+    } catch (exception) {
+      return failureServiceResponse("[getMaxServing] Unable to access backend");
     }
   },
 };

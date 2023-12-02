@@ -20,7 +20,12 @@ import {
 } from "../../global/Atoms";
 import { useRouter } from "next/router";
 import { FrontendNodeGateway } from "../../nodes";
-import { INode, NodeIdsToNodesMap, RecursiveNodeTree } from "../../types";
+import {
+  Cuisine,
+  INode,
+  NodeIdsToNodesMap,
+  RecursiveNodeTree,
+} from "../../types";
 import { Alert } from "../Alert";
 import { ContextMenu } from "../ContextMenu/ContextMenu";
 import { Header } from "../Header";
@@ -57,6 +62,10 @@ export const MainView = React.memo(function MainView() {
   const setAlertIsOpen = useSetRecoilState(alertOpenState);
   const setAlertTitle = useSetRecoilState(alertTitleState);
   const setAlertMessage = useSetRecoilState(alertMessageState);
+  // search modal parameters
+  const [availCuisines, setAvailCuisines] = useState<Cuisine[]>([]);
+  const [maxTime, setMaxTime] = useState(60);
+  const [maxServing, setMaxServing] = useState<number>(1);
 
   /** update our frontend root nodes from the database */
   const loadRootsFromDB = useCallback(async () => {
@@ -66,6 +75,37 @@ export const MainView = React.memo(function MainView() {
       setIsAppLoaded(true);
     }
   }, []);
+
+  /**
+   * Retrieves the available cuisines, longest time, and biggest serving size
+   * for all current recipes to use in search modal
+   */
+  const getParameters = async () => {
+    const cuisinesRes = await FrontendNodeGateway.getCuisines();
+    if (!cuisinesRes.success) {
+      console.error(cuisinesRes.message);
+      return;
+    }
+    const sorted = cuisinesRes.payload.sort();
+    setAvailCuisines(sorted);
+
+    // const timeRes = await FrontendNodeGateway.getMaxTime();
+    // if (!timeRes.success) {
+    //   console.error(timeRes.message);
+    //   return;
+    // }
+
+    const servingRes = await FrontendNodeGateway.getMaxServing();
+    if (!servingRes.success) {
+      console.error(servingRes.message);
+      return;
+    }
+    setMaxServing(servingRes.payload);
+  };
+
+  useEffect(() => {
+    getParameters();
+  }, [createNodeModalOpen]);
 
   useEffect(() => {
     loadRootsFromDB();
@@ -222,6 +262,9 @@ export const MainView = React.memo(function MainView() {
           <SearchModal
             isOpen={searchModalOpen}
             onClose={() => setSearchModalOpen(false)}
+            availCuisines={availCuisines}
+            // maxTime={maxTime}
+            maxServing={maxServing}
           />
           <CreateNodeModal
             isOpen={createNodeModalOpen}

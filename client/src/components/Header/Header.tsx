@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import * as ri from "react-icons/ri";
 import * as ai from "react-icons/ai";
 
-import { NodeIdsToNodesMap } from "../../types";
+import { Cuisine, NodeIdsToNodesMap } from "../../types";
 import Link from "next/link";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import {
@@ -12,8 +12,8 @@ import {
   selectedExtentState,
 } from "../../global/Atoms";
 import "./Header.scss";
-import { Input, InputGroup, InputRightElement, Button } from "@chakra-ui/react";
 import { Button as IButton } from "../Button";
+import { Button } from "@chakra-ui/react";
 import { FrontendNodeGateway } from "~/nodes";
 
 interface IHeaderProps {
@@ -50,7 +50,7 @@ export const Header = (props: IHeaderProps) => {
       <div className="left-bar">
         <Link href={"/"}>
           <div className="name" onClick={onHomeClick}>
-            BookOf<b>P's</b>
+            BookOf<b>{"P's"}</b>
           </div>
         </Link>
         <Link href={"/"}>

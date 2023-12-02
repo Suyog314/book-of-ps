@@ -44,6 +44,7 @@ export interface INode {
   dateCreated?: Date; // date that the node was created
   height?: number[];
   width?: number[];
+  authorId?: string; // UUID for each author
 }
 export interface IRecipeNode extends INode {
   descriptionID: string;
@@ -51,7 +52,7 @@ export interface IRecipeNode extends INode {
   stepsID: string; // list of nodes detailing the steps for the recipe (text/image)
   serving: number; // number of people the recipe serves
   cuisine: Cuisine; // the cuisine that the recipe falls into
-  time: number; // the amount of time the recipe takes to complete
+  time: Date; // the amount of time the recipe takes to complete
 }
 export type FolderContentType = "list" | "grid";
 
@@ -76,6 +77,7 @@ export const allNodeFields: string[] = [
   "serving",
   "cuisine",
   "time",
+  "authorId",
 ];
 
 // Type declaration for map from nodeId --> INode
@@ -102,7 +104,8 @@ export function makeINode(
   title?: any,
   content?: any,
   height?: any,
-  width?: any
+  width?: any,
+  authorId?: any
 ): INode {
   return {
     content: content ?? "content" + nodeId,
@@ -112,6 +115,7 @@ export function makeINode(
     type: type ?? "text",
     height: height ?? [],
     width: width ?? [],
+    authorId: authorId,
   };
 }
 
@@ -124,6 +128,7 @@ export function makeIRecipeNode(
   serving: any,
   cuisine: any,
   time: any,
+  authorId?: any,
   children?: any,
   type?: any,
   title?: any,
@@ -145,6 +150,7 @@ export function makeIRecipeNode(
     serving: serving,
     cuisine: cuisine,
     time: time,
+    authorId: authorId,
   };
 }
 

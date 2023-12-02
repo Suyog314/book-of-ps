@@ -1,0 +1,20 @@
+@import "../../../global/globalCssVariables";
+
+.input-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  border-color: #eef2f6;
+  border-width: 1.15px;
+  border-radius: 6px;
+  padding: 8px;
+  margin-left: 10px;
+  input {
+    width: 20%;
+    // border-radius: 10px;
+  }
+  b {
+    color: gray;
+  }
+}

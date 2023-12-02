@@ -10,6 +10,7 @@ import {
   makeINodeProperty,
   isINodeProperty,
   isINode,
+  Cuisine,
 } from "../types";
 import { NodeCollectionConnection } from "./NodeCollectionConnection";
 
@@ -383,6 +384,45 @@ export class BackendNodeGateway {
       );
     }
     return successfulServiceResponse(rootsToReturn);
+  }
+
+  /**
+   * Method to get all the cuisines from the current recipes
+   * @returns
+   */
+  async getCuisines(): Promise<IServiceResponse<Cuisine[]>> {
+    const getCuisinesRes = await this.nodeCollectionConnection.getCuisines();
+    if (!getCuisinesRes.success) {
+      return failureServiceResponse(getCuisinesRes.message);
+    }
+    return successfulServiceResponse(getCuisinesRes.payload);
+  }
+
+  /**
+   * Method to get the longest cooking time from current recipes
+   */
+  async getMaxTime(): Promise<IServiceResponse<number>> {
+    const getMaxTimeRes = await this.nodeCollectionConnection.getMaxTime();
+    if (!getMaxTimeRes.success) {
+      return failureServiceResponse(getMaxTimeRes.message);
+    }
+    const maxTime = getMaxTimeRes.payload.time;
+    const minutes = maxTime.getHours() * 60 + maxTime.getMinutes();
+    return successfulServiceResponse(minutes);
+  }
+
+  /**
+   * Method to get the largest serving size from current recipes
+   */
+  async getMaxServing(): Promise<IServiceResponse<number>> {
+    const getMaxServingRes =
+      await this.nodeCollectionConnection.getMaxServing();
+    if (!getMaxServingRes.success) {
+      return failureServiceResponse(getMaxServingRes.message);
+    }
+    const recipe = getMaxServingRes.payload;
+    const serving = recipe.serving;
+    return successfulServiceResponse(serving);
   }
 
   /**

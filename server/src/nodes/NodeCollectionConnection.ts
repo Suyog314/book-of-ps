@@ -6,6 +6,8 @@ import {
   successfulServiceResponse,
   makeINodePath,
   isINodePath,
+  Cuisine,
+  IRecipeNode,
 } from "../types";
 import { MongoClient } from "mongodb";
 
@@ -263,5 +265,55 @@ export class NodeCollectionConnection {
     return failureServiceResponse(
       "Failed to update node " + nodeId + " filePath.path"
     );
+  }
+
+  /**
+   *
+   */
+  async getCuisines(): Promise<IServiceResponse<Cuisine[]>> {
+    const query = { type: "recipe" };
+
+    const cuisines = await this.client
+      .db()
+      .collection(this.collectionName)
+      .distinct("cuisine", query);
+    if (cuisines == null) {
+      return failureServiceResponse("[getCuisines] there are no recipes");
+    }
+    return successfulServiceResponse(cuisines);
+  }
+
+  async getMaxTime(): Promise<IServiceResponse<IRecipeNode>> {
+    const query = { type: "recipe" };
+    const maxTimeArr: IRecipeNode[] = [];
+    await this.client
+      .db()
+      .collection(this.collectionName)
+      .find(query)
+      .sort({ time: -1 })
+      .forEach(function (time) {
+        maxTimeArr.push(time);
+      });
+    if (maxTimeArr.length == 0) {
+      return failureServiceResponse("[getMaxTime] there are no recipes");
+    }
+    return successfulServiceResponse(maxTimeArr[0]);
+  }
+
+  async getMaxServing(): Promise<IServiceResponse<IRecipeNode>> {
+    const query = { type: "recipe" };
+    const maxServingArr: IRecipeNode[] = [];
+    await this.client
+      .db()
+      .collection(this.collectionName)
+      .find(query)
+      .sort({ serving: -1 })
+      .forEach(function (serving) {
+        maxServingArr.push(serving);
+      });
+    if (maxServingArr.length == 0) {
+      return failureServiceResponse("[getMaxServing] there are no recipes");
+    }
+    return successfulServiceResponse(maxServingArr[0]);
   }
 }

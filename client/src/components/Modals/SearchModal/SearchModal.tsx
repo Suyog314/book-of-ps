@@ -24,13 +24,17 @@ import { FrontendNodeGateway } from "~/nodes";
 import { LuUtensils } from "react-icons/lu";
 import { SearchResultItem } from "./SearchResultItem";
 import "./SearchModal.scss";
+import { Cuisine, IRecipeNode } from "~/types/INode";
 
 export interface ISearchModalProps {
   isOpen: boolean;
   onClose: () => void;
+  availCuisines: Cuisine[];
+  //maxTime: Date;
+  maxServing: number;
 }
 export const SearchModal = (props: ISearchModalProps) => {
-  const { isOpen, onClose } = props;
+  const { isOpen, onClose, availCuisines, maxServing } = props;
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState<any>([]);
   const [filterType, setFilterType] = useState("");
@@ -40,8 +44,6 @@ export const SearchModal = (props: ISearchModalProps) => {
   const [servingValue, setServingValue] = useState(4);
   const [showTimeTooltip, setShowTimeTooltip] = React.useState(false);
   const [showServingTooltip, setShowServingTooltip] = React.useState(false);
-
-  const cuisines = ["American", "Korean", "Chinese", "Mexican"];
 
   const handleInputChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -66,8 +68,29 @@ export const SearchModal = (props: ISearchModalProps) => {
       });
     }
     if (cuisineType != "") {
-      searchNodes = searchNodes.filter((node) => {
-        return;
+      searchNodes = searchNodes.filter(async (node) => {
+        //if node is a recipe, check if cuisine type matches
+        if (node.type == "recipe") {
+          return (node as IRecipeNode).cuisine == cuisineType;
+        } else {
+          const filepath = node.filePath.path;
+          const filepathLen = node.filePath.path.length;
+          //if non-recipe node is a root, don't include
+          if (filepathLen == 1) {
+            return false;
+          }
+          //check if non-recipe node as a recipe node as a parent
+          for (let i = filepathLen - 1; i >= 0; i--) {
+            const nodeRes = await FrontendNodeGateway.getNode(filepath[i]);
+            if (!nodeRes.success) {
+              console.error("[cuisine filtering] node retrieval failed");
+              return false;
+            }
+            const currNode = nodeRes.payload;
+            return currNode.type == "recipe";
+          }
+          return false;
+        }
       });
     }
     setSearchResults(searchNodes);
@@ -174,7 +197,7 @@ export const SearchModal = (props: ISearchModalProps) => {
                       <MenuItem onClick={() => setCuisineType("")}>
                         All
                       </MenuItem>
-                      {cuisines.map((cuisine, index) => (
+                      {availCuisines.map((cuisine, index) => (
                         <MenuItem
                           key={index}
                           onClick={() => setCuisineType(cuisine)}
@@ -188,8 +211,8 @@ export const SearchModal = (props: ISearchModalProps) => {
                     <div style={{ padding: "0px 10px 0px 0px" }}>Time:</div>
                     <Slider
                       className="time-slider"
-                      defaultValue={1}
-                      min={0}
+                      defaultValue={2}
+                      min={1}
                       max={6}
                       colorScheme="blue"
                       onChange={(v) => setTimeValue(v)}
@@ -205,7 +228,7 @@ export const SearchModal = (props: ISearchModalProps) => {
                         color="white"
                         placement="top"
                         isOpen={showTimeTooltip}
-                        label={`${timeValue}hr`}
+                        label={`≤${timeValue}hr`}
                       >
                         <SliderThumb />
                       </Tooltip>
@@ -215,9 +238,9 @@ export const SearchModal = (props: ISearchModalProps) => {
                     <div style={{ display: "inline-block" }}>Serving Size:</div>
                     <Slider
                       className="serving-slider"
-                      defaultValue={4}
+                      defaultValue={maxServing < 4 ? 1 : 4}
                       min={1}
-                      max={16}
+                      max={maxServing}
                       colorScheme="blue"
                       onChange={(v) => setServingValue(v)}
                       onMouseEnter={() => setShowServingTooltip(true)}
