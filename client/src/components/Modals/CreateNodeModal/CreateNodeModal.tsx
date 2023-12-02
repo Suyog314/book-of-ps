@@ -35,6 +35,8 @@ import { createNodeFromModal, getMeta, uploadImage } from "./createNodeUtils";
 import { useSetRecoilState } from "recoil";
 import { selectedNodeState } from "../../../global/Atoms";
 import { CookTimeInput } from "./CookTimeInput";
+import { IngredientsInput } from "./IngredientsInput";
+import { StepsInput } from "./StepsInput";
 
 export interface ICreateNodeModalProps {
   isOpen: boolean;
@@ -60,6 +62,8 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [serving, setServing] = useState(0);
+  const [ingredients, setIngredients] = useState<string[]>(["", ""]);
+  const [steps, setSteps] = useState<string[]>(["", ""]);
   const [cookTime, setCookTime] = useState(new Date());
   const [cuisine, setCuisine] = useState("");
   const [description, setDescription] = useState("");
@@ -295,22 +299,11 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
                       onChange={handleDescriptionchange}
                       placeholder={"Description..."}
                     />
-                    <Textarea
-                      style={{
-                        width: "75%",
-                        marginLeft: "10px",
-                        marginRight: "10px",
-                      }}
-                      value={description}
-                      onChange={handleDescriptionchange}
-                      placeholder="Ingredients.."
+                    <IngredientsInput
+                      ingredients={ingredients}
+                      setIngredients={setIngredients}
                     />
-                    <Textarea
-                      style={{ width: "90%" }}
-                      value={description}
-                      onChange={handleDescriptionchange}
-                      placeholder="Steps..."
-                    />
+                    <StepsInput steps={steps} setSteps={setSteps} />
                   </div>
 
                   <div></div>
