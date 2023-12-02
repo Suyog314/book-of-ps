@@ -48,6 +48,12 @@ export class BackendUserGateway {
     if (userResponse.success) {
       return failureServiceResponse("User already exist in database.");
     }
+    const emailResponse = await this.userCollectionConnection.findUserByEmail(
+      user.email
+    );
+    if (emailResponse.success) {
+      return failureServiceResponse("Email already used.");
+    }
     // if everything checks out, insert node
     const insertUserResp = await this.userCollectionConnection.createUser(user);
     return insertUserResp;

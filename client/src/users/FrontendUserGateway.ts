@@ -21,7 +21,7 @@ const servicePath = "user/";
  * These methods use the get, post, put and remove http requests from request.ts
  * helper methods to make requests to the server.
  */
-export const FrontendRegisterGateway = {
+export const FrontendUserGateway = {
   createUser: async (user: IUser): Promise<IServiceResponse<IUser>> => {
     try {
       return await post<IServiceResponse<IUser>>(

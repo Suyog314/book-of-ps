@@ -74,4 +74,23 @@ export class UserCollectionConnection {
       return successfulServiceResponse(findResponse);
     }
   }
+
+  /**
+   * Finds user with the email in the database
+   *
+   * @param {string} email
+   * @return successfulServiceResponse<IUser> on success
+   *         failureServiceResponse on failure
+   */
+  async findUserByEmail(email: string): Promise<IServiceResponse<IUser>> {
+    const findResponse = await this.client
+      .db()
+      .collection(this.collectionName)
+      .findOne({ email: email });
+    if (findResponse == null) {
+      return failureServiceResponse("Failed to find user with this email.");
+    } else {
+      return successfulServiceResponse(findResponse);
+    }
+  }
 }
