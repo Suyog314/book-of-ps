@@ -14,18 +14,18 @@ import {
   NumberDecrementStepper,
   NumberInputStepper,
   NumberInputField,
-  PinInput,
-  PinInputField,
-  HStack,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import {
   INode,
   NodeIdsToNodesMap,
-  NodeType,
   nodeTypes,
   RecursiveNodeTree,
   allCuisines,
+  Cuisine,
+  NodeType,
+  makeINodeProperty,
+  INodeProperty,
 } from "../../../types";
 
 import { Button } from "../../Button";
@@ -37,6 +37,7 @@ import { selectedNodeState } from "../../../global/Atoms";
 import { CookTimeInput } from "./CookTimeInput";
 import { IngredientsInput } from "./IngredientsInput";
 import { StepsInput } from "./StepsInput";
+import { FrontendNodeGateway } from "~/nodes";
 
 export interface ICreateNodeModalProps {
   isOpen: boolean;
@@ -64,8 +65,8 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   const [serving, setServing] = useState(0);
   const [ingredients, setIngredients] = useState<string[]>(["", ""]);
   const [steps, setSteps] = useState<string[]>(["", ""]);
-  const [cookTime, setCookTime] = useState(new Date());
-  const [cuisine, setCuisine] = useState("");
+  const [time, setTime] = useState<number>(0);
+  const [cuisine, setCuisine] = useState<Cuisine>("American");
   const [description, setDescription] = useState("");
   const [selectedType, setSelectedType] = useState<NodeType>("" as NodeType);
   const [error, setError] = useState<string>("");
@@ -100,16 +101,12 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     setServing(Number(event.target.value));
   };
 
-  const handleRecipeTimeChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const str = event.target.value;
-    const time = new Date();
-    setCookTime(time);
+  const handleRecipeTimeChange = (time: number) => {
+    setTime(time);
   };
 
   const handleCuisineChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setCuisine(event.target.value);
+    setCuisine(event.target.value as Cuisine);
   };
 
   const handleDescriptionchange = (
@@ -148,7 +145,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       height = [getMetaRes.normalizedHeight, getMetaRes.normalizedHeight];
     }
 
-    let attributes = {
+    const attributes = {
       content,
       nodeIdsToNodesMap,
       parentNodeId: selectedParentNode ? selectedParentNode.nodeId : null,
@@ -159,13 +156,85 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     };
 
     if (selectedType == "recipe") {
-      attributes = {
+      const descriptionID = "";
+      const ingredientsID = "";
+      const stepsID = "";
+      const recipeAttributes = {
         ...attributes,
+        descriptionID,
+        ingredientsID,
+        stepsID,
+        serving,
+        cuisine,
+        time,
       };
+
+      const recipeNode = await createNodeFromModal(recipeAttributes);
+
+      console.log(recipeNode?.nodeId);
+      const descriptionAttributes = {
+        content: description,
+        nodeIdsToNodesMap,
+        parentNodeId: recipeNode ? recipeNode.nodeId : null,
+        title: `${title} Description`,
+        type: "text" as NodeType,
+        height,
+        width,
+      };
+
+      const descriptionNode = await createNodeFromModal(descriptionAttributes);
+
+      const ingredientsAttributes = {
+        content: ingredients.toString(),
+        nodeIdsToNodesMap,
+        parentNodeId: recipeNode ? recipeNode.nodeId : null,
+        title: `${title} Ingredients`,
+        type: "text" as NodeType,
+        height,
+        width,
+      };
+
+      const ingredientsNode = await createNodeFromModal(ingredientsAttributes);
+
+      const stepsAttributes = {
+        content: steps.toString(),
+        nodeIdsToNodesMap,
+        parentNodeId: recipeNode ? recipeNode.nodeId : null,
+        title: `${title} Steps`,
+        type: "text" as NodeType,
+        height,
+        width,
+      };
+
+      const stepsNode = await createNodeFromModal(stepsAttributes);
+
+      const descriptionProperty: INodeProperty = makeINodeProperty(
+        "descriptionID",
+        [descriptionNode?.nodeId]
+      );
+
+      const ingredientsProperty: INodeProperty = makeINodeProperty(
+        "ingredientsID",
+        [ingredientsNode?.nodeId]
+      );
+
+      const stepsProperty: INodeProperty = makeINodeProperty("stepsID", [
+        stepsNode?.nodeId,
+      ]);
+
+      recipeNode?.nodeId &&
+        (await FrontendNodeGateway.updateNode(recipeNode?.nodeId, [
+          descriptionProperty,
+          ingredientsProperty,
+          stepsProperty,
+        ]));
+
       //add checking if statment so that they fill out all of the necessary fields
+    } else {
+      const node = await createNodeFromModal(attributes);
+      node && setSelectedNode(node);
     }
-    const node = await createNodeFromModal(attributes);
-    node && setSelectedNode(node);
+
     onSubmit();
     handleClose();
   };
@@ -178,6 +247,12 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     setSelectedType("" as NodeType);
     setContent("");
     setError("");
+    setDescription("");
+    setIngredients(["", ""]);
+    setSteps(["", ""]);
+    setCuisine("American");
+    setTime(0);
+    setServing(0);
   };
 
   const handleImageUpload = async (
