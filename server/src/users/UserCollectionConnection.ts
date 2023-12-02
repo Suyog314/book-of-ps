@@ -37,7 +37,7 @@ export class UserCollectionConnection {
    * @param {IUser} user
    * @return successfulServiceResponse<IUser>
    */
-  async createUser(user: IUser): Promise<IServiceResponse<IUser>> {
+  async insertUser(user: IUser): Promise<IServiceResponse<IUser>> {
     if (!isIUser(user)) {
       return failureServiceResponse(
         "Failed to insert user due to improper input " +
@@ -76,6 +76,25 @@ export class UserCollectionConnection {
   }
 
   /**
+   * Finds users with the userId's in the database
+   * Returns successfulServiceResponse with empty array when no users found.
+   *
+   * @param {string[]} userIds
+   * @return successfulServiceResponse<IUser[]> on success
+   */
+  async findUsersById(userIds: string[]): Promise<IServiceResponse<IUser[]>> {
+    const foundUsers: IUser[] = [];
+    await this.client
+      .db()
+      .collection(this.collectionName)
+      .find({ userId: { $in: userIds } })
+      .forEach(function (doc) {
+        foundUsers.push(doc);
+      });
+    return successfulServiceResponse(foundUsers);
+  }
+
+  /**
    * Finds user with the email in the database
    *
    * @param {string} email
@@ -92,5 +111,22 @@ export class UserCollectionConnection {
     } else {
       return successfulServiceResponse(findResponse);
     }
+  }
+
+  /**
+   * Deletes all users in the colelction
+   *
+   * @return successfulServiceResponse<null> on success
+   *         failureServiceResponse on failure
+   */
+  async clearUserCollection(): Promise<IServiceResponse<null>> {
+    const response = await this.client
+      .db()
+      .collection(this.collectionName)
+      .deleteMany({});
+    if (response.result.ok) {
+      return successfulServiceResponse(null);
+    }
+    return failureServiceResponse("Failed to clear users collection.");
   }
 }
