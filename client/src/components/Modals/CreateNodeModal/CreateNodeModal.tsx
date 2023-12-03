@@ -288,6 +288,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       contentInputPlaceholder = "Text content...";
       break;
     case "image":
+    case "recipe":
       contentInputPlaceholder = "Image URL...";
       break;
     default:
@@ -333,7 +334,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
                 />
               </div>
             )}
-            {selectedType && isImage && (
+            {selectedType && (isImage || isRecipe) && (
               <div className="modal-input">
                 <Input
                   value={content}
