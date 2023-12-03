@@ -265,12 +265,12 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     setSelectedType("" as NodeType);
     setContent("");
     setError("");
-    // setDescription("");
-    // setIngredients(["", ""]);
-    // setSteps(["", ""]);
-    // setCuisine("American");
-    // setTime(0);
-    // setServing(0);
+    setDescription("");
+    setIngredients(["", ""]);
+    setSteps(["", ""]);
+    setCuisine("American");
+    setTime(0);
+    setServing(0);
   };
 
   const handleImageUpload = async (
