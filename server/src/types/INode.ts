@@ -71,13 +71,24 @@ export const allNodeFields: string[] = [
   "viewType",
   "height",
   "width",
-  "description",
-  "ingredients",
-  "steps",
+  "descriptionID",
+  "ingredientsID",
+  "stepsID",
   "serving",
   "cuisine",
   "time",
   "authorId",
+];
+
+export const allCuisines: string[] = [
+  "American",
+  "Italian",
+  "Chinese",
+  "Korean",
+  "French",
+  "Mexican",
+  "Japanese",
+  "British",
 ];
 
 // Type declaration for map from nodeId --> INode

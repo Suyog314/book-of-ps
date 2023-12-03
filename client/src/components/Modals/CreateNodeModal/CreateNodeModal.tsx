@@ -172,6 +172,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       const recipeNode = await createNodeFromModal(recipeAttributes);
 
       console.log(recipeNode?.nodeId);
+
       const descriptionAttributes = {
         content: description,
         nodeIdsToNodesMap,
@@ -181,6 +182,8 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
         height,
         width,
       };
+
+      // console.log(nodeIdsToNodesMap[recipeNode.nodeId]);
 
       const descriptionNode = await createNodeFromModal(descriptionAttributes);
 
@@ -208,26 +211,41 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
 
       const stepsNode = await createNodeFromModal(stepsAttributes);
 
+      console.log(descriptionNode, ingredientsNode, stepsNode);
+
       const descriptionProperty: INodeProperty = makeINodeProperty(
         "descriptionID",
-        [descriptionNode?.nodeId]
+        descriptionNode?.nodeId
       );
 
       const ingredientsProperty: INodeProperty = makeINodeProperty(
         "ingredientsID",
-        [ingredientsNode?.nodeId]
+        ingredientsNode?.nodeId
       );
 
-      const stepsProperty: INodeProperty = makeINodeProperty("stepsID", [
-        stepsNode?.nodeId,
-      ]);
+      const stepsProperty: INodeProperty = makeINodeProperty(
+        "stepsID",
+        stepsNode?.nodeId
+      );
 
-      recipeNode?.nodeId &&
-        (await FrontendNodeGateway.updateNode(recipeNode?.nodeId, [
-          descriptionProperty,
-          ingredientsProperty,
-          stepsProperty,
-        ]));
+      console.log(descriptionProperty, ingredientsProperty, stepsProperty);
+      if (recipeNode?.nodeId) {
+        const descriptionResp = await FrontendNodeGateway.updateNode(
+          recipeNode?.nodeId,
+          [descriptionProperty]
+        );
+        const ingredientsResp = await FrontendNodeGateway.updateNode(
+          recipeNode?.nodeId,
+          [ingredientsProperty]
+        );
+        const stepsResp = await FrontendNodeGateway.updateNode(
+          recipeNode?.nodeId,
+          [stepsProperty]
+        );
+        console.log(descriptionResp, ingredientsResp, stepsResp);
+      }
+
+      recipeNode && setSelectedNode(recipeNode);
 
       //add checking if statment so that they fill out all of the necessary fields
     } else {
@@ -247,12 +265,12 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     setSelectedType("" as NodeType);
     setContent("");
     setError("");
-    setDescription("");
-    setIngredients(["", ""]);
-    setSteps(["", ""]);
-    setCuisine("American");
-    setTime(0);
-    setServing(0);
+    // setDescription("");
+    // setIngredients(["", ""]);
+    // setSteps(["", ""]);
+    // setCuisine("American");
+    // setTime(0);
+    // setServing(0);
   };
 
   const handleImageUpload = async (
@@ -270,6 +288,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       contentInputPlaceholder = "Text content...";
       break;
     case "image":
+    case "recipe":
       contentInputPlaceholder = "Image URL...";
       break;
     default:
@@ -315,7 +334,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
                 />
               </div>
             )}
-            {selectedType && isImage && (
+            {selectedType && (isImage || isRecipe) && (
               <div className="modal-input">
                 <Input
                   value={content}

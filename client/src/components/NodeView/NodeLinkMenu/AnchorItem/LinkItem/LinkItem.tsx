@@ -111,7 +111,7 @@ export const LinkItem = (props: ILinkItemProps) => {
       setRefresh,
       refresh,
     });
-    router.push(`/${nodeId}`);
+    router.push(`/dashboard/${nodeId}`);
     setSelectedAnchors(anchors);
   };
 

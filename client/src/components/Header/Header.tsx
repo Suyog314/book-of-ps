@@ -50,12 +50,12 @@ export const Header = (props: IHeaderProps) => {
   return (
     <div className={isLinking ? "header-linking" : "header"}>
       <div className="left-bar">
-        <Link href={"/"}>
+        <Link href={"/dashboard"}>
           <div className="name" onClick={onHomeClick}>
             BookOf<b>P&apos;s</b>
           </div>
         </Link>
-        <Link href={"/"}>
+        <Link href={"/dashboard"}>
           <IButton
             isWhite={isLinking}
             style={customButtonStyle}
@@ -84,9 +84,11 @@ export const Header = (props: IHeaderProps) => {
 
       {!isLinking && (
         <div className="sign-out">
-          <Button className="sign-out-button" onClick={() => signOut()}>
-            <p className="placeholder">Sign Out</p>
-          </Button>
+          <IButton
+            text="Sign Out"
+            style={{ fontWeight: "bold" }}
+            onClick={() => signOut()}
+          ></IButton>
         </div>
       )}
 
