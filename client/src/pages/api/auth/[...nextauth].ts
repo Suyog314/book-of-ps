@@ -1,13 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextAuthOptions } from "next-auth";
-import { JWT } from "next-auth/jwt";
+import { JWT, decode, encode } from "next-auth/jwt";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { FrontendUserGateway } from "~/users";
-
-async function refreshToken(token: JWT): Promise<JWT> {
-  return token;
-}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -43,23 +39,29 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-
-  callbacks: {
-    async jwt({ token, user }) {
-      // console.log({ token, user });
-      if (user) return { ...token, ...user };
-
-      return token;
-    },
-
-    async session({ token, session }) {
-      session.user = token.user;
-
-      return session;
-    },
+  session: {
+    strategy: "jwt",
+  },
+  jwt: {
+    encode,
+    decode,
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: { signIn: "/login" },
+  // callbacks: {
+  //   async jwt({ token, user }) {
+  //     // console.log({ token, user });
+  //     if (user) return { ...token, ...user };
+
+  //     return token;
+  //   },
+
+  //   async session({ session, token }) {
+  //     session.user = token.user;
+
+  //     return session;
+  //   },
+  // },
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

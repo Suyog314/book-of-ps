@@ -7,6 +7,7 @@ import {
   Cuisine,
 } from "../../types";
 import { emptyNode } from "~/components/MainView/mainViewUtils";
+import { Session } from "next-auth";
 
 // whether the app is loaded
 export const isAppLoadedState = atom<boolean>({
@@ -115,4 +116,9 @@ export const userName = atom<string>({
 export const userId = atom<string>({
   key: "userId",
   default: "",
+});
+
+export const userSessionState = atom<Session | null>({
+  key: "userSession",
+  default: null,
 });
