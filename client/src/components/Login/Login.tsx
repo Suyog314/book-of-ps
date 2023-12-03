@@ -23,7 +23,7 @@ export default function Login() {
     }
 
     try {
-      const authRes = await signIn("credential", {
+      const authRes = await signIn("credentials", {
         email,
         password,
         redirect: false,
@@ -37,7 +37,7 @@ export default function Login() {
       setEmail("");
       setPassword("");
       setError("");
-      router.replace("/");
+      router.replace("/dashboard");
     } catch (error) {
       console.error(error);
     }

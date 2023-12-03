@@ -5,6 +5,15 @@ const path = require("path");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/login",
+        permanent: true,
+      },
+    ];
+  },
   reactStrictMode: true,
   webpack(config) {
     //  Source: https://github.com/vercel/next.js/discussions/24013#discussioncomment-3787335
