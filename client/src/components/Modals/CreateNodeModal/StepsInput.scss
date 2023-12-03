@@ -1,0 +1,14 @@
+@import "../../../global/globalCssVariables";
+
+.steps-input-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+
+  .ingredient-input {
+    // width: 120px;
+  }
+}

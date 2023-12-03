@@ -1,20 +1,27 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./CookTimeInput.scss";
 
 export interface CookTimeInputProps {
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (time: number) => void;
 }
 export const CookTimeInput = (props: CookTimeInputProps) => {
   const { onChange } = props;
+  const [days, setDays] = useState("");
   const [hours, setHours] = useState("");
   const [minutes, setMinutes] = useState("");
-  const [seconds, setSeconds] = useState("");
 
+  const daysInputRef = useRef(null);
   const hoursInputRef = useRef(null);
   const minutesInputRef = useRef(null);
-  const secondsInputRef = useRef(null);
 
-  const inputs = [hoursInputRef, minutesInputRef, secondsInputRef];
+  const inputs = [daysInputRef, hoursInputRef, minutesInputRef];
+
+  useEffect(() => {
+    console.log(days, hours, minutes);
+    const cookTime: number =
+      Number(days) * 1440 + Number(hours) * 60 + Number(minutes);
+    onChange(cookTime);
+  }, [days, hours, minutes]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -57,6 +64,16 @@ export const CookTimeInput = (props: CookTimeInputProps) => {
   return (
     <div className="input-container">
       <input
+        ref={daysInputRef}
+        type="text"
+        maxLength={2}
+        value={days}
+        onChange={(e) => handleInputChange(e, setDays, daysInputRef)}
+        onKeyDown={(e) => handleKeyDown(e, setDays, daysInputRef)}
+        placeholder="00"
+      />
+      <b>d</b>
+      <input
         ref={hoursInputRef}
         type="text"
         maxLength={2}
@@ -77,17 +94,6 @@ export const CookTimeInput = (props: CookTimeInputProps) => {
         placeholder="00"
       />
       <b>min</b>
-
-      <input
-        ref={secondsInputRef}
-        type="text"
-        maxLength={2}
-        value={seconds}
-        onChange={(e) => handleInputChange(e, setSeconds, secondsInputRef)}
-        onKeyDown={(e) => handleKeyDown(e, setSeconds, secondsInputRef)}
-        placeholder="00"
-      />
-      <b>s</b>
     </div>
   );
 };

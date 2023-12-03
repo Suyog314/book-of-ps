@@ -9,6 +9,7 @@
     "install": "echo \"Make sure you have CD'd into either the client or server folder!\""
   },
   "dependencies": {
+    "next-auth": "^4.24.5",
     "react-flow-renderer": "^10.3.17"
   }
 }
