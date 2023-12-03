@@ -11,7 +11,10 @@ export async function middleware(req: NextRequest) {
   const afterAuth = req.nextUrl.clone();
   afterAuth.pathname = "/dashboard";
 
-  if (req.nextUrl.pathname === "/dashboard") {
+  const reqPath = req.nextUrl.pathname;
+  const regex = /^\/dashboard/;
+
+  if (regex.test(reqPath)) {
     const session = await getToken({
       req,
       secret: process.env.NEXTAUTH_SECRET,
@@ -22,10 +25,7 @@ export async function middleware(req: NextRequest) {
     // If user is authenticated, continue.
   }
 
-  if (
-    req.nextUrl.pathname === "/login" ||
-    req.nextUrl.pathname === "/register"
-  ) {
+  if (reqPath === "/login" || reqPath === "/register") {
     const session = await getToken({
       req,
       secret: process.env.NEXTAUTH_SECRET,
@@ -35,4 +35,6 @@ export async function middleware(req: NextRequest) {
     if (session) return NextResponse.redirect(afterAuth);
     // If user is authenticated, continue.
   }
+
+  // Any bad paths, redirect to dashboard if logged in, else to login page
 }

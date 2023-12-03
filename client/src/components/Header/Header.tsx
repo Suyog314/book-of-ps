@@ -83,19 +83,20 @@ export const Header = (props: IHeaderProps) => {
           </Button>
         </div>
       )}
-      {!isLinking && (
-        <div className="user-session-name">{userSession?.user?.name}</div>
-      )}
-
-      {!isLinking && (
-        <div className="sign-out">
-          <IButton
-            text="Sign Out"
-            style={{ fontWeight: "bold" }}
-            onClick={() => signOut()}
-          ></IButton>
-        </div>
-      )}
+      <div className="right-bar">
+        {!isLinking && (
+          <div className="user-session-name">{userSession?.user?.name}</div>
+        )}
+        {!isLinking && (
+          <div className="sign-out">
+            <IButton
+              text="Sign Out"
+              style={{ fontWeight: "bold" }}
+              onClick={() => signOut()}
+            ></IButton>
+          </div>
+        )}
+      </div>
 
       {isLinking && startAnchor && (
         <div className="right-bar">
