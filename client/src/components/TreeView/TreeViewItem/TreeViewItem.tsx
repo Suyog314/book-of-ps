@@ -99,7 +99,7 @@ export const TreeViewItem = ({
   return (
     <div className="treeView-item">
       {changeUrlOnClick ? (
-        <Link href={`/${pathToString(node.filePath)}`}>
+        <Link href={`/dashboard/${pathToString(node.filePath)}`}>
           <TreeViewChild />
         </Link>
       ) : (

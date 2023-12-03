@@ -93,6 +93,7 @@ export class BackendUserGateway {
       password,
       userResponse.payload.password
     );
+    console.log(passwordsMatch);
     if (!passwordsMatch) {
       return failureServiceResponse("Passwords do not match.");
     }
