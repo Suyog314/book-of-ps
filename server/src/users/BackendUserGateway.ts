@@ -26,12 +26,16 @@ import { JwtService } from "@nestjs/jwt";
  */
 export class BackendUserGateway {
   userCollectionConnection: UserCollectionConnection;
+  EXPIRE_TIME: number;
+  jwtService: JwtService;
 
   constructor(mongoClient: MongoClient, collectionName?: string) {
     this.userCollectionConnection = new UserCollectionConnection(
       mongoClient,
       collectionName ?? "users"
     );
+    this.EXPIRE_TIME = 10800000;
+    this.jwtService = new JwtService();
   }
 
   /**
@@ -95,19 +99,54 @@ export class BackendUserGateway {
     const jwtService = new JwtService();
     const backendTokens = {
       accessToken: await jwtService.signAsync(userResponse.payload, {
-        expiresIn: "1h",
+        expiresIn: "3h",
         secret: process.env.JWTSECRETKEY,
       }),
       refreshToken: await jwtService.signAsync(userResponse.payload, {
         expiresIn: "7d",
         secret: process.env.JWTREFRESHTOKENKEY,
       }),
+      expiresIn: new Date().setTime(new Date().getTime() + this.EXPIRE_TIME),
     };
     const user = userResponse.payload;
     const userSession = makeIUserSession(
       user.name,
       user.email,
-      user.password,
+      user.userId,
+      backendTokens
+    );
+    return successfulServiceResponse(userSession);
+  }
+
+  /**
+   * Refreshes the backend tokens of the user
+   *
+   * @param userID - userId of the user
+   * @returns Promise<IServiceResponse<IUserSession>> - contains the refreshed tokens
+   */
+  async refreshToken(userId: string): Promise<IServiceResponse<IUserSession>> {
+    // check whether already in database
+    const userResponse = await this.userCollectionConnection.findUserById(
+      userId
+    );
+    if (!userResponse.success) {
+      return failureServiceResponse("User not in database.");
+    }
+    const backendTokens = {
+      accessToken: await this.jwtService.signAsync(userResponse.payload, {
+        expiresIn: "3h",
+        secret: process.env.jwtSecretKey,
+      }),
+      refreshToken: await this.jwtService.signAsync(userResponse.payload, {
+        expiresIn: "7d",
+        secret: process.env.jwtRefreshTokenKey,
+      }),
+      expiresIn: new Date().setTime(new Date().getTime() + this.EXPIRE_TIME),
+    };
+    const user = userResponse.payload;
+    const userSession = makeIUserSession(
+      user.name,
+      user.email,
       user.userId,
       backendTokens
     );

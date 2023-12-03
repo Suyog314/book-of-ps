@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 
 import * as ri from "react-icons/ri";
@@ -14,7 +16,7 @@ import {
 import "./Header.scss";
 import { Input, InputGroup, InputRightElement, Button } from "@chakra-ui/react";
 import { Button as IButton } from "../Button";
-import { FrontendNodeGateway } from "~/nodes";
+import { signOut } from "next-auth/react";
 
 interface IHeaderProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
@@ -50,7 +52,7 @@ export const Header = (props: IHeaderProps) => {
       <div className="left-bar">
         <Link href={"/"}>
           <div className="name" onClick={onHomeClick}>
-            BookOf<b>P's</b>
+            BookOf<b>P&apos;s</b>
           </div>
         </Link>
         <Link href={"/"}>
@@ -76,6 +78,14 @@ export const Header = (props: IHeaderProps) => {
             onClick={handleSearchClick}
           >
             <p className="placeholder">Search</p>
+          </Button>
+        </div>
+      )}
+
+      {!isLinking && (
+        <div className="sign-out">
+          <Button className="sign-out-button" onClick={() => signOut()}>
+            <p className="placeholder">Sign Out</p>
           </Button>
         </div>
       )}

@@ -2,8 +2,6 @@ import express, { Request, Response, Router } from "express";
 import { MongoClient } from "mongodb";
 import { IServiceResponse, IUser, IUserSession, isIUser } from "../types";
 import { BackendUserGateway } from "./BackendUserGateway";
-import { json } from "body-parser";
-const bodyJsonParser = json();
 
 export const UserExpressRouter = express.Router();
 
@@ -85,6 +83,23 @@ export class UserRouter {
         }
       }
     );
+
+    /**
+     * Request to refresh a user's backend tokens
+     *
+     * @param req request object coming from client
+     * @param res response object to send to client
+     */
+    UserExpressRouter.post("/refresh", async (req: Request, res: Response) => {
+      try {
+        const userId = req.body.userId;
+        const response: IServiceResponse<IUserSession> =
+          await this.BackendUserGateway.refreshToken(userId);
+        res.status(200).send(response);
+      } catch (e) {
+        res.status(500).send(e.message);
+      }
+    });
   }
 
   /**

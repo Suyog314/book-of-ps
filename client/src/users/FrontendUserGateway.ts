@@ -64,8 +64,23 @@ export const FrontendUserGateway = {
       );
     } catch (exception) {
       return failureServiceResponse(
-        "[findUserByEmail] Unable to access backend"
+        "[authenticateUser] Unable to access backend"
       );
+    }
+  },
+
+  refreshTokens: async (
+    userId: string
+  ): Promise<IServiceResponse<IUserSession>> => {
+    try {
+      return await post<IServiceResponse<IUserSession>>(
+        baseEndpoint + servicePath + "refresh",
+        {
+          userId: userId,
+        }
+      );
+    } catch (exception) {
+      return failureServiceResponse("[refreshTokens] Unable to access backend");
     }
   },
 };
