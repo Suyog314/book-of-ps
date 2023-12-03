@@ -3,13 +3,16 @@ import * as ri from "react-icons/ri";
 import * as ai from "react-icons/ai";
 import { LuUtensils } from "react-icons/lu";
 
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { currentNodeState } from "~/global/Atoms";
 import "./RecipeContent.scss";
 import { INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
 import {
+  Button,
   Link,
+  LinkBox,
+  LinkOverlay,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -27,7 +30,7 @@ export interface RecipeContentProps {
 export const RecipeContent = (props: RecipeContentProps) => {
   const { nodeIdsToNodesMap } = props;
   const [currentNode] = useRecoilState(currentNodeState);
-  const [editingNodeID, setEditingNodeID] = useState("");
+  const setCurrentNode = useSetRecoilState(currentNodeState);
   const [tempUnits] = useState(["celsius", "fahrenheit", "kelvin"]);
   const [volumeUnits] = useState(["ml", "l", "fl oz", "cup", "tsp"]);
   const [weightUnits] = useState(["oz", "lb", "g", "kg"]);
@@ -262,37 +265,42 @@ export const RecipeContent = (props: RecipeContentProps) => {
       <div className="recipe-right">
         <div className="recipe-description-container">
           <b style={{ fontSize: 30 }}>Description</b>
-          <div>
-            <Link href={`/${descriptionNode?.nodeId}`}>
-              <TextContent
-                nodeIdsToNodesMap={nodeIdsToNodesMap}
-                currentNode={descriptionNode}
-                setEditingID={setEditingNodeID}
-              />
-            </Link>
+          <div
+            className="description"
+            onClick={() => setCurrentNode(descriptionNode)}
+          >
+            <TextContent
+              nodeIdsToNodesMap={nodeIdsToNodesMap}
+              currentNode={descriptionNode}
+            />
           </div>
         </div>
         <div className="recipe-ingredients-container">
           <b style={{ fontSize: 30 }}>Ingredients</b>
-          <div className="ingredients">
+          <div
+            className="ingredients"
+            onClick={() => setCurrentNode(ingredientsNode)}
+          >
             {
-              <Link href={`/${ingredientsNode?.nodeId}`}>
-                <TextContent
-                  nodeIdsToNodesMap={nodeIdsToNodesMap}
-                  currentNode={ingredientsNode}
-                  setEditingID={setEditingNodeID}
-                />
-              </Link>
+              <TextContent
+                nodeIdsToNodesMap={nodeIdsToNodesMap}
+                currentNode={ingredientsNode}
+                extensions={["BulletList"]}
+              />
             }
           </div>
         </div>
         <div className="recipe-steps-container">
-          {
-            <TextContent
-              nodeIdsToNodesMap={nodeIdsToNodesMap}
-              currentNode={stepsNode}
-            />
-          }
+          <b style={{ fontSize: 30 }}>Steps</b>
+          <div className="steps" onClick={() => setCurrentNode(stepsNode)}>
+            {
+              <TextContent
+                nodeIdsToNodesMap={nodeIdsToNodesMap}
+                currentNode={stepsNode}
+                extensions={["OrderedList"]}
+              />
+            }
+          </div>
         </div>
       </div>
     </div>

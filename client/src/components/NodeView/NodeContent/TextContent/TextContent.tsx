@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { FrontendAnchorGateway } from "../../../../anchors";
 import {
   currentNodeState,
@@ -35,15 +35,17 @@ import { join } from "path";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
 import OrderedList from "@tiptap/extension-ordered-list";
+import { forEach } from "@tiptap/core/dist/packages/core/src/commands";
 
 export interface INodeLinkMenuProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
   currentNode: INode;
+  extensions: string[];
 }
 
 /** The content of an text node, including all its anchors */
 export const TextContent = (props: INodeLinkMenuProps) => {
-  const { currentNode } = props;
+  const { currentNode, extensions } = props;
   const [refresh] = useRecoilState(refreshState);
   const setCurrentNode = useSetRecoilState(currentNodeState);
   const [anchorRefresh, setAnchorRefresh] = useRecoilState(refreshAnchorState);
@@ -51,6 +53,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     useRecoilState(refreshLinkListState);
   const [editing, setEditing] = useState(false);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
+  const globalCurrentNode = useRecoilValue(currentNodeState);
 
   useEffect(() => {
     console.log(editing);
@@ -78,8 +81,33 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     content: currentNode?.content,
   });
 
-  // TODO: Add all of the functionality for a rich text editor!
-  // (This file is where the majority of your work on text editing will be done)
+  useEffect(() => {
+    console.log(extensions, "extensions");
+    console.log(extensions && extensions.length > 0);
+    if (extensions && extensions.length > 0) {
+      extensions.forEach((extension) => {
+        switch (extension) {
+          case "BulletList":
+            console.log("bulletlist");
+            if (!editor?.chain().focus().toggleBulletList().run()) {
+              editor?.chain().focus().toggleBulletList().run();
+            }
+            editor?.chain().blur();
+            break;
+          case "OrderedList":
+            console.log("orderedlist");
+            if (!editor?.chain().focus().toggleOrderedList().run()) {
+              editor?.chain().focus().toggleOrderedList().run();
+            }
+            editor?.chain().blur();
+            break;
+          default:
+            null;
+            break;
+        }
+      });
+    }
+  }, [extensions]);
 
   /** This function adds anchor marks for anchors in the database to the text editor */
   const addAnchorMarks = async (): Promise<IServiceResponse<any>> => {
@@ -89,7 +117,6 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     const anchorResponse = await FrontendAnchorGateway.getAnchorsByNodeId(
       currentNode?.nodeId
     );
-    console.log(anchorResponse.payload, "payload");
     if (!anchorResponse || !anchorResponse.success) {
       return failureServiceResponse("failed to get anchors");
     }
@@ -117,7 +144,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
           to: anchor.extent.endCharacter + 1,
         });
         editor.commands.setLink({
-          href: "/" + node + "/",
+          href: "/dashboard/" + node + "/",
           target: anchor.anchorId,
         });
       }
@@ -265,17 +292,18 @@ export const TextContent = (props: INodeLinkMenuProps) => {
 
   return (
     <div
-      onFocus={() => {
-        setEditing(true);
+      onClick={() => {
         setCurrentNode(currentNode);
-      }}
-      onBlur={() => {
-        // setEditing(false);
       }}
       className="editor-container"
     >
-      {editing && <TextMenu editor={editor} save={handleContentChange} />}
+      {editing && currentNode === globalCurrentNode && (
+        <TextMenu editor={editor} save={handleContentChange} />
+      )}
       <EditorContent
+        onFocus={() => {
+          setEditing(true);
+        }}
         className="editorContent"
         editor={editor}
         onPointerUp={onPointerUp}
