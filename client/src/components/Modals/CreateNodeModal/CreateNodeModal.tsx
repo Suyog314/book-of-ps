@@ -186,8 +186,6 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
 
       const recipeNode = await createNodeFromModal(recipeAttributes);
 
-      console.log(recipeNode?.nodeId);
-
       const descriptionAttributes = {
         content: description,
         nodeIdsToNodesMap,
@@ -197,9 +195,6 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
         height,
         width,
       };
-
-      // console.log(nodeIdsToNodesMap[recipeNode.nodeId]);
-
       const descriptionNode = await createNodeFromModal(descriptionAttributes);
 
       const ingredientsAttributes = {
@@ -211,7 +206,6 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
         height,
         width,
       };
-
       const ingredientsNode = await createNodeFromModal(ingredientsAttributes);
 
       const stepsAttributes = {
@@ -223,7 +217,6 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
         height,
         width,
       };
-
       const stepsNode = await createNodeFromModal(stepsAttributes);
 
       const descriptionProperty: INodeProperty = makeINodeProperty(
@@ -248,8 +241,9 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
           stepsProperty,
         ]);
       }
-      // onSubmit();
+      onSubmit();
       recipeNode && setSelectedNode(recipeNode);
+      console.log(recipeNode);
 
       //add checking if statment so that they fill out all of the necessary fields
     } else {

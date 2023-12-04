@@ -55,28 +55,37 @@ export const RecipeContent = (props: RecipeContentProps) => {
   ]);
 
   useEffect(() => {
+    let desNode = null;
+    const hi = async () => {
+      desNode = await FrontendNodeGateway.getNode(
+        (currentNode as IRecipeNode).ingredientsID
+      );
+      console.log(desNode.payload);
+    };
+    hi();
+    const ingsNode =
+      nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
+    const stNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
+    console.log(desNode, ingsNode, stNode);
+  }, []);
+  useEffect(() => {
     const getDescriptionNode = () => {
       const desNode =
         nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
       setDescriptionNode(desNode);
-      console.log(desNode);
     };
     const getIngredientsNode = () => {
       const ingsNode =
         nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
       setIngredientsNode(ingsNode);
-      console.log(ingsNode);
     };
     const getStepsNode = () => {
       const stNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
       setStepsNode(stNode);
-      console.log(stNode);
     };
-    setRefresh(!refresh);
     getDescriptionNode();
     getIngredientsNode();
     getStepsNode();
-    setRefresh(!refresh);
   }, [currentNode]);
 
   const handleUnitTypeChange = (
