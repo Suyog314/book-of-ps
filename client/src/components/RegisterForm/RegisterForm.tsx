@@ -9,12 +9,17 @@ import { Button } from "../Button";
 import { makeIUser } from "~/types";
 import bcrypt from "bcryptjs";
 import { FrontendUserGateway } from "~/users";
+import { uploadImage } from "../Modals/CreateNodeModal/createNodeUtils";
+import { ImgUpload } from "../ImgUpload";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
+  const [avatar, setAvatar] = useState(
+    "https://inroomplus.com/cdn/shop/products/18494__86327_grande.jpg?v=1663690876"
+  );
   const [error, setError] = useState("");
 
   const router = useRouter();
@@ -33,7 +38,7 @@ export default function Register() {
     }
     // else, create new user
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = makeIUser(name, email, hashedPassword);
+    const newUser = makeIUser(name, email, hashedPassword, avatar);
     const createUserResp = await FrontendUserGateway.createUser(newUser);
     if (!createUserResp.success) {
       setError(createUserResp.message);
@@ -45,15 +50,33 @@ export default function Register() {
     setEmail("");
     setPassword("");
     setVerifyPassword("");
+    setAvatar(
+      "https://inroomplus.com/cdn/shop/products/18494__86327_grande.jpg?v=1663690876"
+    );
     setError("");
     // redirect to login page
     router.push("/login");
+  };
+
+  const handleImgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    const link = files && files[0] && (await uploadImage(files[0]));
+    link && setAvatar(link);
+  };
+
+  // Function to handle Enter key press
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSubmit();
+    }
   };
 
   return (
     <div className="register-wrapper">
       <h1 className="register-header">Register</h1>
       <div className="register-form">
+        <ImgUpload onChange={handleImgUpload} src={avatar} />
+
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -75,6 +98,7 @@ export default function Register() {
           onChange={(e) => setVerifyPassword(e.target.value)}
           placeholder="Retype Password"
           type="password"
+          onKeyDown={handleKeyPress}
         />
 
         <Button text="Register" onClick={handleSubmit} />

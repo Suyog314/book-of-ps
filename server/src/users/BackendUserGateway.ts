@@ -113,7 +113,8 @@ export class BackendUserGateway {
       user.name,
       user.email,
       user.userId,
-      backendTokens
+      backendTokens,
+      user.userAvatar
     );
     return successfulServiceResponse(userSession);
   }
@@ -148,7 +149,8 @@ export class BackendUserGateway {
       user.name,
       user.email,
       user.userId,
-      backendTokens
+      backendTokens,
+      user.userAvatar
     );
     return successfulServiceResponse(userSession);
   }

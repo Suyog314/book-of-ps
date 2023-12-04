@@ -5,6 +5,7 @@ export interface IUser {
   email: string;
   password: string;
   userId: string;
+  userAvatar?: string;
 }
 
 export interface IUserSession {
@@ -16,18 +17,21 @@ export interface IUserSession {
     refreshToken: string;
     expiresIn: number;
   };
+  userAvatar?: string;
 }
 
 export function makeIUser(
   name: string,
   email: string,
-  password: string
+  password: string,
+  userAvatar?: string
 ): IUser {
   return {
     name: name,
     email: email,
     password: password,
     userId: uuidv4(),
+    userAvatar: userAvatar,
   };
 }
 
@@ -39,12 +43,14 @@ export function makeIUserSession(
     accessToken: string;
     refreshToken: string;
     expiresIn: number;
-  }
+  },
+  userAvatar?: string
 ): IUserSession {
   return {
     name: name,
     email: email,
     userId: userId,
     backendTokens: backendTokens,
+    userAvatar: userAvatar,
   };
 }
