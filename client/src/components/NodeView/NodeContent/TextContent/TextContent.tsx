@@ -31,33 +31,31 @@ import Highlight from "@tiptap/extension-highlight";
 import Underline from "@tiptap/extension-underline";
 import { loadAnchorToLinksMap } from "../../NodeLinkMenu";
 import TextAlign from "@tiptap/extension-text-align";
-import { join } from "path";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
 import OrderedList from "@tiptap/extension-ordered-list";
-import { forEach } from "@tiptap/core/dist/packages/core/src/commands";
 
 export interface INodeLinkMenuProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
   currentNode: INode;
-  extensions: string[];
+  extensions?: string[];
+  editable: boolean;
 }
 
 /** The content of an text node, including all its anchors */
 export const TextContent = (props: INodeLinkMenuProps) => {
-  const { currentNode, extensions } = props;
-  const [refresh] = useRecoilState(refreshState);
+  const { currentNode, extensions, editable } = props;
   const setCurrentNode = useSetRecoilState(currentNodeState);
+  const setSelectedExtent = useSetRecoilState(selectedExtentState);
+  const [refresh, setRefresh] = useRecoilState(refreshState);
   const [anchorRefresh, setAnchorRefresh] = useRecoilState(refreshAnchorState);
   const [linkMenuRefresh, setLinkMenuRefresh] =
     useRecoilState(refreshLinkListState);
-  const [editing, setEditing] = useState(false);
-  const setSelectedExtent = useSetRecoilState(selectedExtentState);
   const globalCurrentNode = useRecoilValue(currentNodeState);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     console.log(editing);
-    console.log(currentNode?.title);
   }, [editing]);
 
   //editor and all extensions are added here
@@ -79,35 +77,8 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       OrderedList,
     ],
     content: currentNode?.content,
+    editable: editable,
   });
-
-  useEffect(() => {
-    console.log(extensions, "extensions");
-    console.log(extensions && extensions.length > 0);
-    if (extensions && extensions.length > 0) {
-      extensions.forEach((extension) => {
-        switch (extension) {
-          case "BulletList":
-            console.log("bulletlist");
-            if (!editor?.chain().focus().toggleBulletList().run()) {
-              editor?.chain().focus().toggleBulletList().run();
-            }
-            editor?.chain().blur();
-            break;
-          case "OrderedList":
-            console.log("orderedlist");
-            if (!editor?.chain().focus().toggleOrderedList().run()) {
-              editor?.chain().focus().toggleOrderedList().run();
-            }
-            editor?.chain().blur();
-            break;
-          default:
-            null;
-            break;
-        }
-      });
-    }
-  }, [extensions]);
 
   /** This function adds anchor marks for anchors in the database to the text editor */
   const addAnchorMarks = async (): Promise<IServiceResponse<any>> => {

@@ -32,6 +32,7 @@ export const NodeContent = (props: INodeContentProps) => {
         <TextContent
           nodeIdsToNodesMap={nodeIdsToNodesMap}
           currentNode={currentNode}
+          editable={true}
         />
       );
     case "recipe":

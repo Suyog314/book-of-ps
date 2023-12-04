@@ -74,7 +74,6 @@ export const GraphModal = (props: IGraphModalProps) => {
       1;
       const increment = 200;
 
-      console.log(filteredAnchorIds.length);
       filteredAnchorIds.forEach((anchorId, index) => {
         const x_mod = index % 3;
         const y_mod = index % 2;
