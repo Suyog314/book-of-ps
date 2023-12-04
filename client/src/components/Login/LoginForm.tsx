@@ -1,18 +1,26 @@
 "use client";
 
-import { Input } from "@chakra-ui/react";
+import { ChakraProvider, Input } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../Button";
 import { signIn } from "next-auth/react";
+import { LoadingScreen } from "../LoadingScreen";
+import "./LoginForm.scss";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
+
+  // Reset loading state when component mounts
+  useEffect(() => {
+    setLoading(false); // Set loading to false when the component mounts
+  }, []);
 
   // handles login and authentication
   const handleLogin = async () => {
@@ -23,6 +31,7 @@ export default function Login() {
     }
 
     try {
+      setLoading(true);
       const authRes = await signIn("credentials", {
         email,
         password,
@@ -30,6 +39,7 @@ export default function Login() {
       });
       if (authRes?.error) {
         setError("Invalid credentials.");
+        setLoading(false);
         return;
       }
 
@@ -40,34 +50,53 @@ export default function Login() {
       router.replace("/dashboard");
     } catch (error) {
       console.error(error);
+      setLoading(false);
+    }
+  };
+
+  // Function to handle Enter key press
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleLogin();
     }
   };
 
   return (
-    <div className="login-wrapper">
-      <h1 className="login-header">Login</h1>
-      <div className="login-form">
-        <Input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-        />
-        <Input
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          type="password"
-        />
+    <div>
+      {loading ? (
+        <ChakraProvider>
+          <div className="loading-screen">
+            <LoadingScreen hasTimeout={true} />
+          </div>
+        </ChakraProvider>
+      ) : (
+        <div className="login-wrapper">
+          <h1 className="login-header">Login</h1>
+          <div className="login-form">
+            <Input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+            />
+            <Input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              type="password"
+              onKeyDown={handleKeyPress}
+            />
 
-        <Button text="Login" onClick={handleLogin} />
+            <Button text="Login" onClick={handleLogin} />
 
-        {error && <div className="login-error-message">{error}</div>}
+            {error && <div className="login-error-message">{error}</div>}
 
-        <Link className="login-no-account" href={"/register"}>
-          Do not have an account?{" "}
-          <span className="login-to-register-link">Register</span>
-        </Link>
-      </div>
+            <Link className="login-no-account" href={"/register"}>
+              Do not have an account?{" "}
+              <span className="login-to-register-link">Register</span>
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

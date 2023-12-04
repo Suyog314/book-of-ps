@@ -121,6 +121,21 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     ));
   };
 
+  const transformContent = (array: string[], type: string) => {
+    let newContent: string = "";
+    array.forEach((element) => {
+      newContent += `<li><p>${element}</p></li>`;
+    });
+    switch (type) {
+      case "Ingredients":
+        newContent = `<ul>${newContent}</ul>`;
+        break;
+      case "Steps":
+        newContent = `<ol>${newContent}</ol>`;
+    }
+    return newContent;
+  };
+
   useEffect(() => {
     console.log(serving);
     console.log(cuisine);
@@ -188,7 +203,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       const descriptionNode = await createNodeFromModal(descriptionAttributes);
 
       const ingredientsAttributes = {
-        content: ingredients.toString(),
+        content: transformContent(ingredients, "Ingredients"),
         nodeIdsToNodesMap,
         parentNodeId: recipeNode ? recipeNode.nodeId : null,
         title: `${title} Ingredients`,
@@ -200,7 +215,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       const ingredientsNode = await createNodeFromModal(ingredientsAttributes);
 
       const stepsAttributes = {
-        content: steps.toString(),
+        content: transformContent(steps, "Steps"),
         nodeIdsToNodesMap,
         parentNodeId: recipeNode ? recipeNode.nodeId : null,
         title: `${title} Steps`,
@@ -210,8 +225,6 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       };
 
       const stepsNode = await createNodeFromModal(stepsAttributes);
-
-      console.log(descriptionNode, ingredientsNode, stepsNode);
 
       const descriptionProperty: INodeProperty = makeINodeProperty(
         "descriptionID",
@@ -228,23 +241,14 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
         stepsNode?.nodeId
       );
 
-      console.log(descriptionProperty, ingredientsProperty, stepsProperty);
       if (recipeNode?.nodeId) {
-        const descriptionResp = await FrontendNodeGateway.updateNode(
-          recipeNode?.nodeId,
-          [descriptionProperty]
-        );
-        const ingredientsResp = await FrontendNodeGateway.updateNode(
-          recipeNode?.nodeId,
-          [ingredientsProperty]
-        );
-        const stepsResp = await FrontendNodeGateway.updateNode(
-          recipeNode?.nodeId,
-          [stepsProperty]
-        );
-        console.log(descriptionResp, ingredientsResp, stepsResp);
+        await FrontendNodeGateway.updateNode(recipeNode?.nodeId, [
+          descriptionProperty,
+          ingredientsProperty,
+          stepsProperty,
+        ]);
       }
-
+      // onSubmit();
       recipeNode && setSelectedNode(recipeNode);
 
       //add checking if statment so that they fill out all of the necessary fields

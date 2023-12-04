@@ -4,7 +4,7 @@ import * as ai from "react-icons/ai";
 import { LuUtensils } from "react-icons/lu";
 
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { currentNodeState } from "~/global/Atoms";
+import { currentNodeState, refreshState } from "~/global/Atoms";
 import "./RecipeContent.scss";
 import { INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
@@ -42,15 +42,9 @@ export const RecipeContent = (props: RecipeContentProps) => {
   const [descriptionNode, setDescriptionNode] = useState<INode>();
   const [ingredientsNode, setIngredientsNode] = useState<INode>();
   const [stepsNode, setStepsNode] = useState<INode>();
+  const [refresh, setRefresh] = useRecoilState(refreshState);
 
   useEffect(() => {
-    console.log(convert(2, "tsp").to("fl oz"));
-    console.log(selectedUnitType);
-    console.log(leftSelectedUnit);
-    console.log(rightSelectedUnit);
-    console.log(leftUnitValue);
-    console.log(rightUnitValue);
-    console.log(currentNode);
     convertUnits();
   }, [
     selectedUnitType,
@@ -61,29 +55,28 @@ export const RecipeContent = (props: RecipeContentProps) => {
   ]);
 
   useEffect(() => {
-    const getDescriptionNode = async () => {
+    const getDescriptionNode = () => {
       const desNode =
         nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
       setDescriptionNode(desNode);
       console.log(desNode);
-      console.log(descriptionNode);
     };
-    const getIngredientsNode = async () => {
+    const getIngredientsNode = () => {
       const ingsNode =
         nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
       setIngredientsNode(ingsNode);
       console.log(ingsNode);
-      console.log(ingredientsNode);
     };
-    const getStepsNode = async () => {
+    const getStepsNode = () => {
       const stNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
       setStepsNode(stNode);
       console.log(stNode);
-      console.log(stepsNode);
     };
+    setRefresh(!refresh);
     getDescriptionNode();
     getIngredientsNode();
     getStepsNode();
+    setRefresh(!refresh);
   }, [currentNode]);
 
   const handleUnitTypeChange = (

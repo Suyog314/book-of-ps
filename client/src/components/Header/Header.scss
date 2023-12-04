@@ -26,6 +26,7 @@
     display: flex;
     margin-left: 50px;
     align-items: center; /* Center its children vertically */
+
     .search-button {
       width: 100%;
       display: flex;
@@ -44,10 +45,23 @@
   }
 
   .right-bar {
-    width: max-content;
+    width: max;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end;
+    margin-left: auto;
+
+    .user-session-name {
+      margin-right: 20px;
+      font-size: large;
+      font-weight: 500;
+    }
+
+    .sign-out {
+      cursor: pointer;
+      font-weight: bold;
+      color: rgb(207, 24, 61);
+    }
   }
 }
 

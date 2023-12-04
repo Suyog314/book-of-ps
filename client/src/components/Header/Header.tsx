@@ -1,20 +1,21 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import * as ri from "react-icons/ri";
 import * as ai from "react-icons/ai";
 
 import { NodeIdsToNodesMap } from "../../types";
 import Link from "next/link";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   isLinkingState,
   startAnchorState,
   selectedExtentState,
+  userSessionState,
 } from "../../global/Atoms";
 import "./Header.scss";
-import { Input, InputGroup, InputRightElement, Button } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import { Button as IButton } from "../Button";
 import { signOut } from "next-auth/react";
 
@@ -36,6 +37,7 @@ export const Header = (props: IHeaderProps) => {
   const [isLinking, setIsLinking] = useRecoilState(isLinkingState);
   const [startAnchor, setStartAnchor] = useRecoilState(startAnchorState);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
+  const userSession = useRecoilValue(userSessionState);
 
   const handleCancelLink = () => {
     setStartAnchor(null);
@@ -81,16 +83,20 @@ export const Header = (props: IHeaderProps) => {
           </Button>
         </div>
       )}
-
-      {!isLinking && (
-        <div className="sign-out">
-          <IButton
-            text="Sign Out"
-            style={{ fontWeight: "bold" }}
-            onClick={() => signOut()}
-          ></IButton>
-        </div>
-      )}
+      <div className="right-bar">
+        {!isLinking && (
+          <div className="user-session-name">{userSession?.user?.name}</div>
+        )}
+        {!isLinking && (
+          <div className="sign-out">
+            <IButton
+              text="Sign Out"
+              style={{ fontWeight: "bold" }}
+              onClick={() => signOut()}
+            ></IButton>
+          </div>
+        )}
+      </div>
 
       {isLinking && startAnchor && (
         <div className="right-bar">
