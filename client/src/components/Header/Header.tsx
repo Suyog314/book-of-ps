@@ -38,6 +38,7 @@ export const Header = (props: IHeaderProps) => {
   const [startAnchor, setStartAnchor] = useRecoilState(startAnchorState);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
   const userSession = useRecoilValue(userSessionState);
+  console.log(userSession?.user);
 
   const handleCancelLink = () => {
     setStartAnchor(null);

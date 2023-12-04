@@ -28,7 +28,6 @@ export const authOptions: NextAuthOptions = {
             email,
             password
           );
-          console.log(authResp.message);
           if (!authResp.success) {
             return null;
           }

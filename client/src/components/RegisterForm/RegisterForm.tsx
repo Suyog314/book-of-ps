@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import "./RegisterForm.scss";
-import { useState } from "react";
-import { Input } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { ChakraProvider, Input } from "@chakra-ui/react";
 import { Button } from "../Button";
 import { makeIUser } from "~/types";
 import bcrypt from "bcryptjs";
 import { FrontendUserGateway } from "~/users";
-import { uploadImage } from "../Modals/CreateNodeModal/createNodeUtils";
-import { ImgUpload } from "../ImgUpload";
+import { http, uploadImage } from "../Modals/CreateNodeModal/createNodeUtils";
+import { LoadingScreen } from "../LoadingScreen";
+import { ImgPreview } from "../ImgUpload";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -18,11 +19,16 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
   const [avatar, setAvatar] = useState(
-    "https://inroomplus.com/cdn/shop/products/18494__86327_grande.jpg?v=1663690876"
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
   );
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    setLoading(false); // Set loading to false when the component mounts
+  }, []);
 
   // handles creation of a new user
   const handleSubmit = async () => {
@@ -51,17 +57,11 @@ export default function Register() {
     setPassword("");
     setVerifyPassword("");
     setAvatar(
-      "https://inroomplus.com/cdn/shop/products/18494__86327_grande.jpg?v=1663690876"
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
     );
     setError("");
     // redirect to login page
     router.push("/login");
-  };
-
-  const handleImgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    const link = files && files[0] && (await uploadImage(files[0]));
-    link && setAvatar(link);
   };
 
   // Function to handle Enter key press
@@ -71,45 +71,101 @@ export default function Register() {
     }
   };
 
+  const uploadProfile = async (file: any): Promise<string> => {
+    // using key for imgur API
+    const apiUrl = "https://api.imgur.com/3/image";
+    const apiKey = "f18e19d8cb9a1f0";
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const data: any = await http({
+        data: formData,
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer " + apiKey,
+        },
+        method: "POST",
+        url: apiUrl,
+      });
+      return data.data.link;
+    } catch (exception) {
+      return "Image was not uploaded";
+    }
+  };
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = event.target.files;
+    const link = files && files[0] && (await uploadImage(files[0]));
+    link && setAvatar(link);
+  };
+
   return (
-    <div className="register-wrapper">
-      <h1 className="register-header">Register</h1>
-      <div className="register-form">
-        <ImgUpload onChange={handleImgUpload} src={avatar} />
+    <div>
+      {loading ? (
+        <ChakraProvider>
+          <div className="loading-screen">
+            <LoadingScreen hasTimeout={true} />
+          </div>
+        </ChakraProvider>
+      ) : (
+        <div className="register-wrapper">
+          <div className="register-box">
+            <h1 className="register-header">Register</h1>
+            {/* <div className="upload-profile">
+              <ImgPreview src={avatar} />
+            </div> */}
+            <div className="register-form">
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Full Name"
+              />
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+              />
+              <Input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                type="password"
+              />
+              <Input
+                value={verifyPassword}
+                onChange={(e) => setVerifyPassword(e.target.value)}
+                placeholder="Retype Password"
+                type="password"
+                onKeyDown={handleKeyPress}
+              />
+              {/* <Input
+                value={avatar}
+                onChange={(e) => setAvatar(e.target.value)}
+                placeholder="Link to Avatar Image"
+                type="text"
+                onKeyDown={handleKeyPress}
+              /> */}
 
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Full Name"
-        />
-        <Input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-        />
-        <Input
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          type="password"
-        />
-        <Input
-          value={verifyPassword}
-          onChange={(e) => setVerifyPassword(e.target.value)}
-          placeholder="Retype Password"
-          type="password"
-          onKeyDown={handleKeyPress}
-        />
+              <button className="register-button" onClick={handleSubmit}>
+                Sign Up
+              </button>
 
-        <Button text="Register" onClick={handleSubmit} />
+              {error && <div className="register-error-message">{error}</div>}
 
-        {error && <div className="register-error-message">{error}</div>}
-
-        <Link className="register-have-account-already" href={"/login"}>
-          Already have an account?{" "}
-          <span className="register-back-to-login">Login</span>
-        </Link>
-      </div>
+              <div className="register-have-account-already">
+                Already have an account?{" "}
+                <Link href={"/login"} onClick={() => setLoading(true)}>
+                  <span className="register-back-to-login">Login</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
