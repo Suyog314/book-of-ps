@@ -260,17 +260,17 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   /** Reset all our state variables and close the modal */
   const handleClose = () => {
     onClose();
-    setTitle("");
+    // setTitle("");
     setSelectedParentNode(null);
     setSelectedType("" as NodeType);
-    setContent("");
+    // setContent("");
     setError("");
-    setDescription("");
-    setIngredients(["", ""]);
-    setSteps(["", ""]);
-    setCuisine("American");
-    setTime(0);
-    setServing(0);
+    // setDescription("");
+    // setIngredients(["", ""]);
+    // setSteps(["", ""]);
+    // setCuisine("American");
+    // setTime(0);
+    // setServing(0);
   };
 
   const handleImageUpload = async (

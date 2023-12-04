@@ -62,34 +62,24 @@ export const RecipeContent = (props: RecipeContentProps) => {
 
   useEffect(() => {
     const getDescriptionNode = async () => {
-      const descriptionNodeResp = await FrontendNodeGateway.getNode(
-        (currentNode as IRecipeNode).descriptionID
-      );
-      if (descriptionNodeResp.success) {
-        setDescriptionNode(descriptionNodeResp.payload);
-      } else {
-        console.log(descriptionNodeResp.message);
-      }
+      const desNode =
+        nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
+      setDescriptionNode(desNode);
+      console.log(desNode);
+      console.log(descriptionNode);
     };
     const getIngredientsNode = async () => {
-      const ingredientsNodeResp = await FrontendNodeGateway.getNode(
-        (currentNode as IRecipeNode).ingredientsID
-      );
-      if (ingredientsNodeResp.success) {
-        setIngredientsNode(ingredientsNodeResp.payload);
-      } else {
-        console.log(ingredientsNodeResp.message);
-      }
+      const ingsNode =
+        nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
+      setIngredientsNode(ingsNode);
+      console.log(ingsNode);
+      console.log(ingredientsNode);
     };
     const getStepsNode = async () => {
-      const stepsNodeResp = await FrontendNodeGateway.getNode(
-        (currentNode as IRecipeNode).stepsID
-      );
-      if (stepsNodeResp.success) {
-        setStepsNode(stepsNodeResp.payload);
-      } else {
-        console.log(stepsNodeResp.message);
-      }
+      const stNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
+      setStepsNode(stNode);
+      console.log(stNode);
+      console.log(stepsNode);
     };
     getDescriptionNode();
     getIngredientsNode();
@@ -265,14 +255,16 @@ export const RecipeContent = (props: RecipeContentProps) => {
       <div className="recipe-right">
         <div className="recipe-description-container">
           <b style={{ fontSize: 30 }}>Description</b>
-          <div
-            className="description"
-            onClick={() => setCurrentNode(descriptionNode)}
-          >
-            <TextContent
-              nodeIdsToNodesMap={nodeIdsToNodesMap}
-              currentNode={descriptionNode}
-            />
+          <div className="description">
+            {descriptionNode ? (
+              <TextContent
+                nodeIdsToNodesMap={nodeIdsToNodesMap}
+                currentNode={descriptionNode}
+                editable={false}
+              />
+            ) : (
+              <p>Loading description...</p>
+            )}
           </div>
         </div>
         <div className="recipe-ingredients-container">
@@ -281,25 +273,31 @@ export const RecipeContent = (props: RecipeContentProps) => {
             className="ingredients"
             onClick={() => setCurrentNode(ingredientsNode)}
           >
-            {
+            {ingredientsNode ? (
               <TextContent
                 nodeIdsToNodesMap={nodeIdsToNodesMap}
                 currentNode={ingredientsNode}
                 extensions={["BulletList"]}
+                editable={false}
               />
-            }
+            ) : (
+              <p>Loading ingredients...</p>
+            )}
           </div>
         </div>
         <div className="recipe-steps-container">
           <b style={{ fontSize: 30 }}>Steps</b>
           <div className="steps" onClick={() => setCurrentNode(stepsNode)}>
-            {
+            {stepsNode ? (
               <TextContent
                 nodeIdsToNodesMap={nodeIdsToNodesMap}
                 currentNode={stepsNode}
                 extensions={["OrderedList"]}
+                editable={false}
               />
-            }
+            ) : (
+              <p>Loading steps...</p>
+            )}
           </div>
         </div>
       </div>
