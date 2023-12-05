@@ -51,6 +51,53 @@
     justify-content: flex-end;
     margin-left: auto;
 
+    .profile-pic-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* Adjust this as needed */
+    }
+
+    /* Circular profile picture wrapper */
+    .profile-pic-wrapper {
+      position: relative;
+      width: 2.3rem; /* Adjust the size of the circle */
+      height: 2.3rem; /* Adjust the size of the circle */
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease; /* Example animation transition */
+    }
+
+    /* Profile picture */
+    .profile-pic {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: filter 0.3s ease; /* Example transition for hover effect */
+    }
+
+    /* Overlay on hover */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(211, 211, 211, 0.5); /* Light gray overlay color */
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding-bottom: 5px; /* Adjust the space for the tag */
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Show tag on hover */
+    .profile-pic-wrapper:hover .overlay {
+      opacity: 1;
+    }
+
     .user-session-name {
       margin-right: 20px;
       font-size: large;

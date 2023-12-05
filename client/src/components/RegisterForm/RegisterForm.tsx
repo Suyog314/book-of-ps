@@ -11,7 +11,6 @@ import bcrypt from "bcryptjs";
 import { FrontendUserGateway } from "~/users";
 import { http, uploadImage } from "../Modals/CreateNodeModal/createNodeUtils";
 import { LoadingScreen } from "../LoadingScreen";
-import { ImgPreview } from "../ImgUpload";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -71,38 +70,6 @@ export default function Register() {
     }
   };
 
-  const uploadProfile = async (file: any): Promise<string> => {
-    // using key for imgur API
-    const apiUrl = "https://api.imgur.com/3/image";
-    const apiKey = "f18e19d8cb9a1f0";
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const data: any = await http({
-        data: formData,
-        headers: {
-          Accept: "application/json",
-          Authorization: "Bearer " + apiKey,
-        },
-        method: "POST",
-        url: apiUrl,
-      });
-      return data.data.link;
-    } catch (exception) {
-      return "Image was not uploaded";
-    }
-  };
-
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = event.target.files;
-    const link = files && files[0] && (await uploadImage(files[0]));
-    link && setAvatar(link);
-  };
-
   return (
     <div>
       {loading ? (
@@ -115,9 +82,6 @@ export default function Register() {
         <div className="register-wrapper">
           <div className="register-box">
             <h1 className="register-header">Register</h1>
-            {/* <div className="upload-profile">
-              <ImgPreview src={avatar} />
-            </div> */}
             <div className="register-form">
               <Input
                 value={name}
@@ -142,13 +106,6 @@ export default function Register() {
                 type="password"
                 onKeyDown={handleKeyPress}
               />
-              {/* <Input
-                value={avatar}
-                onChange={(e) => setAvatar(e.target.value)}
-                placeholder="Link to Avatar Image"
-                type="text"
-                onKeyDown={handleKeyPress}
-              /> */}
 
               <button className="register-button" onClick={handleSubmit}>
                 Sign Up
