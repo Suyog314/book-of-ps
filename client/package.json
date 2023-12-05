@@ -13,6 +13,7 @@
     "@chakra-ui/react": "^2.7.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@fontsource/montserrat": "^5.0.15",
     "@tiptap/core": "^2.1.12",
     "@tiptap/extension-bullet-list": "^2.1.12",
     "@tiptap/extension-highlight": "^2.1.12",

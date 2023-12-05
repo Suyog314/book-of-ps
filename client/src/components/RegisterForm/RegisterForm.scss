@@ -17,6 +17,7 @@ $enlargement-factor: 120%; /* Enlargement factor */
   display: grid;
   place-items: center;
   height: 100vh;
+  font-family: "Montserrat";
 
   .register-box {
     width: 30%; /* Set width to 40% of the screen */
@@ -45,6 +46,7 @@ $enlargement-factor: 120%; /* Enlargement factor */
         border-radius: 4px;
         box-sizing: border-box;
         font-size: 1rem;
+        font-family: "Montserrat";
 
         &:focus {
           outline: none; /* Remove default focus outline */
@@ -56,6 +58,7 @@ $enlargement-factor: 120%; /* Enlargement factor */
         color: red;
         margin-bottom: 10px;
         font-size: 1rem; /* Enlarged by 20% */
+        font-family: "Montserrat";
       }
 
       .register-have-account-already {
@@ -83,6 +86,7 @@ $enlargement-factor: 120%; /* Enlargement factor */
         color: #fff;
         cursor: pointer;
         transition: background-color 0.3s;
+        font-family: "Montserrat";
         font-size: 1.2rem; /* Enlarged by 20% */
 
         &:hover {
