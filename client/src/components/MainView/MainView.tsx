@@ -17,7 +17,6 @@ import {
   alertMessageState,
   isAppLoadedState,
   rootNodesState,
-  isLoggedIn,
   userSessionState,
 } from "../../global/Atoms";
 import { useRouter } from "next/router";
@@ -36,11 +35,7 @@ import {
 import { NodeView } from "../NodeView";
 import { TreeView } from "../TreeView";
 import "./MainView.scss";
-import {
-  createNodeIdsToNodesMap,
-  generateBackground,
-  makeRootWrapper,
-} from "./mainViewUtils";
+import { createNodeIdsToNodesMap, makeRootWrapper } from "./mainViewUtils";
 import { GraphModal } from "../Modals/GraphModal/GraphModal";
 import { ProfileModal } from "../Modals/ProfileModal";
 
@@ -231,14 +226,14 @@ export const MainView = React.memo(function MainView() {
             nodeIdsToNodesMap={nodeIdsToNodesMap}
             onSearchClick={() => setSearchModalOpen(true)}
             onProfileClick={handleProfileClick}
-            avatarSrc={`https://ui-avatars.com/api/?name=${userSession?.user.name}&background=random&rounded=true&bold=true&color=ffffff`}
+            avatarSrc={`https://ui-avatars.com/api/?name=${userSession?.name}&background=random&rounded=true&bold=true&color=ffffff`}
           />
           <ProfileModal
             isOpen={profileModalOpen}
             onClose={() => setProfileModalOpen(false)}
-            avatarSrc={`https://ui-avatars.com/api/?name=${userSession?.user.name}&background=random&rounded=true&bold=true&color=ffffff`}
-            userName={userSession?.user.name}
-            userEmail={userSession?.user.email}
+            avatarSrc={`https://ui-avatars.com/api/?name=${userSession?.name}&background=random&rounded=true&bold=true&color=ffffff`}
+            userName={userSession?.name}
+            userEmail={userSession?.email}
           />
           <SearchModal
             isOpen={searchModalOpen}

@@ -29,11 +29,6 @@ export function isINodeProperty(object: any): boolean {
     propsDefined &&
     allNodeFields.includes((object as INodeProperty).fieldName)
   ) {
-    console.log("hi");
-    console.log(
-      typeof (object as INodeProperty).value,
-      (object as INodeProperty).value
-    );
     switch ((object as INodeProperty).fieldName) {
       case "nodeId":
         return typeof (object as INodeProperty).value === "string";

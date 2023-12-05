@@ -55,23 +55,18 @@ export const SearchModal = (props: ISearchModalProps) => {
       setSearchResults(searchResp.payload);
       setFilteredResults(searchResp.payload);
     } else {
-      console.log(searchResp.message);
       setSearchResults([]);
       setFilteredResults([]);
     }
   };
 
-  useEffect(() => {
-    console.log(searchResults);
-  }, [searchResults]);
+  useEffect(() => {}, [searchResults]);
 
   useEffect(() => {
     onSearch();
   }, [searchInput]);
 
-  useEffect(() => {
-    console.log(searching);
-  }, [searching]);
+  useEffect(() => {}, [searching]);
 
   const handleClose = () => {
     setSearchInput("");
@@ -79,9 +74,7 @@ export const SearchModal = (props: ISearchModalProps) => {
     onClose();
   };
 
-  useEffect(() => {
-    console.log(filteredResults);
-  }, [filteredResults]);
+  useEffect(() => {}, [filteredResults]);
 
   const handleFiltering = (type: string) => {
     if (type === "all") {
@@ -101,7 +94,6 @@ export const SearchModal = (props: ISearchModalProps) => {
   const handleSorting = (order: string, results = filteredResults) => {
     setSortingOrder(order);
     const newSearchResults = [...results];
-    console.log(newSearchResults);
 
     if (order === "oldest") {
       newSearchResults.sort((a, b) => {

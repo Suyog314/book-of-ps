@@ -31,6 +31,8 @@ export interface ICreateNodeModalAttributes {
   serving?: number;
   cuisine?: Cuisine;
   time?: number;
+  authorId?: string;
+  collaborators?: string[];
 }
 
 /**
@@ -91,6 +93,8 @@ export async function createNodeFromModal({
   serving,
   cuisine,
   time,
+  authorId,
+  collaborators,
 }: ICreateNodeModalAttributes): Promise<INode | null> {
   const nodeId = generateObjectId(type);
   // Initial filePath value: create node as a new root
@@ -98,7 +102,6 @@ export async function createNodeFromModal({
   // If parentNodeId is provided, we edit filePath so that we can
   // create the node as a child of the parent
   if (parentNodeId) {
-    console.log(parentNodeId, "parentNodeId");
     const parentNodeResp = await FrontendNodeGateway.getNode(parentNodeId);
     const parentNode = parentNodeResp.payload;
     if (parentNodeResp.success) {
@@ -121,6 +124,8 @@ export async function createNodeFromModal({
     type: type,
     height: height,
     width: width,
+    authorId: authorId,
+    collaborators: collaborators,
   };
 
   switch (type) {

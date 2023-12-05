@@ -114,6 +114,24 @@ export class UserCollectionConnection {
   }
 
   /**
+   * Deletes user with the id in the database
+   *
+   * @param {string} userId
+   * @return successfulServiceResponse<IUser> on success
+   *         failureServiceResponse on failure
+   */
+  async deleteUserById(userId: string): Promise<IServiceResponse<null>> {
+    const deleteResponse = await this.client
+      .db()
+      .collection(this.collectionName)
+      .deleteOne({ userId: userId });
+    if (!deleteResponse.result.ok) {
+      return failureServiceResponse("Failed to find user with this id.");
+    }
+    return successfulServiceResponse(null);
+  }
+
+  /**
    * Deletes all users in the colelction
    *
    * @return successfulServiceResponse<null> on success

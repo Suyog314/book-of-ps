@@ -33,8 +33,12 @@ import { Button } from "../../Button";
 import { TreeView } from "../../TreeView";
 import "./CreateNodeModal.scss";
 import { createNodeFromModal, getMeta, uploadImage } from "./createNodeUtils";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { refreshState, selectedNodeState } from "../../../global/Atoms";
+import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
+import {
+  refreshState,
+  selectedNodeState,
+  userSessionState,
+} from "../../../global/Atoms";
 import { CookTimeInput } from "./CookTimeInput";
 import { IngredientsInput } from "./IngredientsInput";
 import { StepsInput } from "./StepsInput";
@@ -71,6 +75,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   const [description, setDescription] = useState("");
   const [selectedType, setSelectedType] = useState<NodeType>("" as NodeType);
   const [error, setError] = useState<string>("");
+  const userSession = useRecoilValue(userSessionState);
   const [refresh, setRefresh] = useRecoilState(refreshState);
 
   // event handlers for the modal inputs and dropdown selects
@@ -138,11 +143,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     return newContent;
   };
 
-  useEffect(() => {
-    console.log(serving);
-    console.log(cuisine);
-    console.log(description);
-  }, [serving, cuisine, description]);
+  useEffect(() => {}, [serving, cuisine, description]);
 
   // called when the "Create" button is clicked
   const handleSubmit = async () => {
@@ -161,7 +162,8 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       width = [getMetaRes.normalizedWidth, getMetaRes.normalizedWidth];
       height = [getMetaRes.normalizedHeight, getMetaRes.normalizedHeight];
     }
-
+    const authorId = userSession?.userId;
+    const collaborators: string[] = [];
     const attributes = {
       content,
       nodeIdsToNodesMap,
@@ -170,9 +172,26 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       type: selectedType as NodeType,
       height,
       width,
+      authorId,
+      collaborators,
     };
 
     if (selectedType == "recipe") {
+      const descriptionID = "";
+      const ingredientsID = "";
+      const stepsID = "";
+      const recipeAttributes = {
+        ...attributes,
+        descriptionID,
+        ingredientsID,
+        stepsID,
+        serving,
+        cuisine,
+        time,
+      };
+
+      const recipeNode = await createNodeFromModal(recipeAttributes);
+
       const descriptionAttributes = {
         content: description,
         nodeIdsToNodesMap,
@@ -181,6 +200,8 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
         type: "text" as NodeType,
         height,
         width,
+        authorId,
+        collaborators,
       };
       const descriptionNode = await createNodeFromModal(descriptionAttributes);
       console.log(descriptionNode);
@@ -193,6 +214,8 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
         type: "text" as NodeType,
         height,
         width,
+        authorId,
+        collaborators,
       };
       const ingredientsNode = await createNodeFromModal(ingredientsAttributes);
       console.log(ingredientsNode);
@@ -205,6 +228,8 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
         type: "text" as NodeType,
         height,
         width,
+        authorId,
+        collaborators,
       };
       const stepsNode = await createNodeFromModal(stepsAttributes);
       console.log(stepsNode);
