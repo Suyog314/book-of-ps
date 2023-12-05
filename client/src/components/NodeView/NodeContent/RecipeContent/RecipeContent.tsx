@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import * as ri from "react-icons/ri";
 import * as ai from "react-icons/ai";
 import { LuUtensils } from "react-icons/lu";
@@ -10,9 +10,6 @@ import { INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
 import {
   Button,
-  Link,
-  LinkBox,
-  LinkOverlay,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -20,9 +17,12 @@ import {
   NumberInputStepper,
   Select,
 } from "@chakra-ui/react";
+import Link from "next/link";
+
 import { TextContent } from "../TextContent";
 import { FrontendNodeGateway } from "~/nodes";
 import { RecipeTimer } from "./RecipeTimer";
+import { pathToString } from "~/global";
 
 export interface RecipeContentProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
@@ -30,7 +30,6 @@ export interface RecipeContentProps {
 export const RecipeContent = (props: RecipeContentProps) => {
   const { nodeIdsToNodesMap } = props;
   const [currentNode] = useRecoilState(currentNodeState);
-  const setCurrentNode = useSetRecoilState(currentNodeState);
   const [tempUnits] = useState(["celsius", "fahrenheit", "kelvin"]);
   const [volumeUnits] = useState(["ml", "l", "fl oz", "cup", "tsp"]);
   const [weightUnits] = useState(["oz", "lb", "g", "kg"]);
@@ -39,9 +38,9 @@ export const RecipeContent = (props: RecipeContentProps) => {
   const [rightSelectedUnit, setRightSelectedUnit] = useState("");
   const [leftUnitValue, setLeftUnitValue] = useState<number>(0);
   const [rightUnitValue, setRightUnitValue] = useState<number>(0);
-  const [descriptionNode, setDescriptionNode] = useState<INode>();
-  const [ingredientsNode, setIngredientsNode] = useState<INode>();
-  const [stepsNode, setStepsNode] = useState<INode>();
+  const [descriptionNode, setDescriptionNode] = useState<INode>(currentNode);
+  const [ingredientsNode, setIngredientsNode] = useState<INode>(currentNode);
+  const [stepsNode, setStepsNode] = useState<INode>(currentNode);
   const [refresh, setRefresh] = useRecoilState(refreshState);
 
   useEffect(() => {
@@ -54,21 +53,7 @@ export const RecipeContent = (props: RecipeContentProps) => {
     rightUnitValue,
   ]);
 
-  useEffect(() => {
-    let desNode = null;
-    const hi = async () => {
-      desNode = await FrontendNodeGateway.getNode(
-        (currentNode as IRecipeNode).ingredientsID
-      );
-      console.log(desNode.payload);
-    };
-    hi();
-    const ingsNode =
-      nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
-    const stNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
-    console.log(desNode, ingsNode, stNode);
-  }, []);
-  useEffect(() => {
+  const loadNodes = useCallback(() => {
     const getDescriptionNode = () => {
       const desNode =
         nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
@@ -87,6 +72,10 @@ export const RecipeContent = (props: RecipeContentProps) => {
     getIngredientsNode();
     getStepsNode();
   }, [currentNode]);
+
+  useEffect(() => {
+    loadNodes();
+  }, [loadNodes, currentNode, refresh]);
 
   const handleUnitTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -257,50 +246,51 @@ export const RecipeContent = (props: RecipeContentProps) => {
       <div className="recipe-right">
         <div className="recipe-description-container">
           <b style={{ fontSize: 30 }}>Description</b>
-          <div className="description">
-            {descriptionNode ? (
-              <TextContent
-                nodeIdsToNodesMap={nodeIdsToNodesMap}
-                currentNode={descriptionNode}
-                editable={false}
-              />
-            ) : (
-              <p>Loading description...</p>
-            )}
-          </div>
+          <Link href={`/dashboard/${descriptionNode?.nodeId}`}>
+            <div className="description">
+              {descriptionNode ? (
+                <TextContent
+                  nodeIdsToNodesMap={nodeIdsToNodesMap}
+                  currentNode={descriptionNode}
+                  editable={false}
+                />
+              ) : (
+                <p>Loading description...</p>
+              )}
+            </div>
+          </Link>
         </div>
         <div className="recipe-ingredients-container">
           <b style={{ fontSize: 30 }}>Ingredients</b>
-          <div
-            className="ingredients"
-            onClick={() => setCurrentNode(ingredientsNode)}
-          >
-            {ingredientsNode ? (
-              <TextContent
-                nodeIdsToNodesMap={nodeIdsToNodesMap}
-                currentNode={ingredientsNode}
-                extensions={["BulletList"]}
-                editable={false}
-              />
-            ) : (
-              <p>Loading ingredients...</p>
-            )}
-          </div>
+          <Link href={`/dashboard/${ingredientsNode?.nodeId}`}>
+            <div className="ingredients">
+              {ingredientsNode ? (
+                <TextContent
+                  nodeIdsToNodesMap={nodeIdsToNodesMap}
+                  currentNode={ingredientsNode}
+                  editable={false}
+                />
+              ) : (
+                <p>Loading ingredients...</p>
+              )}
+            </div>
+          </Link>
         </div>
         <div className="recipe-steps-container">
           <b style={{ fontSize: 30 }}>Steps</b>
-          <div className="steps" onClick={() => setCurrentNode(stepsNode)}>
-            {stepsNode ? (
-              <TextContent
-                nodeIdsToNodesMap={nodeIdsToNodesMap}
-                currentNode={stepsNode}
-                extensions={["OrderedList"]}
-                editable={false}
-              />
-            ) : (
-              <p>Loading steps...</p>
-            )}
-          </div>
+          <Link href={`/dashboard/${stepsNode?.nodeId}`}>
+            <div className="steps">
+              {stepsNode ? (
+                <TextContent
+                  nodeIdsToNodesMap={nodeIdsToNodesMap}
+                  currentNode={stepsNode}
+                  editable={false}
+                />
+              ) : (
+                <p>Loading steps...</p>
+              )}
+            </div>
+          </Link>
         </div>
       </div>
     </div>

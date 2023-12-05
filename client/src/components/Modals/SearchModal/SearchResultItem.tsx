@@ -35,7 +35,7 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
   }, [date]);
 
   return (
-    <Link href={`/${nodeId}`} onClick={onClose}>
+    <Link href={`/dashboard/${nodeId}`} onClick={onClose}>
       <li className="result-item">
         <div className="result-content">
           <div className="result-type">{`${type} node`}</div>

@@ -26,14 +26,15 @@ import {
   NodeType,
   makeINodeProperty,
   INodeProperty,
+  makeINodePath,
 } from "../../../types";
 
 import { Button } from "../../Button";
 import { TreeView } from "../../TreeView";
 import "./CreateNodeModal.scss";
 import { createNodeFromModal, getMeta, uploadImage } from "./createNodeUtils";
-import { useSetRecoilState } from "recoil";
-import { selectedNodeState } from "../../../global/Atoms";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { refreshState, selectedNodeState } from "../../../global/Atoms";
 import { CookTimeInput } from "./CookTimeInput";
 import { IngredientsInput } from "./IngredientsInput";
 import { StepsInput } from "./StepsInput";
@@ -70,6 +71,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   const [description, setDescription] = useState("");
   const [selectedType, setSelectedType] = useState<NodeType>("" as NodeType);
   const [error, setError] = useState<string>("");
+  const [refresh, setRefresh] = useRecoilState(refreshState);
 
   // event handlers for the modal inputs and dropdown selects
   const handleSelectedTypeChange = (
@@ -171,9 +173,45 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     };
 
     if (selectedType == "recipe") {
-      const descriptionID = "";
-      const ingredientsID = "";
-      const stepsID = "";
+      const descriptionAttributes = {
+        content: description,
+        nodeIdsToNodesMap,
+        parentNodeId: null,
+        title: `${title} Description`,
+        type: "text" as NodeType,
+        height,
+        width,
+      };
+      const descriptionNode = await createNodeFromModal(descriptionAttributes);
+      console.log(descriptionNode);
+
+      const ingredientsAttributes = {
+        content: transformContent(ingredients, "Ingredients"),
+        nodeIdsToNodesMap,
+        parentNodeId: null,
+        title: `${title} Ingredients`,
+        type: "text" as NodeType,
+        height,
+        width,
+      };
+      const ingredientsNode = await createNodeFromModal(ingredientsAttributes);
+      console.log(ingredientsNode);
+
+      const stepsAttributes = {
+        content: transformContent(steps, "Steps"),
+        nodeIdsToNodesMap,
+        parentNodeId: null,
+        title: `${title} Steps`,
+        type: "text" as NodeType,
+        height,
+        width,
+      };
+      const stepsNode = await createNodeFromModal(stepsAttributes);
+      console.log(stepsNode);
+
+      const descriptionID = descriptionNode?.nodeId;
+      const ingredientsID = ingredientsNode?.nodeId;
+      const stepsID = stepsNode?.nodeId;
       const recipeAttributes = {
         ...attributes,
         descriptionID,
@@ -185,65 +223,49 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       };
 
       const recipeNode = await createNodeFromModal(recipeAttributes);
+      console.log(recipeNode);
+      if (recipeNode?.nodeId && descriptionID && ingredientsID && stepsID) {
+        console.log("hello");
 
-      const descriptionAttributes = {
-        content: description,
-        nodeIdsToNodesMap,
-        parentNodeId: recipeNode ? recipeNode.nodeId : null,
-        title: `${title} Description`,
-        type: "text" as NodeType,
-        height,
-        width,
-      };
-      const descriptionNode = await createNodeFromModal(descriptionAttributes);
+        const pathProperty: INodeProperty = makeINodeProperty(
+          "filePath",
+          makeINodePath(
+            [recipeNode.nodeId],
+            [descriptionID, ingredientsID, stepsID]
+          )
+        );
 
-      const ingredientsAttributes = {
-        content: transformContent(ingredients, "Ingredients"),
-        nodeIdsToNodesMap,
-        parentNodeId: recipeNode ? recipeNode.nodeId : null,
-        title: `${title} Ingredients`,
-        type: "text" as NodeType,
-        height,
-        width,
-      };
-      const ingredientsNode = await createNodeFromModal(ingredientsAttributes);
+        await FrontendNodeGateway.updateNode(recipeNode.nodeId, [pathProperty]);
 
-      const stepsAttributes = {
-        content: transformContent(steps, "Steps"),
-        nodeIdsToNodesMap,
-        parentNodeId: recipeNode ? recipeNode.nodeId : null,
-        title: `${title} Steps`,
-        type: "text" as NodeType,
-        height,
-        width,
-      };
-      const stepsNode = await createNodeFromModal(stepsAttributes);
+        const descriptionProperty: INodeProperty = makeINodeProperty(
+          "filePath",
+          makeINodePath(recipeNode.filePath.path.concat([descriptionID]))
+        );
 
-      const descriptionProperty: INodeProperty = makeINodeProperty(
-        "descriptionID",
-        descriptionNode?.nodeId
-      );
-
-      const ingredientsProperty: INodeProperty = makeINodeProperty(
-        "ingredientsID",
-        ingredientsNode?.nodeId
-      );
-
-      const stepsProperty: INodeProperty = makeINodeProperty(
-        "stepsID",
-        stepsNode?.nodeId
-      );
-
-      if (recipeNode?.nodeId) {
-        await FrontendNodeGateway.updateNode(recipeNode?.nodeId, [
+        await FrontendNodeGateway.updateNode(descriptionNode?.nodeId, [
           descriptionProperty,
+        ]);
+
+        const ingredientsProperty: INodeProperty = makeINodeProperty(
+          "filePath",
+          makeINodePath(recipeNode.filePath.path.concat([ingredientsID]))
+        );
+
+        await FrontendNodeGateway.updateNode(ingredientsNode?.nodeId, [
           ingredientsProperty,
+        ]);
+
+        const stepsProperty: INodeProperty = makeINodeProperty(
+          "filePath",
+          makeINodePath(recipeNode.filePath.path.concat([stepsID]))
+        );
+
+        await FrontendNodeGateway.updateNode(stepsNode?.nodeId, [
           stepsProperty,
         ]);
       }
       onSubmit();
       recipeNode && setSelectedNode(recipeNode);
-      console.log(recipeNode);
 
       //add checking if statment so that they fill out all of the necessary fields
     } else {
@@ -253,6 +275,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
 
     onSubmit();
     handleClose();
+    setRefresh(!refresh);
   };
 
   /** Reset all our state variables and close the modal */
