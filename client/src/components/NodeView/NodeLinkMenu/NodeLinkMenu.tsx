@@ -31,10 +31,11 @@ export const NodeLinkMenu = (props: INodeLinkMenuProps) => {
   const [linkMenuRefresh] = useRecoilState(refreshLinkListState);
 
   useEffect(() => {
-    const fetchLinks = async () => {
+    const fetchLinks = async (currentNode: INode) => {
+      console.log(currentNode);
       setAnchorsMap(await loadAnchorToLinksMap({ ...props, currentNode }));
     };
-    fetchLinks();
+    fetchLinks(currentNode);
   }, [currentNode, refresh, selectedAnchors, anchorRefresh, linkMenuRefresh]);
 
   const loadMenu = () => {

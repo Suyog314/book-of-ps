@@ -183,6 +183,15 @@ export class BackendUserGateway {
   }
 
   /**
+   * Method to delete a users by id
+   *
+   * @param userId - The id of the user to delete
+   */
+  async deleteUser(userId: string): Promise<IServiceResponse<null>> {
+    return await this.userCollectionConnection.deleteUserById(userId);
+  }
+
+  /**
    * Method to delete all users from the collection
    *
    */

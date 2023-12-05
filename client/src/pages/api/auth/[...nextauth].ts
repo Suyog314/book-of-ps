@@ -31,6 +31,7 @@ export const authOptions: NextAuthOptions = {
           if (!authResp.success) {
             return null;
           }
+
           // return authResp.payload as any;
           return {
             name: authResp.payload.name,

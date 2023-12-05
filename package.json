@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "next-auth": "^4.24.5",
-    "react-flow-renderer": "^10.3.17"
+    "react-flow-renderer": "^10.3.17",
+    "recoil-persist": "^5.1.0"
   }
 }

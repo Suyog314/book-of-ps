@@ -100,7 +100,6 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       const linkResponse = await FrontendLinkGateway.getLinksByAnchorId(
         anchor.anchorId
       );
-      console.log(linkResponse.payload);
       if (!linkResponse.success) {
         return failureServiceResponse("failed to get link");
       }
