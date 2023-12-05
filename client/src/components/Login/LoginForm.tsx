@@ -4,7 +4,6 @@ import { ChakraProvider, Input } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Button } from "../Button";
 import { signIn } from "next-auth/react";
 import { LoadingScreen } from "../LoadingScreen";
 import "./LoginForm.scss";
@@ -71,29 +70,40 @@ export default function Login() {
         </ChakraProvider>
       ) : (
         <div className="login-wrapper">
-          <h1 className="login-header">Login</h1>
-          <div className="login-form">
-            <Input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-            />
-            <Input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              type="password"
-              onKeyDown={handleKeyPress}
-            />
+          <div className="login-box">
+            <h1 className="login-header">Login</h1>
+            <div className="login-form">
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+              />
+              <Input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                type="password"
+                onKeyDown={handleKeyPress}
+              />
 
-            <Button text="Login" onClick={handleLogin} />
+              <button className="login-button" onClick={handleLogin}>
+                Login
+              </button>
 
-            {error && <div className="login-error-message">{error}</div>}
+              {error && <div className="login-error-message">{error}</div>}
 
-            <Link className="login-no-account" href={"/register"}>
-              Do not have an account?{" "}
-              <span className="login-to-register-link">Register</span>
-            </Link>
+              <div className="login-no-account">
+                Do not have an account?{" "}
+                <Link
+                  href={"/register"}
+                  onClick={() => {
+                    setLoading(true);
+                  }}
+                >
+                  <span className="login-to-register-link">Register</span>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       )}
