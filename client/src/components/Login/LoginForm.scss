@@ -38,6 +38,7 @@ $enlargement-factor: 120%; /* Enlargement factor */
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
+      transition: 0.3s;
 
       input {
         width: 100%;
