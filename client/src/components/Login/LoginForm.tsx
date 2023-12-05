@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { LoadingScreen } from "../LoadingScreen";
 import "./LoginForm.scss";
+import "@fontsource/montserrat";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -71,12 +72,13 @@ export default function Login() {
       ) : (
         <div className="login-wrapper">
           <div className="login-box">
-            <h1 className="login-header">Login</h1>
+            <h1 className="login-header">Enter Your Details</h1>
             <div className="login-form">
               <Input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
+                onKeyDown={handleKeyPress}
               />
               <Input
                 value={password}

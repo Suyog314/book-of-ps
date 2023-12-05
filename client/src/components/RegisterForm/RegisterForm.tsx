@@ -1,5 +1,7 @@
 "use client";
 
+import "@fontsource/montserrat";
+
 import Link from "next/link";
 import { useRouter } from "next/router";
 import "./RegisterForm.scss";
@@ -87,17 +89,20 @@ export default function Register() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Full Name"
+                onKeyDown={handleKeyPress}
               />
               <Input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
+                onKeyDown={handleKeyPress}
               />
               <Input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 type="password"
+                onKeyDown={handleKeyPress}
               />
               <Input
                 value={verifyPassword}

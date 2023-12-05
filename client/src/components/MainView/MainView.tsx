@@ -18,6 +18,7 @@ import {
   isAppLoadedState,
   rootNodesState,
   isLoggedIn,
+  userSessionState,
 } from "../../global/Atoms";
 import { useRouter } from "next/router";
 import { FrontendNodeGateway } from "../../nodes";
@@ -35,8 +36,13 @@ import {
 import { NodeView } from "../NodeView";
 import { TreeView } from "../TreeView";
 import "./MainView.scss";
-import { createNodeIdsToNodesMap, makeRootWrapper } from "./mainViewUtils";
+import {
+  createNodeIdsToNodesMap,
+  generateBackground,
+  makeRootWrapper,
+} from "./mainViewUtils";
 import { GraphModal } from "../Modals/GraphModal/GraphModal";
+import { ProfileModal } from "../Modals/ProfileModal";
 
 export const MainView = React.memo(function MainView() {
   // app states
@@ -47,6 +53,7 @@ export const MainView = React.memo(function MainView() {
   const [moveNodeModalOpen, setMoveNodeModalOpen] = useState(false);
   const [graphModalOpen, setGraphModalOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   // node states
   const [selectedNode, setSelectedNode] = useRecoilState(selectedNodeState);
   const [rootNodes, setRootNodes] = useRecoilState(rootNodesState);
@@ -58,6 +65,7 @@ export const MainView = React.memo(function MainView() {
   const setAlertIsOpen = useSetRecoilState(alertOpenState);
   const setAlertTitle = useSetRecoilState(alertTitleState);
   const setAlertMessage = useSetRecoilState(alertMessageState);
+  const userSession = useRecoilValue(userSessionState);
 
   /** update our frontend root nodes from the database */
   const loadRootsFromDB = useCallback(async () => {
@@ -149,11 +157,14 @@ export const MainView = React.memo(function MainView() {
 
   const handleMoveNodeButtonClick = useCallback(() => {
     setMoveNodeModalOpen(true);
-    console.log("move");
   }, []);
 
   const handleCompleteLinkClick = useCallback(() => {
     setCompleteLinkModalOpen(true);
+  }, []);
+
+  const handleProfileClick = useCallback(() => {
+    setProfileModalOpen(true);
   }, []);
 
   const handleHomeClick = useCallback(() => {
@@ -219,6 +230,15 @@ export const MainView = React.memo(function MainView() {
             onCreateNodeButtonClick={handleCreateNodeButtonClick}
             nodeIdsToNodesMap={nodeIdsToNodesMap}
             onSearchClick={() => setSearchModalOpen(true)}
+            onProfileClick={handleProfileClick}
+            avatarSrc={`https://ui-avatars.com/api/?name=${userSession?.user.name}&background=random&rounded=true&bold=true&color=ffffff`}
+          />
+          <ProfileModal
+            isOpen={profileModalOpen}
+            onClose={() => setProfileModalOpen(false)}
+            avatarSrc={`https://ui-avatars.com/api/?name=${userSession?.user.name}&background=random&rounded=true&bold=true&color=ffffff`}
+            userName={userSession?.user.name}
+            userEmail={userSession?.user.email}
           />
           <SearchModal
             isOpen={searchModalOpen}

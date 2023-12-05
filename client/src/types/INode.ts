@@ -43,6 +43,8 @@ export interface INode {
   dateCreated?: Date; // date that the node was created
   height?: number[];
   width?: number[];
+  authorId?: string;
+  collaborators?: string[];
 }
 export interface IRecipeNode extends INode {
   descriptionID: string;
@@ -94,7 +96,9 @@ export function makeINode(
   title: string | null = null,
   content: any = null,
   height: number[] = [],
-  width: number[] = []
+  width: number[] = [],
+  authorId?: string,
+  collaborators?: string[]
 ): INode {
   return {
     nodeId: nodeId,
@@ -104,6 +108,8 @@ export function makeINode(
     filePath: makeINodePath(path, children),
     height: height ?? [],
     width: width ?? [],
+    authorId: authorId,
+    collaborators: collaborators,
   };
 }
 
