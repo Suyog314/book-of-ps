@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextAuthOptions } from "next-auth";
-import { JWT, decode, encode } from "next-auth/jwt";
+import { decode, encode } from "next-auth/jwt";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { FrontendUserGateway } from "~/users";
@@ -28,11 +28,16 @@ export const authOptions: NextAuthOptions = {
             email,
             password
           );
-          console.log(authResp.message);
           if (!authResp.success) {
             return null;
           }
-          return authResp.payload as any;
+          // return authResp.payload as any;
+          return {
+            name: authResp.payload.name,
+            email: authResp.payload.email,
+            userId: authResp.payload.userId,
+            userAvatar: authResp.payload.userAvatar,
+          } as any;
         } catch (error) {
           console.error("[authenticate] ", error);
         }

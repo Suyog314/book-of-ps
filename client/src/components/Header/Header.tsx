@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import * as ri from "react-icons/ri";
 import * as ai from "react-icons/ai";
@@ -36,6 +36,7 @@ export const Header = (props: IHeaderProps) => {
   const customButtonStyle = { height: 30, marginLeft: 10, width: 30 };
   const [isLinking, setIsLinking] = useRecoilState(isLinkingState);
   const [startAnchor, setStartAnchor] = useRecoilState(startAnchorState);
+  const [bgColor, setBgColor] = useState("a0a0a0");
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
   const userSession = useRecoilValue(userSessionState);
 
@@ -48,6 +49,39 @@ export const Header = (props: IHeaderProps) => {
   const handleSearchClick = () => {
     onSearchClick();
   };
+
+  const handleProfileClick = () => {
+    console.log("hi");
+  };
+
+  function generateBackground(name: string) {
+    let hash = 0;
+    let i;
+
+    for (i = 0; i < name.length; i += 1) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    // name.charCodeAt() return an int between 0 and 65535
+    // left shift (<<)  operator moves to left by number of specified
+    // bites after <<. The whole for loop will create a color hash
+    // based on username length
+    let color = "";
+
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+
+    return color;
+  }
+
+  useEffect(() => {
+    if (!userSession?.user.name) {
+      return;
+    }
+    const color = generateBackground(userSession?.user.name);
+    setBgColor(color);
+  }, []);
 
   return (
     <div className={isLinking ? "header-linking" : "header"}>
@@ -84,6 +118,17 @@ export const Header = (props: IHeaderProps) => {
         </div>
       )}
       <div className="right-bar">
+        {!isLinking && (
+          <div className="profile-pic-container">
+            <div className="profile-pic-wrapper" onClick={handleProfileClick}>
+              <img
+                alt="profile-pic"
+                src={`https://ui-avatars.com/api/?name=${userSession?.user.name}&background=${bgColor}&rounded=true&bold=true&color=ffffff`}
+              ></img>
+              <div className="overlay"></div>
+            </div>
+          </div>
+        )}
         {!isLinking && (
           <div className="user-session-name">{userSession?.user?.name}</div>
         )}

@@ -9,6 +9,7 @@ import { Button } from "../Button";
 import { makeIUser } from "~/types";
 import bcrypt from "bcryptjs";
 import { FrontendUserGateway } from "~/users";
+import { http, uploadImage } from "../Modals/CreateNodeModal/createNodeUtils";
 import { LoadingScreen } from "../LoadingScreen";
 
 export default function Register() {
@@ -16,6 +17,9 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
+  const [avatar, setAvatar] = useState(
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
+  );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -39,7 +43,7 @@ export default function Register() {
     }
     // else, create new user
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = makeIUser(name, email, hashedPassword);
+    const newUser = makeIUser(name, email, hashedPassword, avatar);
     const createUserResp = await FrontendUserGateway.createUser(newUser);
     if (!createUserResp.success) {
       setError(createUserResp.message);
@@ -51,9 +55,19 @@ export default function Register() {
     setEmail("");
     setPassword("");
     setVerifyPassword("");
+    setAvatar(
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
+    );
     setError("");
     // redirect to login page
     router.push("/login");
+  };
+
+  // Function to handle Enter key press
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSubmit();
+    }
   };
 
   return (
@@ -90,6 +104,7 @@ export default function Register() {
                 onChange={(e) => setVerifyPassword(e.target.value)}
                 placeholder="Retype Password"
                 type="password"
+                onKeyDown={handleKeyPress}
               />
 
               <button className="register-button" onClick={handleSubmit}>
