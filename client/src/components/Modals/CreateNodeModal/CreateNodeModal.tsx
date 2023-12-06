@@ -67,7 +67,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
   );
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [serving, setServing] = useState(0);
+  const [serving, setServing] = useState<number>(0);
   const [ingredients, setIngredients] = useState<string[]>(["", ""]);
   const [steps, setSteps] = useState<string[]>(["", ""]);
   const [time, setTime] = useState<number>(0);
@@ -177,21 +177,30 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     };
 
     if (selectedType == "recipe") {
-      // const descriptionID = "";
-      // const ingredientsID = "";
-      // const stepsID = "";
-      // const recipeAttributes = {
-      //   ...attributes,
-      //   descriptionID,
-      //   ingredientsID,
-      //   stepsID,
-      //   serving,
-      //   cuisine,
-      //   time,
-      // };
-
-      // const recipeNode = await createNodeFromModal(recipeAttributes);
-
+      if (serving == 0) {
+        setError("Error: No serving amount");
+        return;
+      }
+      if (time == 0) {
+        setError("Error: No cook time");
+        return;
+      }
+      if (description == "") {
+        setError("Error: No description");
+        return;
+      }
+      if (steps.length == 2 && steps[0] == "" && steps[1] == "") {
+        setError("Error: No cooking steps");
+        return;
+      }
+      if (
+        ingredients.length == 2 &&
+        ingredients[0] == "" &&
+        ingredients[1] == ""
+      ) {
+        setError("Error: No ingredients");
+        return;
+      }
       const descriptionAttributes = {
         content: description,
         nodeIdsToNodesMap,

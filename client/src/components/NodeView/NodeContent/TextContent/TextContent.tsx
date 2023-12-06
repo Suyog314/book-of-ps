@@ -255,13 +255,8 @@ export const TextContent = (props: INodeLinkMenuProps) => {
   }
 
   return (
-    <div
-      className="editor-container"
-      onFocus={() => {
-        setEditing(true);
-      }}
-    >
-      {editing && <TextMenu editor={editor} save={handleContentChange} />}
+    <div className="editor-container">
+      {editable && <TextMenu editor={editor} save={handleContentChange} />}
       <EditorContent
         className="editorContent"
         editor={editor}

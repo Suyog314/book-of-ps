@@ -86,6 +86,7 @@ export const NodeView = (props: INodeViewProps) => {
   }, [currentNode]);
 
   const loadChildAnchorsFromNodeId = useCallback(async () => {
+    const newAnchors: IAnchor[] = [];
     const nodeIDs: string[] = [
       (currentNode as IRecipeNode).descriptionID,
       (currentNode as IRecipeNode).ingredientsID,
@@ -96,10 +97,9 @@ export const NodeView = (props: INodeViewProps) => {
         nodeID
       );
       if (anchorsFromNode.success) {
-        const newAnchors = [...anchors]; // Create a shallow copy of the existing anchors
-        newAnchors.push(...anchorsFromNode.payload); // Concatenate the new anchors
-        setAnchors(newAnchors); // Update the state
+        newAnchors.push(...anchorsFromNode.payload);
       }
+      setAnchors(newAnchors);
     });
   }, [currentNode]);
 

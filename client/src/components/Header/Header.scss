@@ -34,6 +34,7 @@
       font-weight: normal;
       background-color: $secondary-background-color;
       transition: 0.3s;
+      height: 30px;
 
       &:hover {
         background-color: darken($secondary-background-color, 10);

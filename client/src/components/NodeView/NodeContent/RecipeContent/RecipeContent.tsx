@@ -8,7 +8,6 @@ import "./RecipeContent.scss";
 import { Cuisine, INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
 import {
-  Button,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -21,7 +20,6 @@ import Link from "next/link";
 import { TextContent } from "../TextContent";
 import { FrontendNodeGateway } from "~/nodes";
 import { RecipeTimer } from "./RecipeTimer";
-import { pathToString } from "~/global";
 
 export interface RecipeContentProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
@@ -46,34 +44,27 @@ export const RecipeContent = (props: RecipeContentProps) => {
 
   const stepsNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
 
-  // useEffect(() => {
-  //   convertUnits("left");
-  // }, [rightSelectedUnit, leftUnitValue]);
-
-  // useEffect(() => {
-  //   convertUnits("right");
-  // }, [leftSelectedUnit, rightUnitValue]);
-
   useEffect(() => {
-    convertUnits("none");
-  }, [selectedUnitType]);
+    convertUnits();
+  }, [
+    leftSelectedUnit,
+    rightSelectedUnit,
+    leftUnitValue,
+    rightUnitValue,
+    selectedUnitType,
+  ]);
 
-  const convertUnits = (side: string) => {
-    let convertedValue = null;
-    switch (side) {
-      case "left":
-      case "none":
-        convertedValue = convert(leftUnitValue, leftSelectedUnit as any).to(
-          rightSelectedUnit as any
-        );
-        setRightUnitValue(convertedValue as unknown as number);
-      case "right":
-        convertedValue = convert(rightUnitValue, rightSelectedUnit as any).to(
-          leftSelectedUnit as any
-        );
-        setLeftUnitValue(convertedValue as unknown as number);
-    }
+  const convertUnits = () => {
+    const convertedValue = convert(leftUnitValue, leftSelectedUnit as any).to(
+      rightSelectedUnit as any
+    );
+
+    // Limit the number of decimal places to 3
+    const roundedValue = parseFloat(convertedValue.toFixed(3));
+
+    setRightUnitValue(roundedValue);
   };
+
   const handleUnitTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -162,11 +153,11 @@ export const RecipeContent = (props: RecipeContentProps) => {
             <div className="left-input">
               <NumberInput
                 style={{ width: "90%" }}
-                defaultValue={1}
                 onChange={(valueString) => {
                   setLeftUnitValue(Number(valueString));
                 }}
                 value={leftUnitValue}
+                precision={2}
               >
                 <NumberInputField
                   onChange={(value) =>
@@ -181,24 +172,7 @@ export const RecipeContent = (props: RecipeContentProps) => {
             </div>
             <b>=</b>
             <div className="right-input">
-              <NumberInput
-                style={{ width: "90%" }}
-                defaultValue={1}
-                onChange={(valueString) => {
-                  setRightUnitValue(Number(valueString));
-                }}
-                value={rightUnitValue}
-              >
-                <NumberInputField
-                  onChange={(value) =>
-                    setRightUnitValue(Number(value.target.value))
-                  }
-                />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
+              <b>{rightUnitValue}</b>
             </div>
           </div>
           <div className="unit-section">

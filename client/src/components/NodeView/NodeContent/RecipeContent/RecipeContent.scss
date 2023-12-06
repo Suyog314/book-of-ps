@@ -63,15 +63,23 @@
         display: flex;
         margin-top: 16px;
         align-items: center;
+        // justify-content: space-between;
         .left-input {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
+          width: 49%;
         }
         .right-input {
           display: flex;
-          flex-direction: column;
-          align-items: flex-end;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          width: 43%;
+          height: 40px;
+          border-radius: 5px;
+          border-width: 1.05px;
+          margin-left: 13px;
         }
       }
       .unit-section {

@@ -103,7 +103,7 @@ export const LinkItem = (props: ILinkItemProps) => {
       anchors.push(firstAnchor);
       anchors.push(secondAnchor);
     }
-
+    console.log(props);
     const nodeId = await fetchNodeFromLink({
       ...props,
       currentNode,
@@ -111,6 +111,8 @@ export const LinkItem = (props: ILinkItemProps) => {
       setRefresh,
       refresh,
     });
+
+    console.log(nodeId);
     router.push(`/dashboard/${nodeId}`);
     setSelectedAnchors(anchors);
   };
