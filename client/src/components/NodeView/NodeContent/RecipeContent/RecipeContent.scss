@@ -63,15 +63,19 @@
         display: flex;
         margin-top: 16px;
         align-items: center;
+        // justify-content: space-between;
         .left-input {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
+          width: 49%;
         }
         .right-input {
           display: flex;
-          flex-direction: column;
-          align-items: flex-end;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          width: 48%;
         }
       }
       .unit-section {

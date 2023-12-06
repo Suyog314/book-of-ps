@@ -77,6 +77,7 @@ export const NodeView = (props: INodeViewProps) => {
   setCurrentNode(currentNode);
 
   const loadAnchorsFromNodeId = useCallback(async () => {
+    console.log("bruh");
     const anchorsFromNode = await FrontendAnchorGateway.getAnchorsByNodeId(
       currentNode.nodeId
     );
@@ -86,11 +87,13 @@ export const NodeView = (props: INodeViewProps) => {
   }, [currentNode]);
 
   const loadChildAnchorsFromNodeId = useCallback(async () => {
+    setAnchors([]);
     const nodeIDs: string[] = [
       (currentNode as IRecipeNode).descriptionID,
       (currentNode as IRecipeNode).ingredientsID,
       (currentNode as IRecipeNode).stepsID,
     ];
+    console.log(nodeIDs);
     nodeIDs.forEach(async (nodeID) => {
       const anchorsFromNode = await FrontendAnchorGateway.getAnchorsByNodeId(
         nodeID
@@ -172,6 +175,8 @@ export const NodeView = (props: INodeViewProps) => {
   const hasAnchors: boolean = anchors.length > 0;
   let nodePropertiesWidth: number = hasAnchors ? 200 : 0;
   const nodeViewWidth = `calc(100% - ${nodePropertiesWidth}px)`;
+
+  console.log(hasAnchors, "hasAnchors", anchors);
 
   const nodeProperties = useRef<HTMLHeadingElement>(null);
   const divider = useRef<HTMLHeadingElement>(null);
