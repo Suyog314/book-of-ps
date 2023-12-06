@@ -121,7 +121,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       editor.commands.setContent(currentNode?.content);
       addAnchorMarks();
     }
-  }, [currentNode, refresh]);
+  }, [currentNode, editor]);
 
   // Set the selected extent to null when this component loads
   useEffect(() => {
