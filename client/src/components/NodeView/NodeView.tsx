@@ -95,15 +95,12 @@ export const NodeView = (props: INodeViewProps) => {
       const anchorsFromNode = await FrontendAnchorGateway.getAnchorsByNodeId(
         nodeID
       );
-      console.log(nodeID);
       if (anchorsFromNode.success) {
-        console.log(anchorsFromNode.payload);
         const newAnchors = [...anchors]; // Create a shallow copy of the existing anchors
         newAnchors.push(...anchorsFromNode.payload); // Concatenate the new anchors
         setAnchors(newAnchors); // Update the state
       }
     });
-    console.log(anchors, "finalAnchors");
   }, [currentNode]);
 
   const handleStartLinkClick = () => {
@@ -156,14 +153,12 @@ export const NodeView = (props: INodeViewProps) => {
 
   useEffect(() => {
     if (currentNode.type !== "recipe") {
-      console.log("not RecipeNode");
       loadAnchorsFromNodeId();
     }
   }, [loadAnchorsFromNodeId, currentNode, refresh, setSelectedAnchors]);
 
   useEffect(() => {
     if (currentNode.type == "recipe") {
-      console.log("recipeNode");
       loadChildAnchorsFromNodeId();
     }
   }, [loadChildAnchorsFromNodeId, currentNode, refresh, setSelectedAnchors]);
