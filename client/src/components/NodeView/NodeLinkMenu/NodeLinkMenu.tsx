@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { IAnchor, ILink, INode, NodeIdsToNodesMap } from "../../../types";
+import {
+  IAnchor,
+  ILink,
+  INode,
+  IRecipeNode,
+  NodeIdsToNodesMap,
+} from "../../../types";
 import { AnchorItem, LinkItem } from "./AnchorItem";
 import "./NodeLinkMenu.scss";
 import { includesAnchorId, loadAnchorToLinksMap } from "./nodeLinkMenuUtils";
@@ -32,10 +38,32 @@ export const NodeLinkMenu = (props: INodeLinkMenuProps) => {
 
   useEffect(() => {
     const fetchLinks = async (currentNode: INode) => {
-      console.log(currentNode);
       setAnchorsMap(await loadAnchorToLinksMap({ ...props, currentNode }));
     };
-    fetchLinks(currentNode);
+    if (currentNode.type == "recipe") {
+      console.log("recipeNode");
+      let ancMap: {
+        [anchorId: string]: {
+          anchor: IAnchor;
+          links: { link: ILink; oppNode: INode; oppAnchor: IAnchor }[];
+        };
+      } = anchorsMap;
+      const descriptionNode =
+        nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
+      fetchLinks(descriptionNode);
+      ancMap = { ...ancMap, ...anchorsMap };
+      const ingredientsNode =
+        nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
+      fetchLinks(ingredientsNode);
+      ancMap = { ...ancMap, ...anchorsMap };
+      const stepsNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
+      fetchLinks(stepsNode);
+      ancMap = { ...ancMap, ...anchorsMap };
+      console.log(ancMap);
+      setAnchorsMap(ancMap);
+    } else {
+      fetchLinks(currentNode);
+    }
   }, [currentNode, refresh, selectedAnchors, anchorRefresh, linkMenuRefresh]);
 
   const loadMenu = () => {

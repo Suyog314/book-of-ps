@@ -75,6 +75,7 @@ export const MainView = React.memo(function MainView() {
 
   useEffect(() => {
     loadRootsFromDB();
+    console.log(rootNodes);
   }, [loadRootsFromDB, refresh]);
 
   const rootRecursiveNodeTree: RecursiveNodeTree = useMemo(

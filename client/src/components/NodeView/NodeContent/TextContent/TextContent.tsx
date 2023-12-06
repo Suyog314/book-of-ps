@@ -38,13 +38,12 @@ import OrderedList from "@tiptap/extension-ordered-list";
 export interface INodeLinkMenuProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
   currentNode: INode;
-  extensions?: string[];
   editable: boolean;
 }
 
 /** The content of an text node, including all its anchors */
 export const TextContent = (props: INodeLinkMenuProps) => {
-  const { currentNode, extensions, editable } = props;
+  const { currentNode, editable } = props;
   const setCurrentNode = useSetRecoilState(currentNodeState);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
   const [refresh, setRefresh] = useRecoilState(refreshState);
@@ -53,10 +52,6 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     useRecoilState(refreshLinkListState);
   const globalCurrentNode = useRecoilValue(currentNodeState);
   const [editing, setEditing] = useState(false);
-
-  useEffect(() => {
-    console.log(editing);
-  }, [editing]);
 
   //editor and all extensions are added here
   const editor = useEditor({
