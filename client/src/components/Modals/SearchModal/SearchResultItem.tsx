@@ -10,7 +10,7 @@ export interface ISearchResultItemProps {
   onClose: () => void;
 }
 export const SearchResultItem = (props: ISearchResultItemProps) => {
-  const { key, type, title, nodeId, onClose, date } = props;
+  const { type, title, key, nodeId, onClose, date } = props;
 
   const [formattedDate, setFormattedDate] = useState<string>("");
 
@@ -35,7 +35,7 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
   }, [date]);
 
   return (
-    <Link href={`/${nodeId}`} onClick={onClose}>
+    <Link href={`/dashboard/${nodeId}`} onClick={onClose}>
       <li className="result-item">
         <div className="result-content">
           <div className="result-type">{`${type} node`}</div>
