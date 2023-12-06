@@ -68,7 +68,6 @@ export const NodeLinkMenu = (props: INodeLinkMenuProps) => {
     };
     setAnchorsMap({});
     updateAnchorsMap();
-    console.log(anchorsMap);
   }, [currentNode, refresh, selectedAnchors, anchorRefresh, linkMenuRefresh]);
 
   const loadMenu = () => {

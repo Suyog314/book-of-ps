@@ -153,18 +153,13 @@ export const NodeView = (props: INodeViewProps) => {
 
   useEffect(() => {
     if (currentNode.type !== "recipe") {
-      console.log("not RecipeNode");
       loadAnchorsFromNodeId();
     }
   }, [loadAnchorsFromNodeId, currentNode, refresh, setSelectedAnchors]);
 
   useEffect(() => {
     if (currentNode.type == "recipe") {
-      console.log("recipeNode");
-      console.log(anchors, "anchorsBefore");
       loadChildAnchorsFromNodeId();
-      console.log(anchors, "anchorsAfter");
-      console.log(hasAnchors);
     }
   }, [loadChildAnchorsFromNodeId, currentNode, refresh, setSelectedAnchors]);
 
