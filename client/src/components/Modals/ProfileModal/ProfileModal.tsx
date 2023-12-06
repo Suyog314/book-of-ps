@@ -7,10 +7,9 @@ import {
   ModalCloseButton,
   ModalContent,
   ModalFooter,
-  ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
 
 import "./ProfileModal.scss";
 import { signOut } from "next-auth/react";
