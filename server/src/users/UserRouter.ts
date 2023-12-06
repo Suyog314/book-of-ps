@@ -61,6 +61,46 @@ export class UserRouter {
     );
 
     /**
+     * Request to find users by their ids
+     *
+     * @param req request object coming from client
+     * @param res response object to send to client
+     */
+    UserExpressRouter.post(
+      "/getUsersById",
+      async (req: Request, res: Response) => {
+        try {
+          const userIds = req.body.userIds;
+          const response: IServiceResponse<IUser[]> =
+            await this.BackendUserGateway.getUsersById(userIds);
+          res.status(200).send(response);
+        } catch (e) {
+          res.status(500).send(e.message);
+        }
+      }
+    );
+
+    /**
+     * Request to find users by their ids
+     *
+     * @param req request object coming from client
+     * @param res response object to send to client
+     */
+    UserExpressRouter.post(
+      "/getUserById",
+      async (req: Request, res: Response) => {
+        try {
+          const userId = req.body.userId;
+          const response: IServiceResponse<IUser> =
+            await this.BackendUserGateway.getUserById(userId);
+          res.status(200).send(response);
+        } catch (e) {
+          res.status(500).send(e.message);
+        }
+      }
+    );
+
+    /**
      * Request to authenticate user
      *
      * @param req request object coming from client

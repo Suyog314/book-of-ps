@@ -50,6 +50,34 @@ export const FrontendUserGateway = {
     }
   },
 
+  findUserById: async (userId: string): Promise<IServiceResponse<IUser>> => {
+    try {
+      return await post<IServiceResponse<IUser>>(
+        baseEndpoint + servicePath + "getUserById",
+        {
+          userId: userId,
+        }
+      );
+    } catch (exception) {
+      return failureServiceResponse("[getUserById] Unable to access backend");
+    }
+  },
+
+  findUsersById: async (
+    userIds: string[]
+  ): Promise<IServiceResponse<IUser[]>> => {
+    try {
+      return await post<IServiceResponse<IUser[]>>(
+        baseEndpoint + servicePath + "getUsersById",
+        {
+          userIds: userIds,
+        }
+      );
+    } catch (exception) {
+      return failureServiceResponse("[getUsersById] Unable to access backend");
+    }
+  },
+
   authenticateUser: async (
     email: string,
     password: string
