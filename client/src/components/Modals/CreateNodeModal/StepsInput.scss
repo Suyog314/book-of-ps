@@ -2,11 +2,11 @@
 
 .steps-input-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   margin-bottom: 5px;
   margin-left: 10px;
-  margin-right: 10px;
+  margin-right: 20px;
 
   .ingredient-input {
     // width: 120px;

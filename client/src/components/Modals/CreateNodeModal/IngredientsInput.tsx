@@ -1,5 +1,5 @@
 import { Input } from "@chakra-ui/input";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Button } from "~/components/Button";
 import * as ri from "react-icons/ri";
 import "./IngredientInput.scss";
@@ -28,18 +28,20 @@ export const IngredientsInput = (props: IngredientsInputProps) => {
     setIngredients([...ingredients, ""]);
   };
 
+  const buttonStyle = { marginTop: "5px", width: "100%", height: "24px" };
+
   const displayIngredients = () => {
     return ingredients.map((ingredient, index) => {
       return (
         <div className="ingredient-input-container" key={`ingredient-${index}`}>
-          <p
+          {/* <p
             style={{
-              fontSize: "30px",
+              fontSize: "15px",
               marginRight: "10px",
             }}
           >
             •
-          </p>
+          </p> */}
           {index == 0 ? (
             <Input
               className="ingredient-input"
@@ -61,9 +63,10 @@ export const IngredientsInput = (props: IngredientsInputProps) => {
 
           {index == ingredients.length - 1 && (
             <Button
-              style={{ marginLeft: "5px", width: "36px", height: "36px" }}
+              style={buttonStyle}
               onClick={handleAddInputClick}
               icon={<ri.RiAddFill />}
+              text="Add Ingredient"
             />
           )}
         </div>
@@ -73,10 +76,8 @@ export const IngredientsInput = (props: IngredientsInputProps) => {
   return (
     <div
       style={{
-        padding: "0px, 10px, 10px, 10px",
         maxHeight: "160px",
         overflowY: "auto",
-        marginRight: "10px",
         width: "500px",
       }}
     >

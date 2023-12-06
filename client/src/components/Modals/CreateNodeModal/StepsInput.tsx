@@ -27,18 +27,20 @@ export const StepsInput = (props: StepsInputProps) => {
     setSteps([...steps, ""]);
   };
 
+  const buttonStyle = { marginTop: "5px", width: "100%", height: "24px" };
+
   const displaySteps = () => {
     return steps.map((ingredient, index) => {
       return (
         <div className="steps-input-container" key={`ingredient-${index}`}>
-          <p
+          {/* <p
             style={{
-              fontSize: "30px",
+              fontSize: "12px",
               marginRight: "10px",
             }}
           >
             {`${index + 1}.`}
-          </p>
+          </p> */}
           {index == 0 ? (
             <Input
               className="ingredient-input"
@@ -60,7 +62,7 @@ export const StepsInput = (props: StepsInputProps) => {
 
           {index == steps.length - 1 && (
             <Button
-              style={{ marginLeft: "5px", width: "36px", height: "36px" }}
+              style={buttonStyle}
               onClick={handleAddInputClick}
               icon={<ri.RiAddFill />}
             />
@@ -72,14 +74,12 @@ export const StepsInput = (props: StepsInputProps) => {
   return (
     <div
       style={{
-        padding: "0px, 10px, 10px, 10px",
         maxHeight: "160px",
         overflowY: "auto",
-        marginRight: "10px",
         width: "500px",
       }}
     >
-      <div>{displaySteps()}</div>
+      {displaySteps()}
     </div>
   );
 };
