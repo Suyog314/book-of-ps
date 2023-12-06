@@ -7,11 +7,9 @@ import { useRouter } from "next/router";
 import "./RegisterForm.scss";
 import { useEffect, useState } from "react";
 import { ChakraProvider, Input } from "@chakra-ui/react";
-import { Button } from "../Button";
 import { makeIUser } from "~/types";
 import bcrypt from "bcryptjs";
 import { FrontendUserGateway } from "~/users";
-import { http, uploadImage } from "../Modals/CreateNodeModal/createNodeUtils";
 import { LoadingScreen } from "../LoadingScreen";
 
 export default function Register() {
