@@ -50,7 +50,7 @@ export interface IRecipeNode extends INode {
   stepsID: string; // list of nodes detailing the steps for the recipe (text/image)
   serving: number; // number of people the recipe serves
   cuisine: Cuisine; // the cuisine that the recipe falls into
-  time: Date; // the amount of time the recipe takes to complete
+  time: number; // the amount of time the recipe takes to complete
 }
 
 export type FolderContentType = "list" | "grid";

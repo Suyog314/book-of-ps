@@ -17,6 +17,7 @@ import {
   alertMessageState,
   isAppLoadedState,
   rootNodesState,
+  isLoggedIn,
 } from "../../global/Atoms";
 import { useRouter } from "next/router";
 import { FrontendNodeGateway } from "../../nodes";
@@ -89,11 +90,14 @@ export const MainView = React.memo(function MainView() {
     const sorted = cuisinesRes.payload.sort();
     setAvailCuisines(sorted);
 
-    // const timeRes = await FrontendNodeGateway.getMaxTime();
-    // if (!timeRes.success) {
-    //   console.error(timeRes.message);
-    //   return;
-    // }
+    const timeRes = await FrontendNodeGateway.getMaxTime();
+    if (!timeRes.success) {
+      console.error(timeRes.message);
+      return;
+    }
+    const minutes = timeRes.payload;
+    const maxHours = Math.ceil(minutes / 60);
+    setMaxTime(maxHours);
 
     const servingRes = await FrontendNodeGateway.getMaxServing();
     if (!servingRes.success) {
@@ -263,8 +267,9 @@ export const MainView = React.memo(function MainView() {
             isOpen={searchModalOpen}
             onClose={() => setSearchModalOpen(false)}
             availCuisines={availCuisines}
-            // maxTime={maxTime}
+            maxTime={maxTime}
             maxServing={maxServing}
+            nodeIdsToNodesMap={nodeIdsToNodesMap}
           />
           <CreateNodeModal
             isOpen={createNodeModalOpen}

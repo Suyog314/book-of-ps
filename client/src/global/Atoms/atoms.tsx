@@ -90,3 +90,18 @@ export const alertMessageState = atom<string>({
   key: "alertMessageState",
   default: "",
 });
+
+export const isLoggedIn = atom<boolean>({
+  key: "isLogginIn",
+  default: false,
+});
+
+export const userName = atom<string>({
+  key: "userName",
+  default: "",
+});
+
+export const userId = atom<string>({
+  key: "userId",
+  default: "",
+});

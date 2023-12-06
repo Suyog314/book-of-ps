@@ -26,6 +26,12 @@ $input-margin: 10px;
   padding-top: 10px;
 }
 
+.recipe-type-inputs {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
 .modal-title {
   display: flex;
   align-items: center;

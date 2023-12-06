@@ -7,10 +7,13 @@ export interface ISearchResultItemProps {
   key: number;
   nodeId: string;
   date: string;
+  cuisine: string;
+  serving: number;
+  time: number;
   onClose: () => void;
 }
 export const SearchResultItem = (props: ISearchResultItemProps) => {
-  const { key, type, title, nodeId, onClose, date } = props;
+  const { type, title, nodeId, onClose, date, cuisine, serving, time } = props;
 
   const [formattedDate, setFormattedDate] = useState<string>("");
 
@@ -26,7 +29,6 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
     } else {
       result = `${month} ${day}, ${year}`;
     }
-
     setFormattedDate(result);
   };
 
@@ -36,15 +38,24 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
 
   return (
     <Link href={`/${nodeId}`} onClick={onClose}>
-      <li className="result-item">
-        <div className="result-content">
-          <div className="result-type">{`${type} node`}</div>
-          <div className="result-title">{title}</div>
-        </div>
-        <div className="date-container">
-          <p>{formattedDate}</p>
-        </div>
-      </li>
+      <div className="result-recipe-container">
+        {type == "recipe" && (
+          <div className="recipe-content">
+            <div>{cuisine}</div>
+            <div>{serving}</div>
+            <div>{time}</div>
+          </div>
+        )}
+        <li className="result-item">
+          <div className="result-content">
+            <div className="result-type">{`${type} node`}</div>
+            <div className="result-title">{title}</div>
+          </div>
+          <div className="date-container">
+            <p>{formattedDate}</p>
+          </div>
+        </li>
+      </div>
     </Link>
   );
 };

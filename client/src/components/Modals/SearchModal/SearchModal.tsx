@@ -24,24 +24,32 @@ import { FrontendNodeGateway } from "~/nodes";
 import { LuUtensils } from "react-icons/lu";
 import { SearchResultItem } from "./SearchResultItem";
 import "./SearchModal.scss";
-import { Cuisine, IRecipeNode } from "~/types/INode";
+import { Cuisine, INode, IRecipeNode, NodeIdsToNodesMap } from "~/types/INode";
 
 export interface ISearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   availCuisines: Cuisine[];
-  //maxTime: Date;
+  maxTime: number;
   maxServing: number;
+  nodeIdsToNodesMap: NodeIdsToNodesMap;
 }
 export const SearchModal = (props: ISearchModalProps) => {
-  const { isOpen, onClose, availCuisines, maxServing } = props;
+  const {
+    isOpen,
+    onClose,
+    availCuisines,
+    maxTime,
+    maxServing,
+    nodeIdsToNodesMap,
+  } = props;
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState<any>([]);
   const [filterType, setFilterType] = useState("");
   const [sortType, setSortType] = useState("");
   const [cuisineType, setCuisineType] = useState("");
-  const [timeValue, setTimeValue] = useState(1);
-  const [servingValue, setServingValue] = useState(4);
+  const [timeValue, setTimeValue] = useState(maxTime);
+  const [servingValue, setServingValue] = useState(maxServing);
   const [showTimeTooltip, setShowTimeTooltip] = React.useState(false);
   const [showServingTooltip, setShowServingTooltip] = React.useState(false);
 
@@ -67,38 +75,50 @@ export const SearchModal = (props: ISearchModalProps) => {
         return filterType.toLowerCase() == node.type;
       });
     }
+    const newSearchNodes: INode[] = [];
     if (cuisineType != "") {
-      searchNodes = searchNodes.filter(async (node) => {
+      searchNodes.forEach(async (node) => {
         //if node is a recipe, check if cuisine type matches
         if (node.type == "recipe") {
-          return (node as IRecipeNode).cuisine == cuisineType;
+          if ((node as IRecipeNode).cuisine == cuisineType) {
+            newSearchNodes.push(node);
+          }
         } else {
           const filepath = node.filePath.path;
           const filepathLen = node.filePath.path.length;
           //if non-recipe node is a root, don't include
           if (filepathLen == 1) {
-            return false;
+            return;
           }
           //check if non-recipe node as a recipe node as a parent
           for (let i = filepathLen - 1; i >= 0; i--) {
             const nodeRes = await FrontendNodeGateway.getNode(filepath[i]);
             if (!nodeRes.success) {
               console.error("[cuisine filtering] node retrieval failed");
-              return false;
+              return;
             }
             const currNode = nodeRes.payload;
-            return currNode.type == "recipe";
+            if (
+              currNode.type == "recipe" &&
+              (currNode as IRecipeNode).cuisine == cuisineType
+            ) {
+              newSearchNodes.push(node);
+            }
           }
-          return false;
         }
       });
+    } else {
+      searchNodes.forEach((node) => {
+        newSearchNodes.push(node);
+      });
     }
-    setSearchResults(searchNodes);
+    console.log(newSearchNodes);
+    setSearchResults(newSearchNodes);
   };
 
   useEffect(() => {
     onSearch();
-  }, [searchInput, filterType, sortType, timeValue, servingValue]);
+  }, [searchInput, filterType, sortType, timeValue, servingValue, cuisineType]);
 
   const handleClose = () => {
     setSearchInput("");
@@ -106,8 +126,8 @@ export const SearchModal = (props: ISearchModalProps) => {
     setFilterType("");
     setSortType("");
     setCuisineType("");
-    setTimeValue(1);
-    setServingValue(4);
+    setTimeValue(maxTime);
+    setServingValue(maxServing);
     onClose();
   };
 
@@ -190,7 +210,7 @@ export const SearchModal = (props: ISearchModalProps) => {
                       rightIcon={<ri.RiArrowDropDownLine />}
                       className="filter-button"
                     >
-                      Cuisine
+                      {cuisineType == "" ? "Cuisine" : cuisineType}
                     </MenuButton>
 
                     <MenuList>
@@ -211,9 +231,9 @@ export const SearchModal = (props: ISearchModalProps) => {
                     <div style={{ padding: "0px 10px 0px 0px" }}>Time:</div>
                     <Slider
                       className="time-slider"
-                      defaultValue={2}
+                      defaultValue={maxTime}
                       min={1}
-                      max={6}
+                      max={maxTime}
                       colorScheme="blue"
                       onChange={(v) => setTimeValue(v)}
                       onMouseEnter={() => setShowTimeTooltip(true)}
@@ -238,7 +258,7 @@ export const SearchModal = (props: ISearchModalProps) => {
                     <div style={{ display: "inline-block" }}>Serving Size:</div>
                     <Slider
                       className="serving-slider"
-                      defaultValue={maxServing < 4 ? 1 : 4}
+                      defaultValue={maxServing}
                       min={1}
                       max={maxServing}
                       colorScheme="blue"
@@ -258,7 +278,7 @@ export const SearchModal = (props: ISearchModalProps) => {
                         label={
                           servingValue == 1
                             ? "1 person"
-                            : `${servingValue} people`
+                            : `≤ ${servingValue} people`
                         }
                       >
                         <SliderThumb />
@@ -283,6 +303,17 @@ export const SearchModal = (props: ISearchModalProps) => {
                       nodeId={result.nodeId}
                       date={result.dateCreated}
                       onClose={handleClose}
+                      cuisine={
+                        (nodeIdsToNodesMap[result.nodeId] as IRecipeNode)
+                          .cuisine
+                      }
+                      serving={
+                        (nodeIdsToNodesMap[result.nodeId] as IRecipeNode)
+                          .serving
+                      }
+                      time={
+                        (nodeIdsToNodesMap[result.nodeId] as IRecipeNode).time
+                      }
                     />
                   )
                 )}

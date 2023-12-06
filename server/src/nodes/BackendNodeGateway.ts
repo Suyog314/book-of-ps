@@ -98,7 +98,7 @@ export class BackendNodeGateway {
   async searchNodes(
     query: string,
     sortType: string
-  ): Promise<IServiceResponse<any>> {
+  ): Promise<IServiceResponse<INode[]>> {
     return this.nodeCollectionConnection.searchNodes(query, sortType);
   }
   /**
@@ -407,8 +407,7 @@ export class BackendNodeGateway {
       return failureServiceResponse(getMaxTimeRes.message);
     }
     const maxTime = getMaxTimeRes.payload.time;
-    const minutes = maxTime.getHours() * 60 + maxTime.getMinutes();
-    return successfulServiceResponse(minutes);
+    return successfulServiceResponse(maxTime);
   }
 
   /**

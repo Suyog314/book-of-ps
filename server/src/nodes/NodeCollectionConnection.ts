@@ -35,18 +35,22 @@ export class NodeCollectionConnection {
   }
 
   async searchNodes(query: string, sortType: string): Promise<any> {
-    const collection = this.client.db().collection(this.collectionName);
+    const collection = await this.client.db().collection(this.collectionName);
 
     //create text indices for title and content fields
     collection.createIndex({ title: "text", content: "text" });
 
     const myquery = { $text: { $search: query } };
+
     const projection = {
       _id: 0,
       title: 1,
       type: 1,
       nodeId: 1,
       dateCreated: 1,
+      cuisine: 1,
+      serving: 1,
+      time: 1,
       score: { $meta: "textScore" },
     };
 
