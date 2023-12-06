@@ -186,7 +186,7 @@ export const NodeHeader = (props: INodeHeaderProps) => {
             )}
             {isLinking && (
               <Button
-                text="End Link"
+                text="Complete Link"
                 icon={<bi.BiLinkAlt />}
                 onClick={onHandleCompleteLinkClick}
               />

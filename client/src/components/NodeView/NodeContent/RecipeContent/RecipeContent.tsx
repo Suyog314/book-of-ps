@@ -38,16 +38,6 @@ export const RecipeContent = (props: RecipeContentProps) => {
   const [leftUnitValue, setLeftUnitValue] = useState<number>(0);
   const [rightUnitValue, setRightUnitValue] = useState<number>(0);
 
-  useEffect(() => {
-    convertUnits();
-  }, [
-    selectedUnitType,
-    leftSelectedUnit,
-    rightSelectedUnit,
-    leftUnitValue,
-    rightUnitValue,
-  ]);
-
   const descriptionNode =
     nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
 
@@ -56,6 +46,34 @@ export const RecipeContent = (props: RecipeContentProps) => {
 
   const stepsNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
 
+  // useEffect(() => {
+  //   convertUnits("left");
+  // }, [rightSelectedUnit, leftUnitValue]);
+
+  // useEffect(() => {
+  //   convertUnits("right");
+  // }, [leftSelectedUnit, rightUnitValue]);
+
+  useEffect(() => {
+    convertUnits("none");
+  }, [selectedUnitType]);
+
+  const convertUnits = (side: string) => {
+    let convertedValue = null;
+    switch (side) {
+      case "left":
+      case "none":
+        convertedValue = convert(leftUnitValue, leftSelectedUnit as any).to(
+          rightSelectedUnit as any
+        );
+        setRightUnitValue(convertedValue as unknown as number);
+      case "right":
+        convertedValue = convert(rightUnitValue, rightSelectedUnit as any).to(
+          leftSelectedUnit as any
+        );
+        setLeftUnitValue(convertedValue as unknown as number);
+    }
+  };
   const handleUnitTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -86,17 +104,6 @@ export const RecipeContent = (props: RecipeContentProps) => {
       setLeftSelectedUnit(event.target.value);
     } else {
       setRightSelectedUnit(event.target.value);
-    }
-  };
-
-  const convertUnits = () => {
-    if (leftSelectedUnit === rightSelectedUnit) {
-      setRightUnitValue(leftUnitValue);
-    } else {
-      const convertedValue = convert(leftUnitValue, leftSelectedUnit).to(
-        rightSelectedUnit
-      );
-      setRightUnitValue(convertedValue);
     }
   };
 

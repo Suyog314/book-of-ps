@@ -44,13 +44,11 @@ export interface INodeLinkMenuProps {
 /** The content of an text node, including all its anchors */
 export const TextContent = (props: INodeLinkMenuProps) => {
   const { currentNode, editable } = props;
-  const setCurrentNode = useSetRecoilState(currentNodeState);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
   const [refresh, setRefresh] = useRecoilState(refreshState);
   const [anchorRefresh, setAnchorRefresh] = useRecoilState(refreshAnchorState);
   const [linkMenuRefresh, setLinkMenuRefresh] =
     useRecoilState(refreshLinkListState);
-  const globalCurrentNode = useRecoilValue(currentNodeState);
   const [editing, setEditing] = useState(false);
 
   //editor and all extensions are added here
@@ -123,7 +121,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       editor.commands.setContent(currentNode?.content);
       addAnchorMarks();
     }
-  }, [currentNode, editor, refresh]);
+  }, [currentNode, refresh]);
 
   // Set the selected extent to null when this component loads
   useEffect(() => {
@@ -228,6 +226,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     await FrontendNodeGateway.updateNode(currentNode.nodeId, [nodeProperty]);
     addAnchorMarks();
     setLinkMenuRefresh(!linkMenuRefresh);
+    setRefresh(!refresh);
   };
 
   const onPointerUp = () => {
@@ -257,18 +256,13 @@ export const TextContent = (props: INodeLinkMenuProps) => {
 
   return (
     <div
-      onClick={() => {
-        setCurrentNode(currentNode);
-      }}
       className="editor-container"
+      onFocus={() => {
+        setEditing(true);
+      }}
     >
-      {editing && currentNode === globalCurrentNode && (
-        <TextMenu editor={editor} save={handleContentChange} />
-      )}
+      {editing && <TextMenu editor={editor} save={handleContentChange} />}
       <EditorContent
-        onFocus={() => {
-          setEditing(true);
-        }}
         className="editorContent"
         editor={editor}
         onPointerUp={onPointerUp}

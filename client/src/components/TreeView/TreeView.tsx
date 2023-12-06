@@ -14,9 +14,7 @@ export interface ITreeViewProps {
 export const TreeView = (props: ITreeViewProps) => {
   const { roots, parentNode, setParentNode, changeUrlOnClick = true } = props;
 
-  useEffect(() => {
-    console.log(roots, "treeView");
-  }, [parentNode]);
+  useEffect(() => {}, [parentNode]);
   return (
     <div className="treeView-wrapper">
       {roots.map((tree: RecursiveNodeTree) => (
