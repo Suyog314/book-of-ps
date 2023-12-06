@@ -58,6 +58,10 @@ export function isINodeProperty(object: any): boolean {
         return allCuisines.includes((object as INodeProperty).value);
       case "time":
         return typeof (object as INodeProperty).value === "number";
+      case "authorId":
+        return typeof (object as INodeProperty).value === "string";
+      case "collaborators":
+        return typeof (object as INodeProperty).value === "object";
       default:
         return true;
     }

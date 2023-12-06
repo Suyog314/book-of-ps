@@ -79,6 +79,7 @@ export const allNodeFields: string[] = [
   "cuisine",
   "time",
   "authorId",
+  "collaborators",
 ];
 
 export const allCuisines: string[] = [

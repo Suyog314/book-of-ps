@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as ri from "react-icons/ri";
-import * as ai from "react-icons/ai";
 import { LuUtensils } from "react-icons/lu";
 
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { currentNodeState, refreshState } from "~/global/Atoms";
 import "./RecipeContent.scss";
-import { INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
+import { Cuisine, INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
 import {
   Button,
@@ -33,15 +32,11 @@ export const RecipeContent = (props: RecipeContentProps) => {
   const [tempUnits] = useState(["celsius", "fahrenheit", "kelvin"]);
   const [volumeUnits] = useState(["ml", "l", "fl oz", "cup", "tsp"]);
   const [weightUnits] = useState(["oz", "lb", "g", "kg"]);
-  const [selectedUnitType, setSelectedUnitType] = useState("Temperature");
-  const [leftSelectedUnit, setLeftSelectedUnit] = useState("");
-  const [rightSelectedUnit, setRightSelectedUnit] = useState("");
+  const [selectedUnitType, setSelectedUnitType] = useState("Volume");
+  const [leftSelectedUnit, setLeftSelectedUnit] = useState(volumeUnits[0]);
+  const [rightSelectedUnit, setRightSelectedUnit] = useState(volumeUnits[1]);
   const [leftUnitValue, setLeftUnitValue] = useState<number>(0);
   const [rightUnitValue, setRightUnitValue] = useState<number>(0);
-  const [descriptionNode, setDescriptionNode] = useState<INode>(currentNode);
-  const [ingredientsNode, setIngredientsNode] = useState<INode>(currentNode);
-  const [stepsNode, setStepsNode] = useState<INode>(currentNode);
-  const [refresh, setRefresh] = useRecoilState(refreshState);
 
   useEffect(() => {
     convertUnits();
@@ -53,41 +48,13 @@ export const RecipeContent = (props: RecipeContentProps) => {
     rightUnitValue,
   ]);
 
-  useEffect(() => {
-    const getDescriptionNode = () => {
-      console.log(nodeIdsToNodesMap);
-      const desNode =
-        nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
-      console.log(desNode);
-      setDescriptionNode(desNode);
-    };
-    const getIngredientsNode = () => {
-      const ingsNode =
-        nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
-      console.log(ingsNode);
-      setIngredientsNode(ingsNode);
-    };
-    const getStepsNode = () => {
-      const stNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
-      console.log(stNode);
-      setStepsNode(stNode);
-    };
-    getDescriptionNode();
-    getIngredientsNode();
-    getStepsNode();
-  }, [currentNode, refresh]);
+  const descriptionNode =
+    nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
 
-  // useEffect(() => {
-  //   console.log(currentNode);
-  //   loadNodes();
-  // }, [loadNodes, currentNode, refresh]);
-
-  const desNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
-
-  const ingsNode =
+  const ingredientsNode =
     nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
 
-  const stNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
+  const stepsNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
 
   const handleUnitTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -121,6 +88,7 @@ export const RecipeContent = (props: RecipeContentProps) => {
       setRightSelectedUnit(event.target.value);
     }
   };
+
   const convertUnits = () => {
     if (leftSelectedUnit === rightSelectedUnit) {
       setRightUnitValue(leftUnitValue);
@@ -181,9 +149,7 @@ export const RecipeContent = (props: RecipeContentProps) => {
           <Select onChange={handleUnitTypeChange} variant={"filled"}>
             <option value="Volume">Volume</option>
             <option value="Weight">Weight</option>
-            <option value="Temperature" selected>
-              Temperature
-            </option>
+            <option value="Temperature">Temperature</option>
           </Select>
           <div className="input-section">
             <div className="left-input">
@@ -253,17 +219,16 @@ export const RecipeContent = (props: RecipeContentProps) => {
             </div>
           </div>
         </div>
-        {/* <RecipeTimer /> */}
       </div>
       <div className="recipe-right">
         <div className="recipe-description-container">
           <b style={{ fontSize: 30 }}>Description</b>
-          <Link href={`/dashboard/${desNode?.nodeId}`}>
+          <Link href={`/dashboard/${descriptionNode?.nodeId}`}>
             <div className="description">
-              {desNode && (
+              {descriptionNode && (
                 <TextContent
                   nodeIdsToNodesMap={nodeIdsToNodesMap}
-                  currentNode={desNode}
+                  currentNode={descriptionNode}
                   editable={false}
                 />
               )}
@@ -272,12 +237,12 @@ export const RecipeContent = (props: RecipeContentProps) => {
         </div>
         <div className="recipe-ingredients-container">
           <b style={{ fontSize: 30 }}>Ingredients</b>
-          <Link href={`/dashboard/${ingsNode?.nodeId}`}>
+          <Link href={`/dashboard/${ingredientsNode?.nodeId}`}>
             <div className="ingredients">
-              {ingsNode && (
+              {ingredientsNode && (
                 <TextContent
                   nodeIdsToNodesMap={nodeIdsToNodesMap}
-                  currentNode={ingsNode}
+                  currentNode={ingredientsNode}
                   editable={false}
                 />
               )}
@@ -286,12 +251,12 @@ export const RecipeContent = (props: RecipeContentProps) => {
         </div>
         <div className="recipe-steps-container">
           <b style={{ fontSize: 30 }}>Steps</b>
-          <Link href={`/dashboard/${stNode?.nodeId}`}>
+          <Link href={`/dashboard/${stepsNode?.nodeId}`}>
             <div className="steps">
-              {stNode && (
+              {stepsNode && (
                 <TextContent
                   nodeIdsToNodesMap={nodeIdsToNodesMap}
-                  currentNode={stNode}
+                  currentNode={stepsNode}
                   editable={false}
                 />
               )}
