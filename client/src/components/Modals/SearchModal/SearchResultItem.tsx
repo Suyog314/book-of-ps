@@ -10,7 +10,7 @@ export interface ISearchResultItemProps {
   onClose: () => void;
 }
 export const SearchResultItem = (props: ISearchResultItemProps) => {
-  const { key, type, title, nodeId, onClose, date } = props;
+  const { type, title, key, nodeId, onClose, date } = props;
 
   const [formattedDate, setFormattedDate] = useState<string>("");
 

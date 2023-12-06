@@ -38,6 +38,7 @@ import "./MainView.scss";
 import { createNodeIdsToNodesMap, makeRootWrapper } from "./mainViewUtils";
 import { GraphModal } from "../Modals/GraphModal/GraphModal";
 import { ProfileModal } from "../Modals/ProfileModal";
+import { ShareModal } from "../Modals/ShareModal";
 
 export const MainView = React.memo(function MainView() {
   // app states
@@ -49,6 +50,7 @@ export const MainView = React.memo(function MainView() {
   const [graphModalOpen, setGraphModalOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   // node states
   const [selectedNode, setSelectedNode] = useRecoilState(selectedNodeState);
   const [rootNodes, setRootNodes] = useRecoilState(rootNodesState);
@@ -121,6 +123,11 @@ export const MainView = React.memo(function MainView() {
   const handleGraphButtonClick = useCallback(() => {
     setGraphModalOpen(true);
   }, []);
+
+  const handleShareModalClick = useCallback(() => {
+    setShareModalOpen(true);
+  }, []);
+
   const handleCreateNodeButtonClick = useCallback(() => {
     setCreateNodeModalOpen(true);
   }, [setCreateNodeModalOpen]);
@@ -267,6 +274,10 @@ export const MainView = React.memo(function MainView() {
                 node={selectedNode}
                 roots={rootNodes}
               />
+              <ShareModal
+                isOpen={shareModalOpen}
+                onClose={() => setShareModalOpen(false)}
+              />
             </>
           )}
           <div className="content">
@@ -295,6 +306,7 @@ export const MainView = React.memo(function MainView() {
                 onGraphButtonClick={handleGraphButtonClick}
                 onCompleteLinkClick={handleCompleteLinkClick}
                 onCreateNodeButtonClick={handleCreateNodeButtonClick}
+                onShareModalClick={handleShareModalClick}
                 nodeIdsToNodesMap={nodeIdsToNodesMap}
               />
             </div>
