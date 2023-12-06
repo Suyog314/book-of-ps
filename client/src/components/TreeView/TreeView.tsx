@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { INode } from "../../types";
 import { RecursiveNodeTree } from "../../types/RecursiveNodeTree";
 import { TreeViewItem } from "./TreeViewItem";
@@ -13,6 +13,10 @@ export interface ITreeViewProps {
 
 export const TreeView = (props: ITreeViewProps) => {
   const { roots, parentNode, setParentNode, changeUrlOnClick = true } = props;
+
+  useEffect(() => {
+    console.log(roots, "treeView");
+  }, [parentNode]);
   return (
     <div className="treeView-wrapper">
       {roots.map((tree: RecursiveNodeTree) => (

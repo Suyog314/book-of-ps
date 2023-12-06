@@ -53,29 +53,41 @@ export const RecipeContent = (props: RecipeContentProps) => {
     rightUnitValue,
   ]);
 
-  const loadNodes = useCallback(() => {
+  useEffect(() => {
     const getDescriptionNode = () => {
+      console.log(nodeIdsToNodesMap);
       const desNode =
         nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
+      console.log(desNode);
       setDescriptionNode(desNode);
     };
     const getIngredientsNode = () => {
       const ingsNode =
         nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
+      console.log(ingsNode);
       setIngredientsNode(ingsNode);
     };
     const getStepsNode = () => {
       const stNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
+      console.log(stNode);
       setStepsNode(stNode);
     };
     getDescriptionNode();
     getIngredientsNode();
     getStepsNode();
-  }, [currentNode]);
+  }, [currentNode, refresh]);
 
-  useEffect(() => {
-    loadNodes();
-  }, [loadNodes, currentNode, refresh]);
+  // useEffect(() => {
+  //   console.log(currentNode);
+  //   loadNodes();
+  // }, [loadNodes, currentNode, refresh]);
+
+  const desNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
+
+  const ingsNode =
+    nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
+
+  const stNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
 
   const handleUnitTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -246,48 +258,42 @@ export const RecipeContent = (props: RecipeContentProps) => {
       <div className="recipe-right">
         <div className="recipe-description-container">
           <b style={{ fontSize: 30 }}>Description</b>
-          <Link href={`/dashboard/${descriptionNode?.nodeId}`}>
+          <Link href={`/dashboard/${desNode?.nodeId}`}>
             <div className="description">
-              {descriptionNode ? (
+              {desNode && (
                 <TextContent
                   nodeIdsToNodesMap={nodeIdsToNodesMap}
-                  currentNode={descriptionNode}
+                  currentNode={desNode}
                   editable={false}
                 />
-              ) : (
-                <p>Loading description...</p>
               )}
             </div>
           </Link>
         </div>
         <div className="recipe-ingredients-container">
           <b style={{ fontSize: 30 }}>Ingredients</b>
-          <Link href={`/dashboard/${ingredientsNode?.nodeId}`}>
+          <Link href={`/dashboard/${ingsNode?.nodeId}`}>
             <div className="ingredients">
-              {ingredientsNode ? (
+              {ingsNode && (
                 <TextContent
                   nodeIdsToNodesMap={nodeIdsToNodesMap}
-                  currentNode={ingredientsNode}
+                  currentNode={ingsNode}
                   editable={false}
                 />
-              ) : (
-                <p>Loading ingredients...</p>
               )}
             </div>
           </Link>
         </div>
         <div className="recipe-steps-container">
           <b style={{ fontSize: 30 }}>Steps</b>
-          <Link href={`/dashboard/${stepsNode?.nodeId}`}>
+          <Link href={`/dashboard/${stNode?.nodeId}`}>
             <div className="steps">
-              {stepsNode ? (
+              {stNode && (
                 <TextContent
                   nodeIdsToNodesMap={nodeIdsToNodesMap}
-                  currentNode={stepsNode}
+                  currentNode={stNode}
                   editable={false}
                 />
-              ) : (
-                <p>Loading steps...</p>
               )}
             </div>
           </Link>

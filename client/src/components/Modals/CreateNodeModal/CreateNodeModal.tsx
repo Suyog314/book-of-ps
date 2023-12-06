@@ -177,20 +177,20 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     };
 
     if (selectedType == "recipe") {
-      const descriptionID = "";
-      const ingredientsID = "";
-      const stepsID = "";
-      const recipeAttributes = {
-        ...attributes,
-        descriptionID,
-        ingredientsID,
-        stepsID,
-        serving,
-        cuisine,
-        time,
-      };
+      // const descriptionID = "";
+      // const ingredientsID = "";
+      // const stepsID = "";
+      // const recipeAttributes = {
+      //   ...attributes,
+      //   descriptionID,
+      //   ingredientsID,
+      //   stepsID,
+      //   serving,
+      //   cuisine,
+      //   time,
+      // };
 
-      const recipeNode = await createNodeFromModal(recipeAttributes);
+      // const recipeNode = await createNodeFromModal(recipeAttributes);
 
       const descriptionAttributes = {
         content: description,
@@ -245,6 +245,8 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
         serving,
         cuisine,
         time,
+        authorId,
+        collaborators,
       };
 
       const recipeNode = await createNodeFromModal(recipeAttributes);
@@ -289,7 +291,6 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
           stepsProperty,
         ]);
       }
-      onSubmit();
       recipeNode && setSelectedNode(recipeNode);
 
       //add checking if statment so that they fill out all of the necessary fields
