@@ -205,7 +205,8 @@ export const NodeHeader = (props: INodeHeaderProps) => {
             {isFolder && (
               <div className="select">
                 <Select
-                  bg="f1f1f1"
+                  bg="rgb(241, 241, 241)"
+                  variant={"filled"}
                   defaultValue={(currentNode as IFolderNode).viewType}
                   onChange={handleUpdateFolderView}
                   height={35}

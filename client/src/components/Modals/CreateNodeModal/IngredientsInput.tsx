@@ -33,6 +33,12 @@ export const IngredientsInput = (props: IngredientsInputProps) => {
     setButtonPressed(true);
   };
 
+  const handleDeleteInputClick = (index: number) => {
+    const newIngredients = [...ingredients];
+    newIngredients.splice(index, 1);
+    setIngredients(newIngredients);
+  };
+
   useLayoutEffect(() => {
     if (buttonPressed && lastInputRef.current && containerRef.current) {
       lastInputRef.current.focus();
@@ -41,7 +47,13 @@ export const IngredientsInput = (props: IngredientsInputProps) => {
     }
   }, [buttonPressed, ingredients]);
 
-  const buttonStyle = { marginTop: "5px", width: "100%", height: "24px" };
+  const addButtonStyle = { marginTop: "5px", width: "100%", height: "24px" };
+
+  const deleteButtonStyle = {
+    marginLeft: "5px",
+    width: "40px",
+    height: "40px",
+  };
 
   const displayIngredients = () => {
     return ingredients.map((ingredient, index) => {
@@ -57,17 +69,24 @@ export const IngredientsInput = (props: IngredientsInputProps) => {
               ref={isLast ? lastInputRef : null}
             />
           ) : (
-            <Input
-              className="ingredient-input"
-              value={ingredient}
-              onChange={(event) => handleInputChange(event, index)}
-              ref={isLast ? lastInputRef : null}
-            />
+            <div className="input-and-cancel">
+              <Input
+                className="ingredient-input"
+                value={ingredient}
+                onChange={(event) => handleInputChange(event, index)}
+                ref={isLast ? lastInputRef : null}
+              />
+              <Button
+                icon={<ri.RiCloseLine />}
+                style={deleteButtonStyle}
+                onClick={() => handleDeleteInputClick(index)}
+              />
+            </div>
           )}
 
           {isLast && (
             <Button
-              style={buttonStyle}
+              style={addButtonStyle}
               onClick={handleAddInputClick}
               icon={<ri.RiAddFill />}
               text="Add Ingredient"

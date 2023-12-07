@@ -29,6 +29,12 @@ export const StepsInput = (props: StepsInputProps) => {
     setButtonPressed(true);
   };
 
+  const handleDeleteInputClick = (index: number) => {
+    const newSteps = [...steps];
+    newSteps.splice(index, 1);
+    setSteps(newSteps);
+  };
+
   useLayoutEffect(() => {
     if (buttonPressed && lastInputRef.current && containerRef.current) {
       lastInputRef.current.focus();
@@ -43,15 +49,10 @@ export const StepsInput = (props: StepsInputProps) => {
     marginLeft: "5px",
     width: "40px",
     height: "40px",
-    backgroundColor: "E95678",
-    transition: "background-color 0.3s",
-    ":hover": {
-      backgroundColor: "#E95678",
-    },
   };
 
   const displaySteps = () => {
-    return steps.map((ingredient, index) => {
+    return steps.map((step, index) => {
       const isLast = index === steps.length - 1;
       return (
         <div className="steps-input-container" key={`ingredient-${index}`}>
@@ -59,7 +60,7 @@ export const StepsInput = (props: StepsInputProps) => {
             <Input
               className="step-input"
               placeholder="Steps..."
-              value={ingredient}
+              value={step}
               onChange={(event) => handleInputChange(event, index)}
               ref={isLast ? lastInputRef : null}
             />
@@ -67,11 +68,15 @@ export const StepsInput = (props: StepsInputProps) => {
             <div className="input-and-cancel">
               <Input
                 className="step-input"
-                value={ingredient}
+                value={step}
                 onChange={(event) => handleInputChange(event, index)}
                 ref={isLast ? lastInputRef : null}
               />
-              <Button icon={<ri.RiCloseLine />} style={deleteButtonStyle} />
+              <Button
+                icon={<ri.RiCloseLine />}
+                style={deleteButtonStyle}
+                onClick={() => handleDeleteInputClick(index)}
+              />
             </div>
           )}
 

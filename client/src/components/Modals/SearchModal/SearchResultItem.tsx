@@ -58,7 +58,7 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
             <div className="time-section">
               <ri.RiTimerLine className="time-icon" />
               <div className="recipe-text">
-                {hours != 0 && hours + "hr "} {mins != 0 && mins + "min"}
+                {hours != 0 && hours + "hr "} {mins != 0 && mins + " min"}
               </div>
             </div>
           </div>

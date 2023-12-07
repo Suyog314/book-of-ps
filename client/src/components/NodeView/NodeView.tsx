@@ -98,8 +98,8 @@ export const NodeView = (props: INodeViewProps) => {
       );
       if (anchorsFromNode.success) {
         newAnchors.push(...anchorsFromNode.payload);
+        setAnchors(newAnchors);
       }
-      setAnchors(newAnchors);
     });
   }, [currentNode]);
 
