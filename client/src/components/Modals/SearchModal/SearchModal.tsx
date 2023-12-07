@@ -24,9 +24,11 @@ import { FrontendNodeGateway } from "~/nodes";
 import { LuUtensils } from "react-icons/lu";
 import { SearchResultItem } from "./SearchResultItem";
 import "./SearchModal.scss";
+import { IoPersonAddOutline } from "react-icons/io5";
 import { Cuisine, INode, IRecipeNode, NodeIdsToNodesMap } from "~/types/INode";
-import { isRecoilValue } from "recoil";
+import { isRecoilValue, useRecoilValue } from "recoil";
 import { AiOutlineConsoleSql } from "react-icons/ai";
+import { userSessionState } from "~/global/Atoms";
 
 export interface ISearchModalProps {
   isOpen: boolean;
@@ -45,6 +47,9 @@ export const SearchModal = (props: ISearchModalProps) => {
     maxServing,
     nodeIdsToNodesMap,
   } = props;
+
+  const user = useRecoilValue(userSessionState);
+
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState<any>([]);
   const [filterType, setFilterType] = useState("");
@@ -52,6 +57,7 @@ export const SearchModal = (props: ISearchModalProps) => {
   const [cuisineType, setCuisineType] = useState("");
   const [timeValue, setTimeValue] = useState(maxTime);
   const [servingValue, setServingValue] = useState(maxServing);
+  const [sharingType, setSharingType] = useState("");
   const [showTimeTooltip, setShowTimeTooltip] = React.useState(false);
   const [showServingTooltip, setShowServingTooltip] = React.useState(false);
 
@@ -107,13 +113,22 @@ export const SearchModal = (props: ISearchModalProps) => {
 
   const isValidSearchNode = (node: INode): boolean => {
     let cType: boolean;
+
     if (cuisineType == "") {
       cType = true;
     } else {
       cType = (node as IRecipeNode).cuisine == cuisineType;
     }
+
+    const sType =
+      sharingType == "" ||
+      (sharingType == "Me" && user?.userId == (node as IRecipeNode).authorId) ||
+      (sharingType == "Others" &&
+        user?.userId != (node as IRecipeNode).authorId);
+
     return (
       cType &&
+      sType &&
       (node as IRecipeNode).serving <= servingValue &&
       (node as IRecipeNode).time <= timeValue
     );
@@ -121,7 +136,15 @@ export const SearchModal = (props: ISearchModalProps) => {
 
   useEffect(() => {
     onSearch();
-  }, [searchInput, filterType, sortType, timeValue, servingValue, cuisineType]);
+  }, [
+    searchInput,
+    filterType,
+    sortType,
+    timeValue,
+    servingValue,
+    cuisineType,
+    sharingType,
+  ]);
 
   const handleClose = () => {
     setSearchInput("");
@@ -131,6 +154,7 @@ export const SearchModal = (props: ISearchModalProps) => {
     setCuisineType("");
     setTimeValue(maxTime);
     setServingValue(maxServing);
+    setSharingType("");
     onClose();
   };
 
@@ -173,6 +197,9 @@ export const SearchModal = (props: ISearchModalProps) => {
 
                   <MenuList className="menu-list">
                     <MenuItem onClick={() => setFilterType("")}>All</MenuItem>
+                    <MenuItem onClick={() => setFilterType("Recipe")}>
+                      Recipe
+                    </MenuItem>
                     <MenuItem onClick={() => setFilterType("Text")}>
                       Text
                     </MenuItem>
@@ -225,6 +252,26 @@ export const SearchModal = (props: ISearchModalProps) => {
                         {cuisine}
                       </MenuItem>
                     ))}
+                  </MenuList>
+                </Menu>
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    leftIcon={<IoPersonAddOutline />}
+                    rightIcon={<ri.RiArrowDropDownLine />}
+                    className="filter-button"
+                  >
+                    {sharingType == "" ? "All" : sharingType}
+                  </MenuButton>
+
+                  <MenuList className="menu-list">
+                    <MenuItem onClick={() => setSharingType("")}>All</MenuItem>
+                    <MenuItem onClick={() => setSharingType("Me")}>
+                      Created by Me
+                    </MenuItem>
+                    <MenuItem onClick={() => setSharingType("Others")}>
+                      Created by Others
+                    </MenuItem>
                   </MenuList>
                 </Menu>
                 <div className="time-section">

@@ -52,6 +52,7 @@ export class NodeCollectionConnection {
       serving: 1,
       time: 1,
       filePath: 1,
+      authorId: 1,
       score: { $meta: "textScore" },
     };
 
