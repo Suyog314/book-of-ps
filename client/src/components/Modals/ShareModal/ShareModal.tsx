@@ -12,8 +12,9 @@ import React, { useEffect, useState } from "react";
 import { IoPersonRemoveOutline } from "react-icons/io5";
 import { IoPersonAddOutline } from "react-icons/io5";
 import "./ShareModal.scss";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
+  currentNodeCollabsState,
   currentNodeState,
   refreshState,
   userSessionState,
@@ -39,12 +40,12 @@ export const ShareModal = (props: IShareModalProps) => {
   const [refresh, setRefresh] = useRecoilState(refreshState);
   const [userToAdd, setUserToAdd] = useState("");
   const [error, setError] = useState("");
-  const [newCollabEmails, setNewCollabEmails] = useState<string[]>(
-    currentNode.collaborators ? currentNode.collaborators : []
+  const [currentNodeCollabs, setCurrentNodeCollabs] = useRecoilState(
+    currentNodeCollabsState
   );
 
   useEffect(() => {
-    setNewCollabEmails(
+    setCurrentNodeCollabs(
       currentNode.collaborators ? currentNode.collaborators : []
     );
   }, [currentNode]);
@@ -69,7 +70,7 @@ export const ShareModal = (props: IShareModalProps) => {
   // Reset our state variables and close the modal
   const handleClose = async () => {
     onClose();
-    await handleUpdateShare(newCollabEmails);
+    await handleUpdateShare(currentNodeCollabs);
     setUserToAdd("");
     setError("");
   };
@@ -101,8 +102,8 @@ export const ShareModal = (props: IShareModalProps) => {
       setError("개새끼 don't add yourself.");
       return;
     }
-    const newCollabUpdate = [userToAdd, ...newCollabEmails];
-    setNewCollabEmails(newCollabUpdate);
+    const newCollabUpdate = [userToAdd, ...currentNodeCollabs];
+    setCurrentNodeCollabs(newCollabUpdate);
     setUserToAdd("");
     setError("");
   };
@@ -110,13 +111,13 @@ export const ShareModal = (props: IShareModalProps) => {
   // Remove item from newCollabs
   const handleRemoveUser = (userId: string) => {
     const newCollabUpdate: string[] = [];
-    newCollabEmails.forEach((user) => {
+    currentNodeCollabs.forEach((user) => {
       if (user == userId) {
         return;
       }
       newCollabUpdate.push(user);
     });
-    setNewCollabEmails(newCollabUpdate);
+    setCurrentNodeCollabs(newCollabUpdate);
   };
 
   return (
@@ -144,16 +145,16 @@ export const ShareModal = (props: IShareModalProps) => {
             </div>
             <div className="share-list-item-container">
               <ul className="share-list-people">
-                {newCollabEmails &&
-                  newCollabEmails.map((userId) => (
-                    <div key={userId} className="share-list-item-wrapper">
+                {currentNodeCollabs &&
+                  currentNodeCollabs.map((userEmail) => (
+                    <div key={userEmail} className="share-list-item-wrapper">
                       <li className="share-list-item">
-                        <div className="share-title">{newCollabEmails}</div>
+                        <div className="share-title">{userEmail}</div>
                       </li>
                       <Button
                         style={{ marginLeft: "10px", height: "44px" }}
                         icon={<IoPersonRemoveOutline />}
-                        onClick={() => handleRemoveUser(userId)}
+                        onClick={() => handleRemoveUser(userEmail)}
                       />
                     </div>
                   ))}

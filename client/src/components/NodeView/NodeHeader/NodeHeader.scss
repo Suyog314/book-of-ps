@@ -37,4 +37,52 @@
       cursor: pointer;
     }
   }
+
+  .profile-pic-container {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    transition: all 0.3s ease;
+
+    .profile-pic-wrapper {
+      width: 2rem;
+      height: 2rem;
+      margin-right: 5px;
+      position: relative;
+      display: inline-block;
+
+      .tooltip {
+        visibility: hidden;
+        width: max-content;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 100%;
+        left: 50%;
+        top: calc(100% + 5px);
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        font-size: xx-small;
+      }
+
+      &:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      &:first-child:hover .tooltip {
+        content: "Author";
+      }
+
+      &:not(:first-child):hover .tooltip {
+        content: "Collaborator";
+      }
+    }
+  }
 }

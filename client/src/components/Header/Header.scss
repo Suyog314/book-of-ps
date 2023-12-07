@@ -67,7 +67,7 @@
       border-radius: 50%;
       overflow: hidden;
       cursor: pointer;
-      transition: transform 0.3s ease; /* Example animation transition */
+      transition: transform 0.3s ease;
     }
 
     /* Profile picture */
@@ -75,7 +75,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: filter 0.3s ease; /* Example transition for hover effect */
+      transition: filter 0.3s ease;
     }
 
     /* Overlay on hover */
