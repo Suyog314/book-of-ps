@@ -1,4 +1,5 @@
 import {
+  Cuisine,
   failureServiceResponse,
   IAnchor,
   ILink,
@@ -166,14 +167,52 @@ export const FrontendNodeGateway = {
     }
   },
 
-  searchNodes: async (query: string): Promise<IServiceResponse<any>> => {
+  searchNodes: async (
+    query: string,
+    sortType: string
+  ): Promise<IServiceResponse<INode[]>> => {
     try {
-      return await post<IServiceResponse<any>>(
-        baseEndpoint + servicePath + "search/",
-        { query: query }
+      return await post<IServiceResponse<INode[]>>(
+        baseEndpoint + servicePath + "search",
+        {
+          query: query,
+          sortType: sortType,
+        }
       );
     } catch (exception) {
-      return failureServiceResponse("[searchNodes] Unable to access backend");
+      return failureServiceResponse(
+        "[searchForNodes] Unable to access backend"
+      );
+    }
+  },
+
+  getCuisines: async (): Promise<IServiceResponse<Cuisine[]>> => {
+    try {
+      return await get<IServiceResponse<Cuisine[]>>(
+        baseEndpoint + servicePath + "cuisines"
+      );
+    } catch (exception) {
+      return failureServiceResponse("[getCuisines] Unable to access backend");
+    }
+  },
+
+  getMaxTime: async (): Promise<IServiceResponse<number>> => {
+    try {
+      return await get<IServiceResponse<number>>(
+        baseEndpoint + servicePath + "time"
+      );
+    } catch (exception) {
+      return failureServiceResponse("[getMaxTime] Unable to access backend");
+    }
+  },
+
+  getMaxServing: async (): Promise<IServiceResponse<number>> => {
+    try {
+      return await get<IServiceResponse<number>>(
+        baseEndpoint + servicePath + "serving"
+      );
+    } catch (exception) {
+      return failureServiceResponse("[getMaxServing] Unable to access backend");
     }
   },
 };

@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from "react";
 import "./SearchResultItem.scss";
 import Link from "next/link";
+import { LuUtensils } from "react-icons/lu";
+import * as ri from "react-icons/ri";
+
 export interface ISearchResultItemProps {
   type: string;
   title: string;
   key: number;
   nodeId: string;
   date: string;
+  cuisine: string;
+  serving: number;
+  time: number;
   onClose: () => void;
 }
 export const SearchResultItem = (props: ISearchResultItemProps) => {
-  const { type, title, key, nodeId, onClose, date } = props;
+  const { type, title, nodeId, onClose, date, cuisine, serving, time } = props;
 
   const [formattedDate, setFormattedDate] = useState<string>("");
+
+  const hours = Math.floor(time / 60);
+  const mins = time % 60;
 
   const processDate = () => {
     const d = new Date(date);
@@ -26,7 +35,6 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
     } else {
       result = `${month} ${day}, ${year}`;
     }
-
     setFormattedDate(result);
   };
 
@@ -36,15 +44,35 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
 
   return (
     <Link href={`/dashboard/${nodeId}`} onClick={onClose}>
-      <li className="result-item">
-        <div className="result-content">
-          <div className="result-type">{`${type} node`}</div>
-          <div className="result-title">{title}</div>
-        </div>
-        <div className="date-container">
-          <p>{formattedDate}</p>
-        </div>
-      </li>
+      <div className="result-recipe-container">
+        {type == "recipe" && (
+          <div className="recipe-content">
+            <div className="cuisine-section">
+              <LuUtensils className="cuisine-logo" />
+              <div className="recipe-text">{cuisine}</div>
+            </div>
+            <div className="serving-section">
+              <ri.RiUserLine className="serving-icon" />
+              <div className="recipe-text">{serving}</div>
+            </div>
+            <div className="time-section">
+              <ri.RiTimerLine className="time-icon" />
+              <div className="recipe-text">
+                {hours != 0 && hours + "hr "} {mins != 0 && mins + "min"}
+              </div>
+            </div>
+          </div>
+        )}
+        <li className="result-item">
+          <div className="result-content">
+            <div className="result-type">{`${type} node`}</div>
+            <div className="result-title">{title}</div>
+          </div>
+          <div className="date-container">
+            <p>{formattedDate}</p>
+          </div>
+        </li>
+      </div>
     </Link>
   );
 };

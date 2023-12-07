@@ -24,24 +24,36 @@ import { FrontendNodeGateway } from "~/nodes";
 import { LuUtensils } from "react-icons/lu";
 import { SearchResultItem } from "./SearchResultItem";
 import "./SearchModal.scss";
+import { Cuisine, INode, IRecipeNode, NodeIdsToNodesMap } from "~/types/INode";
+import { isRecoilValue } from "recoil";
+import { AiOutlineConsoleSql } from "react-icons/ai";
 
 export interface ISearchModalProps {
   isOpen: boolean;
   onClose: () => void;
+  availCuisines: Cuisine[];
+  maxTime: number;
+  maxServing: number;
+  nodeIdsToNodesMap: NodeIdsToNodesMap;
 }
 export const SearchModal = (props: ISearchModalProps) => {
-  const { isOpen, onClose } = props;
+  const {
+    isOpen,
+    onClose,
+    availCuisines,
+    maxTime,
+    maxServing,
+    nodeIdsToNodesMap,
+  } = props;
   const [searchInput, setSearchInput] = useState("");
-  const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any>([]);
-  const [filteredResults, setFilteredResults] = useState<any>([]);
-  const [sortingOrder, setSortingOrder] = useState<string>("relevance");
-  const [timeValue, setTimeValue] = useState(1);
-  const [servingValue, setServingValue] = useState(8);
+  const [filterType, setFilterType] = useState("");
+  const [sortType, setSortType] = useState("");
+  const [cuisineType, setCuisineType] = useState("");
+  const [timeValue, setTimeValue] = useState(maxTime);
+  const [servingValue, setServingValue] = useState(maxServing);
   const [showTimeTooltip, setShowTimeTooltip] = React.useState(false);
   const [showServingTooltip, setShowServingTooltip] = React.useState(false);
-
-  const cuisines = ["American", "Korean", "Chinese", "Mexican"];
 
   const handleInputChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -50,71 +62,76 @@ export const SearchModal = (props: ISearchModalProps) => {
   };
 
   const onSearch = async () => {
-    const searchResp = await FrontendNodeGateway.searchNodes(searchInput);
-    if (searchResp.success) {
-      setSearchResults(searchResp.payload);
-      setFilteredResults(searchResp.payload);
-    } else {
-      setSearchResults([]);
-      setFilteredResults([]);
+    const searchRes = await FrontendNodeGateway.searchNodes(
+      searchInput,
+      sortType
+    );
+    if (!searchRes.success) {
+      console.error(searchRes.message);
+      return;
     }
+
+    let searchNodes = searchRes.payload;
+    if (filterType != "") {
+      searchNodes = searchNodes.filter((node) => {
+        return filterType.toLowerCase() == node.type;
+      });
+    }
+
+    const newSearchNodes: INode[] = [];
+
+    searchNodes.forEach((node) => {
+      //if node is a recipe, check if valid search match
+      if (node.type == "recipe") {
+        if (isValidSearchNode(node)) {
+          newSearchNodes.push(node);
+        }
+      } else {
+        const filepath = node.filePath.path;
+        const filepathLen = node.filePath.path.length;
+        //if non-recipe node is a root, don't include
+        if (filepathLen == 1) {
+          return;
+        }
+        //check if non-recipe node as a recipe node as a parent
+        for (let i = filepathLen - 1; i >= 0; i--) {
+          const currNode = nodeIdsToNodesMap[filepath[i]];
+          if (currNode.type == "recipe" && isValidSearchNode(currNode)) {
+            newSearchNodes.push(node);
+          }
+        }
+      }
+    });
+    setSearchResults(newSearchNodes);
   };
 
-  useEffect(() => {}, [searchResults]);
+  const isValidSearchNode = (node: INode): boolean => {
+    let cType: boolean;
+    if (cuisineType == "") {
+      cType = true;
+    } else {
+      cType = (node as IRecipeNode).cuisine == cuisineType;
+    }
+    return (
+      cType &&
+      (node as IRecipeNode).serving <= servingValue &&
+      (node as IRecipeNode).time <= timeValue
+    );
+  };
 
   useEffect(() => {
     onSearch();
-  }, [searchInput]);
-
-  useEffect(() => {}, [searching]);
+  }, [searchInput, filterType, sortType, timeValue, servingValue, cuisineType]);
 
   const handleClose = () => {
     setSearchInput("");
     setSearchResults([]);
+    setFilterType("");
+    setSortType("");
+    setCuisineType("");
+    setTimeValue(maxTime);
+    setServingValue(maxServing);
     onClose();
-  };
-
-  useEffect(() => {}, [filteredResults]);
-
-  const handleFiltering = (type: string) => {
-    if (type === "all") {
-      setFilteredResults(searchResults);
-      handleSorting(sortingOrder, searchResults);
-    } else {
-      const newSearchResults = searchResults.filter(
-        (result: { type: string }) => {
-          return result.type === type;
-        }
-      );
-      setFilteredResults(newSearchResults);
-      handleSorting(sortingOrder, newSearchResults);
-    }
-  };
-
-  const handleSorting = (order: string, results = filteredResults) => {
-    setSortingOrder(order);
-    const newSearchResults = [...results];
-
-    if (order === "oldest") {
-      newSearchResults.sort((a, b) => {
-        const dateATime = new Date(a.dateCreated).getTime();
-        const dateBTime = new Date(b.dateCreated).getTime();
-        return dateATime - dateBTime;
-      });
-    } else if (order === "newest") {
-      newSearchResults.sort((a, b) => {
-        const dateATime = new Date(a.dateCreated).getTime();
-        const dateBTime = new Date(b.dateCreated).getTime();
-        return dateBTime - dateATime;
-      });
-    } else if (order === "relevance") {
-      newSearchResults.sort((a, b) => {
-        const scoreA = a.score;
-        const scoreB = b.score;
-        return scoreB - scoreA;
-      });
-    }
-    setFilteredResults(newSearchResults);
   };
 
   return (
@@ -137,164 +154,168 @@ export const SearchModal = (props: ISearchModalProps) => {
                 value={searchInput}
                 border="0px"
                 onChange={handleInputChange}
-                onFocus={() => setSearching(true)}
-                onBlur={() => setSearching(false)}
                 focusBorderColor="white"
                 variant={"unstyled"}
                 height={"60px"}
               />
             </InputGroup>
 
-            {searchResults.length > 0 && (
-              <div className="results">
-                <div className="filters">
-                  <Menu>
-                    <MenuButton
-                      as={Button}
-                      rightIcon={<ri.RiArrowDropDownLine />}
-                      className="filter-button"
-                    >
-                      Filter by
-                    </MenuButton>
+            <div className="results">
+              <div className="filters">
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<ri.RiArrowDropDownLine />}
+                    className="filter-button"
+                  >
+                    {filterType == "" ? "Filter By:" : filterType}
+                  </MenuButton>
 
-                    <MenuList>
-                      <MenuItem onClick={() => handleFiltering("all")}>
-                        All
-                      </MenuItem>
-                      <MenuItem onClick={() => handleFiltering("text")}>
-                        Text
-                      </MenuItem>
-                      <MenuItem onClick={() => handleFiltering("image")}>
-                        Image
-                      </MenuItem>
-                      <MenuItem onClick={() => handleFiltering("folder")}>
-                        Folder
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
-                  <Menu>
-                    <MenuButton
-                      as={Button}
-                      leftIcon={<ri.RiArrowUpDownLine />}
-                      rightIcon={<ri.RiArrowDropDownLine />}
-                      className="sort-button"
-                    >
-                      Sort
-                    </MenuButton>
-                    <MenuList>
-                      <MenuItem onClick={() => handleSorting("relevance")}>
-                        Relevance
-                      </MenuItem>
-                      <MenuItem onClick={() => handleSorting("newest")}>
-                        Created: Newest First
-                      </MenuItem>
-                      <MenuItem onClick={() => handleSorting("oldest")}>
-                        Created: Oldest First
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
-                  <Menu>
-                    <MenuButton
-                      as={Button}
-                      leftIcon={<LuUtensils />}
-                      rightIcon={<ri.RiArrowDropDownLine />}
-                      className="filter-button"
-                    >
-                      Cuisine
-                    </MenuButton>
+                  <MenuList className="menu-list">
+                    <MenuItem onClick={() => setFilterType("")}>All</MenuItem>
+                    <MenuItem onClick={() => setFilterType("Text")}>
+                      Text
+                    </MenuItem>
+                    <MenuItem onClick={() => setFilterType("Image")}>
+                      Image
+                    </MenuItem>
+                    <MenuItem onClick={() => setFilterType("Folder")}>
+                      Folder
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    leftIcon={<ri.RiArrowUpDownLine />}
+                    rightIcon={<ri.RiArrowDropDownLine />}
+                    className="sort-button"
+                  >
+                    {sortType == "" ? "Sort" : sortType}
+                  </MenuButton>
+                  <MenuList className="menu-list">
+                    <MenuItem onClick={() => setSortType("")}>
+                      Relevance
+                    </MenuItem>
+                    <MenuItem onClick={() => setSortType("Newest")}>
+                      Created: Newest First
+                    </MenuItem>
+                    <MenuItem onClick={() => setSortType("Oldest")}>
+                      Created: Oldest First
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    leftIcon={<LuUtensils />}
+                    rightIcon={<ri.RiArrowDropDownLine />}
+                    className="filter-button"
+                  >
+                    {cuisineType == "" ? "Cuisine" : cuisineType}
+                  </MenuButton>
 
-                    <MenuList>
-                      {cuisines.map((cuisine, index) => (
-                        <MenuItem
-                          key={index}
-                          onClick={() => handleFiltering("text")}
-                        >
-                          {cuisine}
-                        </MenuItem>
-                      ))}
-                    </MenuList>
-                  </Menu>
-                  <div className="time-section">
-                    <div style={{ padding: "0px 10px 0px 0px" }}>Time:</div>
-                    <Slider
-                      className="time-slider"
-                      defaultValue={1}
-                      min={0}
-                      max={6}
-                      colorScheme="blue"
-                      onChange={(v) => setTimeValue(v)}
-                      onMouseEnter={() => setShowTimeTooltip(true)}
-                      onMouseLeave={() => setShowTimeTooltip(false)}
-                    >
-                      <SliderTrack>
-                        <SliderFilledTrack />
-                      </SliderTrack>
-                      <Tooltip
-                        hasArrow
-                        bg="blue.500"
-                        color="white"
-                        placement="top"
-                        isOpen={showTimeTooltip}
-                        label={`${timeValue}hr`}
+                  <MenuList className="menu-list">
+                    <MenuItem onClick={() => setCuisineType("")}>All</MenuItem>
+                    {availCuisines.map((cuisine, index) => (
+                      <MenuItem
+                        key={index}
+                        onClick={() => setCuisineType(cuisine)}
                       >
-                        <SliderThumb />
-                      </Tooltip>
-                    </Slider>
-                  </div>
-                  <div className="serving-section">
-                    <div style={{ display: "inline-block" }}>Serving Size:</div>
-                    <Slider
-                      className="serving-slider"
-                      defaultValue={8}
-                      min={1}
-                      max={16}
-                      colorScheme="blue"
-                      onChange={(v) => setServingValue(v)}
-                      onMouseEnter={() => setShowServingTooltip(true)}
-                      onMouseLeave={() => setShowServingTooltip(false)}
+                        {cuisine}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
+                <div className="time-section">
+                  <div style={{ padding: "0px 10px 0px 0px" }}>Time:</div>
+                  <Slider
+                    className="time-slider"
+                    defaultValue={Math.ceil(maxTime / 60)}
+                    min={1}
+                    max={Math.ceil(maxTime / 60)}
+                    colorScheme="blue"
+                    onChange={(v) => setTimeValue(v * 60)}
+                    onMouseEnter={() => setShowTimeTooltip(true)}
+                    onMouseLeave={() => setShowTimeTooltip(false)}
+                  >
+                    <SliderTrack>
+                      <SliderFilledTrack />
+                    </SliderTrack>
+                    <Tooltip
+                      hasArrow
+                      bg="blue.500"
+                      color="white"
+                      placement="top"
+                      isOpen={showTimeTooltip}
+                      label={`≤${Math.ceil(timeValue / 60)}hr`}
                     >
-                      <SliderTrack>
-                        <SliderFilledTrack />
-                      </SliderTrack>
-                      <Tooltip
-                        hasArrow
-                        bg="blue.500"
-                        color="white"
-                        placement="top"
-                        isOpen={showServingTooltip}
-                        label={
-                          servingValue == 1
-                            ? "1 person"
-                            : `${servingValue} people`
-                        }
-                      >
-                        <SliderThumb />
-                      </Tooltip>
-                    </Slider>
-                  </div>
+                      <SliderThumb className="slider-thumb" />
+                    </Tooltip>
+                  </Slider>
                 </div>
-                {filteredResults.map(
-                  (
-                    result: {
-                      type: string;
-                      title: string;
-                      nodeId: string;
-                      dateCreated: string;
-                    },
-                    index: number
-                  ) => (
-                    <SearchResultItem
-                      key={index}
-                      type={result.type}
-                      title={result.title}
-                      nodeId={result.nodeId}
-                      date={result.dateCreated}
-                      onClose={handleClose}
-                    />
-                  )
-                )}
+                <div className="serving-section">
+                  <div style={{ display: "inline-block" }}>Serving Size:</div>
+                  <Slider
+                    className="serving-slider"
+                    defaultValue={maxServing}
+                    min={1}
+                    max={maxServing}
+                    colorScheme="blue"
+                    onChange={(v) => setServingValue(v)}
+                    onMouseEnter={() => setShowServingTooltip(true)}
+                    onMouseLeave={() => setShowServingTooltip(false)}
+                  >
+                    <SliderTrack>
+                      <SliderFilledTrack />
+                    </SliderTrack>
+                    <Tooltip
+                      hasArrow
+                      bg="blue.500"
+                      color="white"
+                      placement="top"
+                      isOpen={showServingTooltip}
+                      label={
+                        servingValue == 1
+                          ? "1 person"
+                          : `≤ ${servingValue} people`
+                      }
+                    >
+                      <SliderThumb className="slider-thumb" />
+                    </Tooltip>
+                  </Slider>
+                </div>
               </div>
-            )}
+              {searchResults.map(
+                (
+                  result: {
+                    type: string;
+                    title: string;
+                    nodeId: string;
+                    dateCreated: string;
+                  },
+                  index: number
+                ) => (
+                  <SearchResultItem
+                    key={index}
+                    type={result.type}
+                    title={result.title}
+                    nodeId={result.nodeId}
+                    date={result.dateCreated}
+                    onClose={handleClose}
+                    cuisine={
+                      (nodeIdsToNodesMap[result.nodeId] as IRecipeNode).cuisine
+                    }
+                    serving={
+                      (nodeIdsToNodesMap[result.nodeId] as IRecipeNode).serving
+                    }
+                    time={
+                      (nodeIdsToNodesMap[result.nodeId] as IRecipeNode).time
+                    }
+                  />
+                )
+              )}
+            </div>
           </ModalBody>
         </ModalContent>
       </div>

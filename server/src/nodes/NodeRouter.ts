@@ -6,6 +6,7 @@ import {
   RecursiveNodeTree,
   IServiceResponse,
   isINode,
+  Cuisine,
 } from "../types";
 import { BackendNodeGateway } from "./BackendNodeGateway";
 import { json } from "body-parser";
@@ -57,12 +58,10 @@ export class NodeRouter {
     NodeExpressRouter.post("/search", async (req: Request, res: Response) => {
       try {
         const query = req.body.query;
-        if (!(typeof query === "string")) {
-          res.status(400).send("query not a string!");
-        } else {
-          const response = await this.BackendNodeGateway.searchNodes(query);
-          res.status(200).send(response);
-        }
+        const sortType = req.body.sortType;
+        const response: IServiceResponse<INode[]> =
+          await this.BackendNodeGateway.searchNodes(query, sortType);
+        res.status(200).send(response);
       } catch (e) {
         res.status(500).send(e.message);
       }
@@ -204,6 +203,39 @@ export class NodeRouter {
       try {
         const response: IServiceResponse<RecursiveNodeTree[]> =
           await this.BackendNodeGateway.getRoots();
+        res.status(200).send(response);
+      } catch (e) {
+        res.status(500).send(e.message);
+      }
+    });
+
+    /**
+     * Request to retrieve all the cuisines from current recipes
+     */
+    NodeExpressRouter.get("/cuisines", async (req: Request, res: Response) => {
+      try {
+        const response: IServiceResponse<Cuisine[]> =
+          await this.BackendNodeGateway.getCuisines();
+        res.status(200).send(response);
+      } catch (e) {
+        res.status(500).send(e.message);
+      }
+    });
+
+    NodeExpressRouter.get("/time", async (req: Request, res: Response) => {
+      try {
+        const response: IServiceResponse<number> =
+          await this.BackendNodeGateway.getMaxTime();
+        res.status(200).send(response);
+      } catch (e) {
+        res.status(500).send(e.message);
+      }
+    });
+
+    NodeExpressRouter.get("/serving", async (req: Request, res: Response) => {
+      try {
+        const response: IServiceResponse<number> =
+          await this.BackendNodeGateway.getMaxServing();
         res.status(200).send(response);
       } catch (e) {
         res.status(500).send(e.message);

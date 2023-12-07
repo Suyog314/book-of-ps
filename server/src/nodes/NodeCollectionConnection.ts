@@ -6,6 +6,8 @@ import {
   successfulServiceResponse,
   makeINodePath,
   isINodePath,
+  Cuisine,
+  IRecipeNode,
 } from "../types";
 import { MongoClient } from "mongodb";
 
@@ -32,34 +34,44 @@ export class NodeCollectionConnection {
     this.collectionName = collectionName ?? "nodes";
   }
 
-  async searchNodes(string: string): Promise<any> {
-    await this.client
-      .db()
-      .collection(this.collectionName)
-      .createIndex({ title: "text", content: "text" });
+  async searchNodes(query: string, sortType: string): Promise<any> {
+    const collection = await this.client.db().collection(this.collectionName);
 
-    const query = { $text: { $search: string } };
+    //create text indices for title and content fields
+    collection.createIndex({ title: "text", content: "text" });
 
-    const sort: { score: { $meta: "textScore" } } = {
-      score: { $meta: "textScore" },
-    };
+    const myquery = { $text: { $search: query } };
+
     const projection = {
       _id: 0,
       title: 1,
-      nodeId: 1,
       type: 1,
+      nodeId: 1,
       dateCreated: 1,
+      cuisine: 1,
+      serving: 1,
+      time: 1,
+      filePath: 1,
       score: { $meta: "textScore" },
     };
 
-    const nodes = await this.client.db().collection(this.collectionName);
-    const cursor = nodes.find(query).sort(sort).project(projection);
-    const documents = await cursor.toArray();
-    if (documents.length == 0) {
-      return failureServiceResponse("No Search Results Found");
+    const nodes: INode[] = [];
+    let sort = {};
+    if (sortType == "Newest") {
+      sort = { dateCreated: -1 };
+    } else if (sortType == "Oldest") {
+      sort = { dateCreated: 1 };
     } else {
-      return successfulServiceResponse(documents);
+      sort = { score: { $meta: "textScore" } };
     }
+    await collection
+      .find(myquery)
+      .sort(sort)
+      .project(projection)
+      .forEach(function (node) {
+        nodes.push(node);
+      });
+    return successfulServiceResponse(nodes);
   }
 
   /**
@@ -258,5 +270,55 @@ export class NodeCollectionConnection {
     return failureServiceResponse(
       "Failed to update node " + nodeId + " filePath.path"
     );
+  }
+
+  /**
+   *
+   */
+  async getCuisines(): Promise<IServiceResponse<Cuisine[]>> {
+    const query = { type: "recipe" };
+
+    const cuisines = await this.client
+      .db()
+      .collection(this.collectionName)
+      .distinct("cuisine", query);
+    if (cuisines == null) {
+      return failureServiceResponse("[getCuisines] there are no recipes");
+    }
+    return successfulServiceResponse(cuisines);
+  }
+
+  async getMaxTime(): Promise<IServiceResponse<IRecipeNode>> {
+    const query = { type: "recipe" };
+    const maxTimeArr: IRecipeNode[] = [];
+    await this.client
+      .db()
+      .collection(this.collectionName)
+      .find(query)
+      .sort({ time: -1 })
+      .forEach(function (time) {
+        maxTimeArr.push(time);
+      });
+    if (maxTimeArr.length == 0) {
+      return failureServiceResponse("[getMaxTime] there are no recipes");
+    }
+    return successfulServiceResponse(maxTimeArr[0]);
+  }
+
+  async getMaxServing(): Promise<IServiceResponse<IRecipeNode>> {
+    const query = { type: "recipe" };
+    const maxServingArr: IRecipeNode[] = [];
+    await this.client
+      .db()
+      .collection(this.collectionName)
+      .find(query)
+      .sort({ serving: -1 })
+      .forEach(function (serving) {
+        maxServingArr.push(serving);
+      });
+    if (maxServingArr.length == 0) {
+      return failureServiceResponse("[getMaxServing] there are no recipes");
+    }
+    return successfulServiceResponse(maxServingArr[0]);
   }
 }
