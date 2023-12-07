@@ -26,6 +26,7 @@ import { SearchResultItem } from "./SearchResultItem";
 import "./SearchModal.scss";
 import { Cuisine, INode, IRecipeNode, NodeIdsToNodesMap } from "~/types/INode";
 import { isRecoilValue } from "recoil";
+import { AiOutlineConsoleSql } from "react-icons/ai";
 
 export interface ISearchModalProps {
   isOpen: boolean;
@@ -79,7 +80,6 @@ export const SearchModal = (props: ISearchModalProps) => {
 
     const newSearchNodes: INode[] = [];
 
-    console.log(searchNodes, cuisineType, servingValue, timeValue);
     searchNodes.forEach((node) => {
       //if node is a recipe, check if valid search match
       if (node.type == "recipe") {
@@ -87,26 +87,21 @@ export const SearchModal = (props: ISearchModalProps) => {
           newSearchNodes.push(node);
         }
       } else {
-        if (cuisineType != "") {
-          const filepath = node.filePath.path;
-          const filepathLen = node.filePath.path.length;
-          //if non-recipe node is a root, don't include
-          if (filepathLen == 1) {
-            return;
+        const filepath = node.filePath.path;
+        const filepathLen = node.filePath.path.length;
+        //if non-recipe node is a root, don't include
+        if (filepathLen == 1) {
+          return;
+        }
+        //check if non-recipe node as a recipe node as a parent
+        for (let i = filepathLen - 1; i >= 0; i--) {
+          const currNode = nodeIdsToNodesMap[filepath[i]];
+          if (currNode.type == "recipe" && isValidSearchNode(currNode)) {
+            newSearchNodes.push(node);
           }
-          //check if non-recipe node as a recipe node as a parent
-          for (let i = filepathLen - 1; i >= 0; i--) {
-            const currNode = nodeIdsToNodesMap[filepath[i]];
-            if (currNode.type == "recipe" && isValidSearchNode(currNode)) {
-              newSearchNodes.push(node);
-            }
-          }
-        } else {
-          newSearchNodes.push(node);
         }
       }
     });
-    console.log(newSearchNodes);
     setSearchResults(newSearchNodes);
   };
 
@@ -253,7 +248,7 @@ export const SearchModal = (props: ISearchModalProps) => {
                       color="white"
                       placement="top"
                       isOpen={showTimeTooltip}
-                      label={`≤${Math.ceil(maxTime / 60)}hr`}
+                      label={`≤${Math.ceil(timeValue / 60)}hr`}
                     >
                       <SliderThumb className="slider-thumb" />
                     </Tooltip>
