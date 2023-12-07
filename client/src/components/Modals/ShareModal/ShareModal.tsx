@@ -1,5 +1,4 @@
 import {
-  Button,
   Input,
   Modal,
   ModalBody,
@@ -10,7 +9,8 @@ import {
   ModalOverlay,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-
+import { IoPersonRemoveOutline } from "react-icons/io5";
+import { IoPersonAddOutline } from "react-icons/io5";
 import "./ShareModal.scss";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
@@ -21,6 +21,7 @@ import {
 import { INodeProperty, makeINodeProperty } from "~/types";
 import { FrontendNodeGateway } from "~/nodes";
 import { FrontendUserGateway } from "~/users";
+import { Button } from "~/components/Button";
 
 export interface IShareModalProps {
   isOpen: boolean;
@@ -84,22 +85,26 @@ export const ShareModal = (props: IShareModalProps) => {
     event: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (event.key === "Enter") {
-      const userDbCheckResp = await FrontendUserGateway.findUserByEmail(
-        userToAdd
-      );
-      if (!userDbCheckResp.success) {
-        setError("User does not exist.");
-        return;
-      }
-      if (userDbCheckResp.payload.email == userSession?.email) {
-        setError("개새끼 don't add yourself.");
-        return;
-      }
-      const newCollabUpdate = [userToAdd, ...newCollabEmails];
-      setNewCollabEmails(newCollabUpdate);
-      setUserToAdd("");
-      setError("");
+      await handleAddUser();
     }
+  };
+
+  const handleAddUser = async () => {
+    const userDbCheckResp = await FrontendUserGateway.findUserByEmail(
+      userToAdd
+    );
+    if (!userDbCheckResp.success) {
+      setError("User does not exist.");
+      return;
+    }
+    if (userDbCheckResp.payload.email == userSession?.email) {
+      setError("개새끼 don't add yourself.");
+      return;
+    }
+    const newCollabUpdate = [userToAdd, ...newCollabEmails];
+    setNewCollabEmails(newCollabUpdate);
+    setUserToAdd("");
+    setError("");
   };
 
   // Remove item from newCollabs
@@ -130,22 +135,27 @@ export const ShareModal = (props: IShareModalProps) => {
                   value={userToAdd}
                   onKeyDown={handleKeyPress}
                 />
-                <Button style={{ marginLeft: "10px" }}>Add</Button>
+                <Button
+                  onClick={handleAddUser}
+                  style={{ height: "40px", marginLeft: "10px" }}
+                  icon={<IoPersonAddOutline />}
+                />
               </div>
             </div>
-            <div className="share-list-wrapper">
+            <div className="share-list-item-container">
               <ul className="share-list-people">
                 {newCollabEmails &&
                   newCollabEmails.map((userId) => (
-                    <li
-                      key={userId} // each user has unique userId
-                      className="share-list-item"
-                    >
-                      <div className="share-title">{newCollabEmails}</div>
-                      <Button onClick={() => handleRemoveUser(userId)}>
-                        Remove
-                      </Button>
-                    </li>
+                    <div key={userId} className="share-list-item-wrapper">
+                      <li className="share-list-item">
+                        <div className="share-title">{newCollabEmails}</div>
+                      </li>
+                      <Button
+                        style={{ marginLeft: "10px", height: "44px" }}
+                        icon={<IoPersonRemoveOutline />}
+                        onClick={() => handleRemoveUser(userId)}
+                      />
+                    </div>
                   ))}
               </ul>
             </div>
