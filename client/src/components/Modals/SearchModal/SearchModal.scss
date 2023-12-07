@@ -5,15 +5,23 @@ $input-margin: 10px;
 .results {
   padding: 12px;
   padding-top: 0px;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin-top: 12px;
   max-height: 70vh;
   .filters {
+    .menu-list {
+      z-index: 1;
+    }
+    .slider-thumb {
+      z-index: auto;
+    }
     .time-section,
     .serving-section {
       display: flex;
       flex-direction: column;
       padding: 5px;
+      .serving-slider {
+      }
     }
     .filter-button,
     .sort-button {

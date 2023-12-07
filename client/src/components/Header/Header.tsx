@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import * as ri from "react-icons/ri";
 import * as ai from "react-icons/ai";
 
-import { NodeIdsToNodesMap } from "../../types";
+import { Cuisine, NodeIdsToNodesMap } from "../../types";
 import Link from "next/link";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import {
