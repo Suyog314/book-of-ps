@@ -8,9 +8,9 @@
   z-index: 9999;
 }
 
-$primary-color: #ff7f50; /* Orange color */
+$primary-color: #ff7f50;
 $background-color: #f8f8f8;
-$enlargement-factor: 120%; /* Enlargement factor */
+$enlargement-factor: 120%;
 
 /* Login wrapper */
 .login-wrapper {
@@ -21,7 +21,7 @@ $enlargement-factor: 120%; /* Enlargement factor */
   font-weight: 100;
 
   .login-box {
-    width: 30%; /* Set width to 40% of the screen */
+    width: 30%;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
@@ -31,7 +31,7 @@ $enlargement-factor: 120%; /* Enlargement factor */
       margin-top: 1rem;
       margin-bottom: 2rem;
       font-size: x-large;
-      font-weight: bold; /* Bold title */
+      font-weight: bold;
     }
 
     .login-form {
@@ -40,6 +40,9 @@ $enlargement-factor: 120%; /* Enlargement factor */
       gap: 0.75rem;
       transition: 0.3s;
 
+      .login-button-active {
+        background-color: darken($primary-theme-color, 15%);
+      }
       input {
         width: 100%;
         margin-bottom: 8px;
@@ -51,23 +54,23 @@ $enlargement-factor: 120%; /* Enlargement factor */
         transition: 0.3s;
 
         &:focus {
-          outline: none; /* Remove default focus outline */
-          border: 2px solid $secondary-theme-color; /* Highlight border color */
+          outline: none;
+          border: 2px solid $secondary-theme-color;
         }
       }
 
       .login-error-message {
         color: red;
         margin-bottom: 10px;
-        font-size: 1rem; /* Enlarged by 20% */
+        font-size: 1rem;
         font-family: "Helvetica";
       }
 
       .login-no-account {
-        text-align: right; /* Align to the right */
-        font-size: 0.875rem; /* Small text size */
-        margin-top: 10px; /* Adjust margin as needed */
-        // font-family: "Montserrat";
+        text-align: right;
+        font-size: 0.875rem;
+        margin-top: 10px;
+        font-family: "Helvetica";
 
         .login-to-register-link {
           color: #0645ad;

@@ -88,7 +88,13 @@ export default function Login() {
                 onKeyDown={handleKeyPress}
               />
 
-              <button className="login-button" onClick={handleLogin}>
+              <button
+                className={
+                  "login-button" +
+                  (email !== "" && password !== "" ? "-active" : "")
+                }
+                onClick={handleLogin}
+              >
                 Login
               </button>
 
