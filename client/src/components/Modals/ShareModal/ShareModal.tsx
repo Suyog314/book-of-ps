@@ -130,6 +130,7 @@ export const ShareModal = (props: IShareModalProps) => {
                   value={userToAdd}
                   onKeyDown={handleKeyPress}
                 />
+                <Button>hello</Button>
               </div>
             </div>
             <div className="share-list-wrapper">

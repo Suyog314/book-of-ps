@@ -1,5 +1,9 @@
 @import "../../../global/globalCssVariables";
 
+.share-add-input {
+  display: flex;
+  flex-direction: row;
+}
 .share-list-item {
   list-style: none;
   border-radius: 8px;
