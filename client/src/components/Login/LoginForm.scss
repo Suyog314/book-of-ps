@@ -43,6 +43,7 @@ $enlargement-factor: 120%;
       .login-button-active {
         background-color: darken($primary-theme-color, 15%);
       }
+
       input {
         width: 100%;
         margin-bottom: 8px;
@@ -93,7 +94,6 @@ $enlargement-factor: 120%;
         cursor: pointer;
         font-family: "Helvetica";
         transition: background-color 0.3s;
-
         font-size: 1.2rem; /* Enlarged by 20% */
 
         &:hover {
