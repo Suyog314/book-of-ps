@@ -66,7 +66,7 @@ export const TextMenu = (props: IEditorProps) => {
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={
           "textEditorButton" +
-          (editor.isActive("bulletList") ? "activeTextEditorButton" : "")
+          (editor.isActive("bulletList") ? " activeTextEditorButton" : "")
         }
       >
         Bullet

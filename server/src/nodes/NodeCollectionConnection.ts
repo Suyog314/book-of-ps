@@ -51,6 +51,7 @@ export class NodeCollectionConnection {
       cuisine: 1,
       serving: 1,
       time: 1,
+      filePath: 1,
       score: { $meta: "textScore" },
     };
 

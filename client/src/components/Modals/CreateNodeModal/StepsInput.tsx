@@ -1,5 +1,5 @@
 import { Input } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { Button } from "~/components/Button";
 import * as ri from "react-icons/ri";
 import "./StepsInput.scss";
@@ -11,9 +11,10 @@ export interface StepsInputProps {
 
 export const StepsInput = (props: StepsInputProps) => {
   const { setSteps, steps } = props;
-  useEffect(() => {
-    console.log(steps);
-  }, [steps]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lastInputRef = useRef<HTMLInputElement>(null);
+  const [buttonPressed, setButtonPressed] = useState(false);
+
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number
@@ -25,61 +26,64 @@ export const StepsInput = (props: StepsInputProps) => {
 
   const handleAddInputClick = () => {
     setSteps([...steps, ""]);
+    setButtonPressed(true);
   };
+
+  useLayoutEffect(() => {
+    if (buttonPressed && lastInputRef.current && containerRef.current) {
+      lastInputRef.current.focus();
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      setButtonPressed(false);
+    }
+  }, [buttonPressed, steps]);
+
+  const buttonStyle = { marginTop: "5px", width: "100%", height: "24px" };
 
   const displaySteps = () => {
     return steps.map((ingredient, index) => {
+      const isLast = index === steps.length - 1;
       return (
         <div className="steps-input-container" key={`ingredient-${index}`}>
-          <p
-            style={{
-              fontSize: "30px",
-              marginRight: "10px",
-            }}
-          >
-            {`${index + 1}.`}
-          </p>
-          {index == 0 ? (
+          {index === 0 ? (
             <Input
               className="ingredient-input"
               placeholder="Steps..."
               value={ingredient}
-              onChange={(event) => {
-                handleInputChange(event, index);
-              }}
+              onChange={(event) => handleInputChange(event, index)}
+              ref={isLast ? lastInputRef : null}
             />
           ) : (
             <Input
               className="ingredient-input"
               value={ingredient}
-              onChange={(event) => {
-                handleInputChange(event, index);
-              }}
+              onChange={(event) => handleInputChange(event, index)}
+              ref={isLast ? lastInputRef : null}
             />
           )}
 
-          {index == steps.length - 1 && (
+          {isLast && (
             <Button
-              style={{ marginLeft: "5px", width: "36px", height: "36px" }}
+              style={buttonStyle}
               onClick={handleAddInputClick}
               icon={<ri.RiAddFill />}
+              text="Add Step"
             />
           )}
         </div>
       );
     });
   };
+
   return (
     <div
       style={{
-        padding: "0px, 10px, 10px, 10px",
         maxHeight: "160px",
         overflowY: "auto",
-        marginRight: "10px",
         width: "500px",
       }}
+      ref={containerRef}
     >
-      <div>{displaySteps()}</div>
+      {displaySteps()}
     </div>
   );
 };

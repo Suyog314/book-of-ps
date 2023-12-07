@@ -254,24 +254,9 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     return <div className="text-content">{currentNode?.content}</div>;
   }
 
-  const belongsToRecipe = async () => {
-    const nodeResp = await FrontendNodeGateway.getNode(
-      currentNode.filePath.path[0]
-    );
-    if (nodeResp.success) {
-      const node = nodeResp.payload;
-      console.log(node.type == "recipe");
-      return node.type == "recipe";
-    } else {
-      return false;
-    }
-  };
-
   return (
     <div className="editor-container">
-      {!belongsToRecipe() && (
-        <TextMenu editor={editor} save={handleContentChange} />
-      )}
+      {editable && <TextMenu editor={editor} save={handleContentChange} />}
       <EditorContent
         className="editorContent"
         editor={editor}

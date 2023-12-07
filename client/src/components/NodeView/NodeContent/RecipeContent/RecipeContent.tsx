@@ -8,7 +8,6 @@ import "./RecipeContent.scss";
 import { Cuisine, INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
 import {
-  Button,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -21,7 +20,6 @@ import Link from "next/link";
 import { TextContent } from "../TextContent";
 import { FrontendNodeGateway } from "~/nodes";
 import { RecipeTimer } from "./RecipeTimer";
-import { pathToString } from "~/global";
 
 export interface RecipeContentProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
