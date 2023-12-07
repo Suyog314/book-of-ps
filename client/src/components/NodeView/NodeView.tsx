@@ -1,7 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FrontendAnchorGateway } from "../../anchors";
 import { generateObjectId } from "../../global";
-import { IAnchor, INode, isSameExtent, NodeIdsToNodesMap } from "../../types";
+import {
+  IAnchor,
+  INode,
+  IRecipeNode,
+  isSameExtent,
+  NodeIdsToNodesMap,
+} from "../../types";
 import { NodeBreadcrumb } from "./NodeBreadcrumb";
 import { NodeContent } from "./NodeContent";
 import { NodeHeader } from "./NodeHeader";
@@ -35,6 +41,8 @@ export interface INodeViewProps {
   onGraphButtonClick: () => void;
   // handler for opening graph modal
   onMoveButtonClick: (node: INode) => void;
+  // handler for opening share modal
+  onShareModalClick: () => void;
   // children used when rendering folder node
   childNodes?: INode[];
 }
@@ -49,6 +57,7 @@ export const NodeView = (props: INodeViewProps) => {
     onDeleteButtonClick,
     onGraphButtonClick,
     onMoveButtonClick,
+    onShareModalClick,
     childNodes,
   } = props;
   const setIsLinking = useSetRecoilState(isLinkingState);
@@ -68,12 +77,36 @@ export const NodeView = (props: INodeViewProps) => {
   setCurrentNode(currentNode);
 
   const loadAnchorsFromNodeId = useCallback(async () => {
+    console.log("bruh");
     const anchorsFromNode = await FrontendAnchorGateway.getAnchorsByNodeId(
       currentNode.nodeId
     );
     if (anchorsFromNode.success) {
       setAnchors(anchorsFromNode.payload);
     }
+  }, [currentNode]);
+
+  const loadChildAnchorsFromNodeId = useCallback(async () => {
+    setAnchors([]);
+    const nodeIDs: string[] = [
+      (currentNode as IRecipeNode).descriptionID,
+      (currentNode as IRecipeNode).ingredientsID,
+      (currentNode as IRecipeNode).stepsID,
+    ];
+    console.log(nodeIDs);
+    nodeIDs.forEach(async (nodeID) => {
+      const anchorsFromNode = await FrontendAnchorGateway.getAnchorsByNodeId(
+        nodeID
+      );
+      console.log(nodeID);
+      if (anchorsFromNode.success) {
+        console.log(anchorsFromNode.payload);
+        const newAnchors = [...anchors]; // Create a shallow copy of the existing anchors
+        newAnchors.push(...anchorsFromNode.payload); // Concatenate the new anchors
+        setAnchors(newAnchors); // Update the state
+      }
+    });
+    console.log(anchors, "finalAnchors");
   }, [currentNode]);
 
   const handleStartLinkClick = () => {
@@ -125,13 +158,25 @@ export const NodeView = (props: INodeViewProps) => {
   };
 
   useEffect(() => {
-    loadAnchorsFromNodeId();
+    if (currentNode.type !== "recipe") {
+      console.log("not RecipeNode");
+      loadAnchorsFromNodeId();
+    }
   }, [loadAnchorsFromNodeId, currentNode, refresh, setSelectedAnchors]);
+
+  useEffect(() => {
+    if (currentNode.type == "recipe") {
+      console.log("recipeNode");
+      loadChildAnchorsFromNodeId();
+    }
+  }, [loadChildAnchorsFromNodeId, currentNode, refresh, setSelectedAnchors]);
 
   const hasBreadcrumb: boolean = path.length > 1;
   const hasAnchors: boolean = anchors.length > 0;
   let nodePropertiesWidth: number = hasAnchors ? 200 : 0;
   const nodeViewWidth = `calc(100% - ${nodePropertiesWidth}px)`;
+
+  console.log(hasAnchors, "hasAnchors", anchors);
 
   const nodeProperties = useRef<HTMLHeadingElement>(null);
   const divider = useRef<HTMLHeadingElement>(null);
@@ -184,6 +229,7 @@ export const NodeView = (props: INodeViewProps) => {
           onGraphButtonClick={onGraphButtonClick}
           onHandleStartLinkClick={handleStartLinkClick}
           onHandleCompleteLinkClick={handleCompleteLinkClick}
+          onShareModalClick={onShareModalClick}
         />
         <div className="nodeView-scrollable">
           {hasBreadcrumb && (

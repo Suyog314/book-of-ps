@@ -7,6 +7,7 @@ import {
   IAnchor,
   ILink,
   INode,
+  IRecipeNode,
   NodeIdsToNodesMap,
 } from "../../../types";
 interface ILinkItemProps {
@@ -113,17 +114,35 @@ export const fetchNodeFromLink = async (props: ILinkItemProps) => {
   const secondAnchorId = link.anchor2Id;
   const firstAnchor = await FrontendAnchorGateway.getAnchor(firstAnchorId);
   const secondAnchor = await FrontendAnchorGateway.getAnchor(secondAnchorId);
+  console.log(firstAnchor, secondAnchor, "anchors");
   if (firstAnchor.payload !== null && secondAnchor.payload !== null) {
     const firstNode = nodeIdsToNodesMap[firstAnchor.payload.nodeId];
     const secondNode = nodeIdsToNodesMap[secondAnchor.payload.nodeId];
-    if (firstNode?.nodeId === currentNode?.nodeId && secondNode?.nodeId) {
-      setSelectedNode(secondNode);
-      setRefresh(!refresh);
-      return secondNode.nodeId;
-    } else if (firstNode?.nodeId) {
-      setSelectedNode(firstNode);
-      setRefresh(!refresh);
-      return firstNode.nodeId;
+    if (currentNode.type !== "recipe") {
+      if (firstNode?.nodeId === currentNode?.nodeId && secondNode?.nodeId) {
+        setSelectedNode(secondNode);
+        setRefresh(!refresh);
+        return secondNode.nodeId;
+      } else if (firstNode?.nodeId) {
+        setSelectedNode(firstNode);
+        setRefresh(!refresh);
+        return firstNode.nodeId;
+      }
+    } else {
+      const nodeIDs = [
+        (currentNode as IRecipeNode).descriptionID,
+        (currentNode as IRecipeNode).ingredientsID,
+        (currentNode as IRecipeNode).stepsID,
+      ];
+      if (nodeIDs.includes(firstNode?.nodeId) && secondNode?.nodeId) {
+        setSelectedNode(secondNode);
+        setRefresh(!refresh);
+        return secondNode.nodeId;
+      } else if (firstNode?.nodeId) {
+        setSelectedNode(firstNode);
+        setRefresh(!refresh);
+        return firstNode.nodeId;
+      }
     }
   }
 };

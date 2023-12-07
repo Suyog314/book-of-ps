@@ -22,7 +22,6 @@ export const TextMenu = (props: IEditorProps) => {
     }
   };
 
-  // TODO: Add a menu of buttons for your text editor here
   return (
     <div id="textMenu">
       <button

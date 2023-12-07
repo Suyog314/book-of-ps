@@ -17,7 +17,7 @@ import {
   alertMessageState,
   isAppLoadedState,
   rootNodesState,
-  isLoggedIn,
+  userSessionState,
 } from "../../global/Atoms";
 import { useRouter } from "next/router";
 import { FrontendNodeGateway } from "../../nodes";
@@ -42,6 +42,8 @@ import { TreeView } from "../TreeView";
 import "./MainView.scss";
 import { createNodeIdsToNodesMap, makeRootWrapper } from "./mainViewUtils";
 import { GraphModal } from "../Modals/GraphModal/GraphModal";
+import { ProfileModal } from "../Modals/ProfileModal";
+import { ShareModal } from "../Modals/ShareModal";
 
 export const MainView = React.memo(function MainView() {
   // app states
@@ -52,6 +54,8 @@ export const MainView = React.memo(function MainView() {
   const [moveNodeModalOpen, setMoveNodeModalOpen] = useState(false);
   const [graphModalOpen, setGraphModalOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   // node states
   const [selectedNode, setSelectedNode] = useRecoilState(selectedNodeState);
   const [rootNodes, setRootNodes] = useRecoilState(rootNodesState);
@@ -63,6 +67,7 @@ export const MainView = React.memo(function MainView() {
   const setAlertIsOpen = useSetRecoilState(alertOpenState);
   const setAlertTitle = useSetRecoilState(alertTitleState);
   const setAlertMessage = useSetRecoilState(alertMessageState);
+  const userSession = useRecoilValue(userSessionState);
   // search modal parameters
   const [availCuisines, setAvailCuisines] = useState<Cuisine[]>([]);
   const [maxTime, setMaxTime] = useState(60);
@@ -96,8 +101,7 @@ export const MainView = React.memo(function MainView() {
       return;
     }
     const minutes = timeRes.payload;
-    const maxHours = Math.ceil(minutes / 60);
-    setMaxTime(maxHours);
+    setMaxTime(minutes);
 
     const servingRes = await FrontendNodeGateway.getMaxServing();
     if (!servingRes.success) {
@@ -113,6 +117,7 @@ export const MainView = React.memo(function MainView() {
 
   useEffect(() => {
     loadRootsFromDB();
+    console.log(rootNodes);
   }, [loadRootsFromDB, refresh]);
 
   const rootRecursiveNodeTree: RecursiveNodeTree = useMemo(
@@ -160,6 +165,11 @@ export const MainView = React.memo(function MainView() {
   const handleGraphButtonClick = useCallback(() => {
     setGraphModalOpen(true);
   }, []);
+
+  const handleShareModalClick = useCallback(() => {
+    setShareModalOpen(true);
+  }, []);
+
   const handleCreateNodeButtonClick = useCallback(() => {
     setCreateNodeModalOpen(true);
   }, [setCreateNodeModalOpen]);
@@ -192,11 +202,14 @@ export const MainView = React.memo(function MainView() {
 
   const handleMoveNodeButtonClick = useCallback(() => {
     setMoveNodeModalOpen(true);
-    console.log("move");
   }, []);
 
   const handleCompleteLinkClick = useCallback(() => {
     setCompleteLinkModalOpen(true);
+  }, []);
+
+  const handleProfileClick = useCallback(() => {
+    setProfileModalOpen(true);
   }, []);
 
   const handleHomeClick = useCallback(() => {
@@ -262,6 +275,15 @@ export const MainView = React.memo(function MainView() {
             onCreateNodeButtonClick={handleCreateNodeButtonClick}
             nodeIdsToNodesMap={nodeIdsToNodesMap}
             onSearchClick={() => setSearchModalOpen(true)}
+            onProfileClick={handleProfileClick}
+            avatarSrc={`https://ui-avatars.com/api/?name=${userSession?.name}&background=random&rounded=true&bold=true&color=ffffff`}
+          />
+          <ProfileModal
+            isOpen={profileModalOpen}
+            onClose={() => setProfileModalOpen(false)}
+            avatarSrc={`https://ui-avatars.com/api/?name=${userSession?.name}&background=random&rounded=true&bold=true&color=ffffff`}
+            userName={userSession?.name}
+            userEmail={userSession?.email}
           />
           <SearchModal
             isOpen={searchModalOpen}
@@ -298,6 +320,10 @@ export const MainView = React.memo(function MainView() {
                 node={selectedNode}
                 roots={rootNodes}
               />
+              <ShareModal
+                isOpen={shareModalOpen}
+                onClose={() => setShareModalOpen(false)}
+              />
             </>
           )}
           <div className="content">
@@ -326,6 +352,7 @@ export const MainView = React.memo(function MainView() {
                 onGraphButtonClick={handleGraphButtonClick}
                 onCompleteLinkClick={handleCompleteLinkClick}
                 onCreateNodeButtonClick={handleCreateNodeButtonClick}
+                onShareModalClick={handleShareModalClick}
                 nodeIdsToNodesMap={nodeIdsToNodesMap}
               />
             </div>

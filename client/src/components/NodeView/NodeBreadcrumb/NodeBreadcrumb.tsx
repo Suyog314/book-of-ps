@@ -29,7 +29,10 @@ export const NodeBreadcrumb = ({
   return (
     <div className="node-breadcrumb">
       {parentNodes.map((node: INode) => (
-        <Link href={`/${pathToString(node.filePath)}`} key={node.nodeId}>
+        <Link
+          href={`/dashboard/${pathToString(node.filePath)}`}
+          key={node.nodeId}
+        >
           <div className="breadcrumb-item-wrapper">
             <div
               className={"breadcrumb-item"}

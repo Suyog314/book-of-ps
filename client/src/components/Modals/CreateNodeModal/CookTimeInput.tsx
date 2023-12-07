@@ -20,6 +20,7 @@ export const CookTimeInput = (props: CookTimeInputProps) => {
     console.log(days, hours, minutes);
     const cookTime: number =
       Number(days) * 1440 + Number(hours) * 60 + Number(minutes);
+    console.log(cookTime);
     onChange(cookTime);
   }, [days, hours, minutes]);
 

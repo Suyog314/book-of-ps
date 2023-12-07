@@ -1,22 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react";
-import ReactFlow, {
-  useNodesState,
-  useEdgesState,
-  applyEdgeChanges,
-  applyNodeChanges,
-} from "react-flow-renderer";
-import { IAnchor, ILink, INode, NodeIdsToNodesMap } from "~/types";
+import ReactFlow, { useNodesState, useEdgesState } from "react-flow-renderer";
+import { IAnchor, INode, NodeIdsToNodesMap } from "~/types";
 import { FrontendAnchorGateway } from "~/anchors";
-import { FrontendLinkGateway } from "~/links";
 import { loadAnchorToLinksMap } from "~/components/NodeView/NodeLinkMenu";
 import "./GraphModal.scss";
 import {
@@ -50,7 +43,7 @@ export const GraphModal = (props: IGraphModalProps) => {
     setNodes([
       {
         id: node.nodeId,
-        type: node.type,
+        type: "default",
         data: { label: node.title },
         position: { x: 125, y: 125 },
         selected: true,
@@ -74,7 +67,6 @@ export const GraphModal = (props: IGraphModalProps) => {
       1;
       const increment = 200;
 
-      console.log(filteredAnchorIds.length);
       filteredAnchorIds.forEach((anchorId, index) => {
         const x_mod = index % 3;
         const y_mod = index % 2;
@@ -92,7 +84,7 @@ export const GraphModal = (props: IGraphModalProps) => {
               ...prevNodes,
               {
                 id: link.oppNode.nodeId,
-                type: link.oppNode.type,
+                type: "default",
                 data: { label: link.oppNode.title },
                 position: { x: 0 + x_mod * increment, y: 250 * y_mod },
               },

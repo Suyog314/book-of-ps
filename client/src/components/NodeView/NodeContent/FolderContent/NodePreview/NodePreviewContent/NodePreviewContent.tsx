@@ -17,6 +17,8 @@ export const NodePreviewContent = (props: INodeContentPreviewProps) => {
       return <ImagePreviewContent content={content} />;
     case "text":
       return <TextPreviewContent content={content} />;
+    case "recipe":
+      return <ImagePreviewContent content={content} />;
     default:
       return null;
   }

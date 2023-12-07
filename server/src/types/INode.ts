@@ -45,6 +45,7 @@ export interface INode {
   height?: number[];
   width?: number[];
   authorId?: string; // UUID for each author
+  collaborators?: string[];
 }
 export interface IRecipeNode extends INode {
   descriptionID: string;
@@ -71,13 +72,25 @@ export const allNodeFields: string[] = [
   "viewType",
   "height",
   "width",
-  "description",
-  "ingredients",
-  "steps",
+  "descriptionID",
+  "ingredientsID",
+  "stepsID",
   "serving",
   "cuisine",
   "time",
   "authorId",
+  "collaborators",
+];
+
+export const allCuisines: string[] = [
+  "American",
+  "Italian",
+  "Chinese",
+  "Korean",
+  "French",
+  "Mexican",
+  "Japanese",
+  "British",
 ];
 
 // Type declaration for map from nodeId --> INode
@@ -105,7 +118,8 @@ export function makeINode(
   content?: any,
   height?: any,
   width?: any,
-  authorId?: any
+  authorId?: any,
+  collaborators?: any
 ): INode {
   return {
     content: content ?? "content" + nodeId,
@@ -116,6 +130,7 @@ export function makeINode(
     height: height ?? [],
     width: width ?? [],
     authorId: authorId,
+    collaborators: collaborators,
   };
 }
 
@@ -134,7 +149,8 @@ export function makeIRecipeNode(
   title?: any,
   content?: any,
   height?: any,
-  width?: any
+  width?: any,
+  collaborators?: any
 ): IRecipeNode {
   return {
     content: content ?? "content" + nodeId,
@@ -151,6 +167,7 @@ export function makeIRecipeNode(
     cuisine: cuisine,
     time: time,
     authorId: authorId,
+    collaborators: collaborators,
   };
 }
 

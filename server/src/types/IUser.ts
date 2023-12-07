@@ -3,45 +3,52 @@ export interface IUser {
   email: string;
   password: string;
   userId: string;
+  userAvatar?: string;
 }
 
-export interface IUserSession extends IUser {
+export interface IUserSession {
+  name: string;
+  email: string;
+  userId: string;
   backendTokens: {
     accessToken: string;
     refreshToken: string;
   };
+  userAvatar?: string;
 }
 
 export function makeIUser(
   name: string,
   email: string,
   password: string,
-  userId: string
+  userId: string,
+  userAvatar?: string
 ): IUser {
   return {
     name: name,
     email: email,
     password: password,
     userId: userId,
+    userAvatar: userAvatar,
   };
 }
 
 export function makeIUserSession(
   name: string,
   email: string,
-  password: string,
   userId: string,
   backendTokens: {
     accessToken: string;
     refreshToken: string;
-  }
+  },
+  userAvatar?: string
 ): IUserSession {
   return {
     name: name,
     email: email,
-    password: password,
     userId: userId,
     backendTokens: backendTokens,
+    userAvatar: userAvatar,
   };
 }
 

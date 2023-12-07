@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import * as ri from "react-icons/ri";
-import * as ai from "react-icons/ai";
 import { LuUtensils } from "react-icons/lu";
 
 import { useRecoilState } from "recoil";
-import { currentNodeState } from "~/global/Atoms";
+import { currentNodeState, refreshState } from "~/global/Atoms";
 import "./RecipeContent.scss";
-import { INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
+import { Cuisine, INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
 import {
-  Link,
+  Button,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -17,9 +16,12 @@ import {
   NumberInputStepper,
   Select,
 } from "@chakra-ui/react";
+import Link from "next/link";
+
 import { TextContent } from "../TextContent";
 import { FrontendNodeGateway } from "~/nodes";
 import { RecipeTimer } from "./RecipeTimer";
+import { pathToString } from "~/global";
 
 export interface RecipeContentProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
@@ -27,71 +29,43 @@ export interface RecipeContentProps {
 export const RecipeContent = (props: RecipeContentProps) => {
   const { nodeIdsToNodesMap } = props;
   const [currentNode] = useRecoilState(currentNodeState);
-  const [editingNodeID, setEditingNodeID] = useState("");
   const [tempUnits] = useState(["celsius", "fahrenheit", "kelvin"]);
   const [volumeUnits] = useState(["ml", "l", "fl oz", "cup", "tsp"]);
   const [weightUnits] = useState(["oz", "lb", "g", "kg"]);
-  const [selectedUnitType, setSelectedUnitType] = useState("Temperature");
-  const [leftSelectedUnit, setLeftSelectedUnit] = useState("");
-  const [rightSelectedUnit, setRightSelectedUnit] = useState("");
+  const [selectedUnitType, setSelectedUnitType] = useState("Volume");
+  const [leftSelectedUnit, setLeftSelectedUnit] = useState(volumeUnits[0]);
+  const [rightSelectedUnit, setRightSelectedUnit] = useState(volumeUnits[1]);
   const [leftUnitValue, setLeftUnitValue] = useState<number>(0);
   const [rightUnitValue, setRightUnitValue] = useState<number>(0);
-  const [descriptionNode, setDescriptionNode] = useState<INode>();
-  const [ingredientsNode, setIngredientsNode] = useState<INode>();
-  const [stepsNode, setStepsNode] = useState<INode>();
+
+  const descriptionNode =
+    nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
+
+  const ingredientsNode =
+    nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
+
+  const stepsNode = nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
 
   useEffect(() => {
-    console.log(convert(2, "tsp").to("fl oz"));
-    console.log(selectedUnitType);
-    console.log(leftSelectedUnit);
-    console.log(rightSelectedUnit);
-    console.log(leftUnitValue);
-    console.log(rightUnitValue);
-    console.log(currentNode);
     convertUnits();
   }, [
-    selectedUnitType,
     leftSelectedUnit,
     rightSelectedUnit,
     leftUnitValue,
     rightUnitValue,
+    selectedUnitType,
   ]);
 
-  useEffect(() => {
-    const getDescriptionNode = async () => {
-      const descriptionNodeResp = await FrontendNodeGateway.getNode(
-        (currentNode as IRecipeNode).descriptionID
-      );
-      if (descriptionNodeResp.success) {
-        setDescriptionNode(descriptionNodeResp.payload);
-      } else {
-        console.log(descriptionNodeResp.message);
-      }
-    };
-    const getIngredientsNode = async () => {
-      const ingredientsNodeResp = await FrontendNodeGateway.getNode(
-        (currentNode as IRecipeNode).ingredientsID
-      );
-      if (ingredientsNodeResp.success) {
-        setIngredientsNode(ingredientsNodeResp.payload);
-      } else {
-        console.log(ingredientsNodeResp.message);
-      }
-    };
-    const getStepsNode = async () => {
-      const stepsNodeResp = await FrontendNodeGateway.getNode(
-        (currentNode as IRecipeNode).stepsID
-      );
-      if (stepsNodeResp.success) {
-        setStepsNode(stepsNodeResp.payload);
-      } else {
-        console.log(stepsNodeResp.message);
-      }
-    };
-    getDescriptionNode();
-    getIngredientsNode();
-    getStepsNode();
-  }, [currentNode]);
+  const convertUnits = () => {
+    const convertedValue = convert(leftUnitValue, leftSelectedUnit as any).to(
+      rightSelectedUnit as any
+    );
+
+    // Limit the number of decimal places to 3
+    const roundedValue = parseFloat(convertedValue.toFixed(3));
+
+    setRightUnitValue(roundedValue);
+  };
 
   const handleUnitTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -123,16 +97,6 @@ export const RecipeContent = (props: RecipeContentProps) => {
       setLeftSelectedUnit(event.target.value);
     } else {
       setRightSelectedUnit(event.target.value);
-    }
-  };
-  const convertUnits = () => {
-    if (leftSelectedUnit === rightSelectedUnit) {
-      setRightUnitValue(leftUnitValue);
-    } else {
-      const convertedValue = convert(leftUnitValue, leftSelectedUnit).to(
-        rightSelectedUnit
-      );
-      setRightUnitValue(convertedValue);
     }
   };
 
@@ -185,19 +149,17 @@ export const RecipeContent = (props: RecipeContentProps) => {
           <Select onChange={handleUnitTypeChange} variant={"filled"}>
             <option value="Volume">Volume</option>
             <option value="Weight">Weight</option>
-            <option value="Temperature" selected>
-              Temperature
-            </option>
+            <option value="Temperature">Temperature</option>
           </Select>
           <div className="input-section">
             <div className="left-input">
               <NumberInput
                 style={{ width: "90%" }}
-                defaultValue={1}
                 onChange={(valueString) => {
                   setLeftUnitValue(Number(valueString));
                 }}
                 value={leftUnitValue}
+                precision={2}
               >
                 <NumberInputField
                   onChange={(value) =>
@@ -212,24 +174,7 @@ export const RecipeContent = (props: RecipeContentProps) => {
             </div>
             <b>=</b>
             <div className="right-input">
-              <NumberInput
-                style={{ width: "90%" }}
-                defaultValue={1}
-                onChange={(valueString) => {
-                  setRightUnitValue(Number(valueString));
-                }}
-                value={rightUnitValue}
-              >
-                <NumberInputField
-                  onChange={(value) =>
-                    setRightUnitValue(Number(value.target.value))
-                  }
-                />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
+              <b>{rightUnitValue}</b>
             </div>
           </div>
           <div className="unit-section">
@@ -257,42 +202,49 @@ export const RecipeContent = (props: RecipeContentProps) => {
             </div>
           </div>
         </div>
-        {/* <RecipeTimer /> */}
       </div>
       <div className="recipe-right">
         <div className="recipe-description-container">
           <b style={{ fontSize: 30 }}>Description</b>
-          <div>
-            <Link href={`/${descriptionNode?.nodeId}`}>
-              <TextContent
-                nodeIdsToNodesMap={nodeIdsToNodesMap}
-                currentNode={descriptionNode}
-                setEditingID={setEditingNodeID}
-              />
-            </Link>
-          </div>
+          <Link href={`/dashboard/${descriptionNode?.nodeId}`}>
+            <div className="description">
+              {descriptionNode && (
+                <TextContent
+                  nodeIdsToNodesMap={nodeIdsToNodesMap}
+                  currentNode={descriptionNode}
+                  editable={false}
+                />
+              )}
+            </div>
+          </Link>
         </div>
         <div className="recipe-ingredients-container">
           <b style={{ fontSize: 30 }}>Ingredients</b>
-          <div className="ingredients">
-            {
-              <Link href={`/${ingredientsNode?.nodeId}`}>
+          <Link href={`/dashboard/${ingredientsNode?.nodeId}`}>
+            <div className="ingredients">
+              {ingredientsNode && (
                 <TextContent
                   nodeIdsToNodesMap={nodeIdsToNodesMap}
                   currentNode={ingredientsNode}
-                  setEditingID={setEditingNodeID}
+                  editable={false}
                 />
-              </Link>
-            }
-          </div>
+              )}
+            </div>
+          </Link>
         </div>
         <div className="recipe-steps-container">
-          {
-            <TextContent
-              nodeIdsToNodesMap={nodeIdsToNodesMap}
-              currentNode={stepsNode}
-            />
-          }
+          <b style={{ fontSize: 30 }}>Steps</b>
+          <Link href={`/dashboard/${stepsNode?.nodeId}`}>
+            <div className="steps">
+              {stepsNode && (
+                <TextContent
+                  nodeIdsToNodesMap={nodeIdsToNodesMap}
+                  currentNode={stepsNode}
+                  editable={false}
+                />
+              )}
+            </div>
+          </Link>
         </div>
       </div>
     </div>

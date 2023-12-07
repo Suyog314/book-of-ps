@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { IAnchor, ILink, INode, NodeIdsToNodesMap } from "../../../types";
+import {
+  IAnchor,
+  ILink,
+  INode,
+  IRecipeNode,
+  NodeIdsToNodesMap,
+} from "../../../types";
 import { AnchorItem, LinkItem } from "./AnchorItem";
 import "./NodeLinkMenu.scss";
 import { includesAnchorId, loadAnchorToLinksMap } from "./nodeLinkMenuUtils";
@@ -29,12 +35,40 @@ export const NodeLinkMenu = (props: INodeLinkMenuProps) => {
   }>({});
   const [anchorRefresh] = useRecoilState(refreshAnchorState);
   const [linkMenuRefresh] = useRecoilState(refreshLinkListState);
-
   useEffect(() => {
-    const fetchLinks = async () => {
-      setAnchorsMap(await loadAnchorToLinksMap({ ...props, currentNode }));
+    const fetchLinks = async (currentNode: INode) => {
+      return await loadAnchorToLinksMap({ ...props, currentNode });
     };
-    fetchLinks();
+
+    const updateAnchorsMap = async () => {
+      if (currentNode.type === "recipe") {
+        let ancMap: {
+          [anchorId: string]: {
+            anchor: IAnchor;
+            links: { link: ILink; oppNode: INode; oppAnchor: IAnchor }[];
+          };
+        } = anchorsMap;
+
+        const descriptionNode =
+          nodeIdsToNodesMap[(currentNode as IRecipeNode).descriptionID];
+        ancMap = { ...ancMap, ...(await fetchLinks(descriptionNode)) };
+
+        const ingredientsNode =
+          nodeIdsToNodesMap[(currentNode as IRecipeNode).ingredientsID];
+        ancMap = { ...ancMap, ...(await fetchLinks(ingredientsNode)) };
+
+        const stepsNode =
+          nodeIdsToNodesMap[(currentNode as IRecipeNode).stepsID];
+        ancMap = { ...ancMap, ...(await fetchLinks(stepsNode)) };
+
+        setAnchorsMap(ancMap);
+      } else {
+        setAnchorsMap(await fetchLinks(currentNode));
+      }
+    };
+    setAnchorsMap({});
+    updateAnchorsMap();
+    console.log(anchorsMap, "anchorsMap");
   }, [currentNode, refresh, selectedAnchors, anchorRefresh, linkMenuRefresh]);
 
   const loadMenu = () => {

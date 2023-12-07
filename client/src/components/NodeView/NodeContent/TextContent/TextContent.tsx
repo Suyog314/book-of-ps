@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { FrontendAnchorGateway } from "../../../../anchors";
 import {
   currentNodeState,
@@ -31,7 +31,6 @@ import Highlight from "@tiptap/extension-highlight";
 import Underline from "@tiptap/extension-underline";
 import { loadAnchorToLinksMap } from "../../NodeLinkMenu";
 import TextAlign from "@tiptap/extension-text-align";
-import { join } from "path";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
 import OrderedList from "@tiptap/extension-ordered-list";
@@ -39,23 +38,18 @@ import OrderedList from "@tiptap/extension-ordered-list";
 export interface INodeLinkMenuProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
   currentNode: INode;
+  editable: boolean;
 }
 
 /** The content of an text node, including all its anchors */
 export const TextContent = (props: INodeLinkMenuProps) => {
-  const { currentNode } = props;
-  const [refresh] = useRecoilState(refreshState);
-  const setCurrentNode = useSetRecoilState(currentNodeState);
+  const { currentNode, editable } = props;
+  const setSelectedExtent = useSetRecoilState(selectedExtentState);
+  const [refresh, setRefresh] = useRecoilState(refreshState);
   const [anchorRefresh, setAnchorRefresh] = useRecoilState(refreshAnchorState);
   const [linkMenuRefresh, setLinkMenuRefresh] =
     useRecoilState(refreshLinkListState);
   const [editing, setEditing] = useState(false);
-  const setSelectedExtent = useSetRecoilState(selectedExtentState);
-
-  useEffect(() => {
-    console.log(editing);
-    console.log(currentNode?.title);
-  }, [editing]);
 
   //editor and all extensions are added here
   const editor = useEditor({
@@ -76,10 +70,8 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       OrderedList,
     ],
     content: currentNode?.content,
+    editable: editable,
   });
-
-  // TODO: Add all of the functionality for a rich text editor!
-  // (This file is where the majority of your work on text editing will be done)
 
   /** This function adds anchor marks for anchors in the database to the text editor */
   const addAnchorMarks = async (): Promise<IServiceResponse<any>> => {
@@ -89,7 +81,6 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     const anchorResponse = await FrontendAnchorGateway.getAnchorsByNodeId(
       currentNode?.nodeId
     );
-    console.log(anchorResponse.payload, "payload");
     if (!anchorResponse || !anchorResponse.success) {
       return failureServiceResponse("failed to get anchors");
     }
@@ -102,7 +93,6 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       const linkResponse = await FrontendLinkGateway.getLinksByAnchorId(
         anchor.anchorId
       );
-      console.log(linkResponse.payload);
       if (!linkResponse.success) {
         return failureServiceResponse("failed to get link");
       }
@@ -117,7 +107,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
           to: anchor.extent.endCharacter + 1,
         });
         editor.commands.setLink({
-          href: "/" + node + "/",
+          href: "/dashboard/" + node + "/",
           target: anchor.anchorId,
         });
       }
@@ -131,7 +121,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
       editor.commands.setContent(currentNode?.content);
       addAnchorMarks();
     }
-  }, [currentNode, editor, refresh]);
+  }, [currentNode, editor]);
 
   // Set the selected extent to null when this component loads
   useEffect(() => {
@@ -236,6 +226,7 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     await FrontendNodeGateway.updateNode(currentNode.nodeId, [nodeProperty]);
     addAnchorMarks();
     setLinkMenuRefresh(!linkMenuRefresh);
+    setRefresh(!refresh);
   };
 
   const onPointerUp = () => {
@@ -263,18 +254,24 @@ export const TextContent = (props: INodeLinkMenuProps) => {
     return <div className="text-content">{currentNode?.content}</div>;
   }
 
+  const belongsToRecipe = async () => {
+    const nodeResp = await FrontendNodeGateway.getNode(
+      currentNode.filePath.path[0]
+    );
+    if (nodeResp.success) {
+      const node = nodeResp.payload;
+      console.log(node.type == "recipe");
+      return node.type == "recipe";
+    } else {
+      return false;
+    }
+  };
+
   return (
-    <div
-      onFocus={() => {
-        setEditing(true);
-        setCurrentNode(currentNode);
-      }}
-      onBlur={() => {
-        // setEditing(false);
-      }}
-      className="editor-container"
-    >
-      {editing && <TextMenu editor={editor} save={handleContentChange} />}
+    <div className="editor-container">
+      {!belongsToRecipe() && (
+        <TextMenu editor={editor} save={handleContentChange} />
+      )}
       <EditorContent
         className="editorContent"
         editor={editor}

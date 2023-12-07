@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./SearchResultItem.scss";
 import Link from "next/link";
+import { LuUtensils } from "react-icons/lu";
+import * as ri from "react-icons/ri";
+
 export interface ISearchResultItemProps {
   type: string;
   title: string;
@@ -16,6 +19,9 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
   const { type, title, nodeId, onClose, date, cuisine, serving, time } = props;
 
   const [formattedDate, setFormattedDate] = useState<string>("");
+
+  const hours = Math.floor(time / 60);
+  const mins = time % 60;
 
   const processDate = () => {
     const d = new Date(date);
@@ -37,13 +43,24 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
   }, [date]);
 
   return (
-    <Link href={`/${nodeId}`} onClick={onClose}>
+    <Link href={`/dashboard/${nodeId}`} onClick={onClose}>
       <div className="result-recipe-container">
         {type == "recipe" && (
           <div className="recipe-content">
-            <div>{cuisine}</div>
-            <div>{serving}</div>
-            <div>{time}</div>
+            <div className="cuisine-section">
+              <LuUtensils className="cuisine-logo" />
+              <div className="recipe-text">{cuisine}</div>
+            </div>
+            <div className="serving-section">
+              <ri.RiUserLine className="serving-icon" />
+              <div className="recipe-text">{serving}</div>
+            </div>
+            <div className="time-section">
+              <ri.RiTimerLine className="time-icon" />
+              <div className="recipe-text">
+                {hours != 0 && hours + "hr "} {mins != 0 && mins + "min"}
+              </div>
+            </div>
           </div>
         )}
         <li className="result-item">

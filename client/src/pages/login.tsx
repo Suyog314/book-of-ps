@@ -1,5 +1,9 @@
-import Login from "~/components/Login/Login";
+import LoginForm from "~/components/Login/LoginForm";
 
-export default function Register() {
-  return <Login />;
+export default function Login() {
+  // const session = await getServerSession(authOptions);
+
+  // if (session) redirect("/dashboard");
+
+  return <LoginForm />;
 }

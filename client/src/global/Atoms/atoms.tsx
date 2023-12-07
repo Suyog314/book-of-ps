@@ -1,5 +1,12 @@
 import { atom } from "recoil";
-import { INode, IAnchor, Extent, RecursiveNodeTree } from "../../types";
+import {
+  INode,
+  IAnchor,
+  Extent,
+  RecursiveNodeTree,
+  Cuisine,
+  IUser,
+} from "../../types";
 import { emptyNode } from "~/components/MainView/mainViewUtils";
 
 // whether the app is loaded
@@ -91,17 +98,29 @@ export const alertMessageState = atom<string>({
   default: "",
 });
 
-export const isLoggedIn = atom<boolean>({
-  key: "isLogginIn",
-  default: false,
+export const availCuisinesState = atom<Set<Cuisine>>({
+  key: "availCuisinesState",
+  default: new Set(),
 });
 
-export const userName = atom<string>({
-  key: "userName",
-  default: "",
-});
+export const localStorageEffect =
+  (key: any) =>
+  ({ setSelf, onSet }: any) => {
+    if (typeof window == "undefined") {
+      console.error("Server side rendering.");
+      return;
+    }
+    const savedValue = localStorage.getItem(key);
+    if (savedValue != null) {
+      setSelf(JSON.parse(savedValue));
+    }
+    onSet((newValue: any) => {
+      localStorage.setItem(key, JSON.stringify(newValue));
+    });
+  };
 
-export const userId = atom<string>({
-  key: "userId",
-  default: "",
+export const userSessionState = atom<IUser | null>({
+  key: "userSession",
+  default: null,
+  effects_UNSTABLE: [localStorageEffect("order")],
 });

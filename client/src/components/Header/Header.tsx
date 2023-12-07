@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 
 import * as ri from "react-icons/ri";
@@ -12,15 +14,17 @@ import {
   selectedExtentState,
 } from "../../global/Atoms";
 import "./Header.scss";
-import { Button as IButton } from "../Button";
 import { Button } from "@chakra-ui/react";
-import { FrontendNodeGateway } from "~/nodes";
+import { Button as IButton } from "../Button";
+import { signOut } from "next-auth/react";
 
 interface IHeaderProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
   onCreateNodeButtonClick: () => void;
   onHomeClick: () => void;
   onSearchClick: () => void;
+  onProfileClick: () => void;
+  avatarSrc: string;
 }
 
 export const Header = (props: IHeaderProps) => {
@@ -29,6 +33,8 @@ export const Header = (props: IHeaderProps) => {
     onHomeClick,
     nodeIdsToNodesMap,
     onSearchClick,
+    onProfileClick,
+    avatarSrc,
   } = props;
   const customButtonStyle = { height: 30, marginLeft: 10, width: 30 };
   const [isLinking, setIsLinking] = useRecoilState(isLinkingState);
@@ -48,12 +54,12 @@ export const Header = (props: IHeaderProps) => {
   return (
     <div className={isLinking ? "header-linking" : "header"}>
       <div className="left-bar">
-        <Link href={"/"}>
+        <Link href={"/dashboard"}>
           <div className="name" onClick={onHomeClick}>
-            BookOf<b>{"P's"}</b>
+            BookOf<b>P&apos;s</b>
           </div>
         </Link>
-        <Link href={"/"}>
+        <Link href={"/dashboard"}>
           <IButton
             isWhite={isLinking}
             style={customButtonStyle}
@@ -79,6 +85,16 @@ export const Header = (props: IHeaderProps) => {
           </Button>
         </div>
       )}
+      <div className="right-bar">
+        {!isLinking && (
+          <div className="profile-pic-container">
+            <div className="profile-pic-wrapper" onClick={onProfileClick}>
+              <img alt="profile-pic" src={avatarSrc}></img>
+              <div className="overlay"></div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {isLinking && startAnchor && (
         <div className="right-bar">

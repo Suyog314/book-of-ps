@@ -1,23 +1,33 @@
 "use client";
 
+import "@fontsource/montserrat";
+
 import Link from "next/link";
 import { useRouter } from "next/router";
 import "./RegisterForm.scss";
-import { useState } from "react";
-import { Input } from "@chakra-ui/react";
-import { Button } from "../Button";
+import { useEffect, useState } from "react";
+import { ChakraProvider, Input } from "@chakra-ui/react";
 import { makeIUser } from "~/types";
 import bcrypt from "bcryptjs";
 import { FrontendUserGateway } from "~/users";
+import { LoadingScreen } from "../LoadingScreen";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
+  const [avatar, setAvatar] = useState(
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
+  );
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    setLoading(false); // Set loading to false when the component mounts
+  }, []);
 
   // handles creation of a new user
   const handleSubmit = async () => {
@@ -33,7 +43,7 @@ export default function Register() {
     }
     // else, create new user
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = makeIUser(name, email, hashedPassword);
+    const newUser = makeIUser(name, email, hashedPassword, avatar);
     const createUserResp = await FrontendUserGateway.createUser(newUser);
     if (!createUserResp.success) {
       setError(createUserResp.message);
@@ -45,47 +55,77 @@ export default function Register() {
     setEmail("");
     setPassword("");
     setVerifyPassword("");
+    setAvatar(
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
+    );
     setError("");
     // redirect to login page
     router.push("/login");
   };
 
+  // Function to handle Enter key press
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSubmit();
+    }
+  };
+
   return (
-    <div className="register-wrapper">
-      <h1 className="register-header">Register</h1>
-      <div className="register-form">
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Full Name"
-        />
-        <Input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-        />
-        <Input
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          type="password"
-        />
-        <Input
-          value={verifyPassword}
-          onChange={(e) => setVerifyPassword(e.target.value)}
-          placeholder="Retype Password"
-          type="password"
-        />
+    <div>
+      {loading ? (
+        <ChakraProvider>
+          <div className="loading-screen">
+            <LoadingScreen hasTimeout={true} />
+          </div>
+        </ChakraProvider>
+      ) : (
+        <div className="register-wrapper">
+          <div className="register-box">
+            <h1 className="register-header">Register</h1>
+            <div className="register-form">
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Full Name"
+                onKeyDown={handleKeyPress}
+              />
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                onKeyDown={handleKeyPress}
+              />
+              <Input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                type="password"
+                onKeyDown={handleKeyPress}
+              />
+              <Input
+                value={verifyPassword}
+                onChange={(e) => setVerifyPassword(e.target.value)}
+                placeholder="Retype Password"
+                type="password"
+                onKeyDown={handleKeyPress}
+              />
 
-        <Button text="Register" onClick={handleSubmit} />
+              <button className="register-button" onClick={handleSubmit}>
+                Sign Up
+              </button>
 
-        {error && <div className="register-error-message">{error}</div>}
+              {error && <div className="register-error-message">{error}</div>}
 
-        <Link className="register-have-account-already" href={"/login"}>
-          Already have an account?{" "}
-          <span className="register-back-to-login">Login</span>
-        </Link>
-      </div>
+              <div className="register-have-account-already">
+                Already have an account?{" "}
+                <Link href={"/login"} onClick={() => setLoading(true)}>
+                  <span className="register-back-to-login">Login</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
