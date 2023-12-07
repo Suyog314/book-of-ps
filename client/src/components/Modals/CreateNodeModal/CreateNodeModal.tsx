@@ -143,8 +143,6 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     return newContent;
   };
 
-  useEffect(() => {}, [serving, cuisine, description]);
-
   // called when the "Create" button is clicked
   const handleSubmit = async () => {
     if (!nodeTypes.includes(selectedType)) {
@@ -175,6 +173,13 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
       authorId,
       collaborators,
     };
+
+    if (selectedType == "text" || selectedType == "image") {
+      if (selectedParentNode == null) {
+        setError("Error: Not created within recipe node");
+        return;
+      }
+    }
 
     if (selectedType == "recipe") {
       if (serving == 0) {
