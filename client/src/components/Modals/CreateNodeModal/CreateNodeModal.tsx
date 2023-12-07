@@ -182,6 +182,10 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     }
 
     if (selectedType == "recipe") {
+      if (selectedParentNode !== null) {
+        setError("Error: Can't nest recipes");
+        return;
+      }
       if (serving == 0) {
         setError("Error: No serving amount");
         return;
