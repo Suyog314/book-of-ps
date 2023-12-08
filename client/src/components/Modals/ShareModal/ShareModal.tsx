@@ -98,7 +98,7 @@ export const ShareModal = (props: IShareModalProps) => {
       return;
     }
     if (userDbCheckResp.payload.email == userSession?.email) {
-      setError("개새끼 don't add yourself.");
+      setError("Don't add yourself.");
       return;
     }
     const newCollabUpdate = [userToAdd, ...newCollabEmails];

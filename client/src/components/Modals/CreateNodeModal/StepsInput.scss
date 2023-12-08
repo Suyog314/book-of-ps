@@ -1,5 +1,7 @@
 @import "../../../global/globalCssVariables";
-
+::-webkit-scrollbar-thumb {
+  background: $primary-theme-color;
+}
 .steps-input-container {
   display: flex;
   flex-direction: column;
