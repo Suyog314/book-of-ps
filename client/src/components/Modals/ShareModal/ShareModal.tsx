@@ -12,14 +12,14 @@ import React, { useEffect, useState } from "react";
 import { IoPersonRemoveOutline } from "react-icons/io5";
 import { IoPersonAddOutline } from "react-icons/io5";
 import "./ShareModal.scss";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import {
   currentNodeCollabsState,
   currentNodeState,
   refreshState,
   userSessionState,
 } from "~/global/Atoms";
-import { INodeProperty, makeINodeProperty } from "~/types";
+import { INodeProperty, IRecipeNode, makeINodeProperty } from "~/types";
 import { FrontendNodeGateway } from "~/nodes";
 import { FrontendUserGateway } from "~/users";
 import { Button } from "~/components/Button";
@@ -56,12 +56,40 @@ export const ShareModal = (props: IShareModalProps) => {
       "collaborators",
       newCollabs
     );
-    const updateResp = await FrontendNodeGateway.updateNode(
+    // update the parent node
+    const updateRespPar = await FrontendNodeGateway.updateNode(
       currentNode.nodeId,
       [nodeProperty]
     );
-    if (!updateResp.success) {
-      console.error(updateResp.message);
+    if (!updateRespPar.success) {
+      console.error(updateRespPar.message);
+      return;
+    }
+    // update description node
+    const updateRespDesc = await FrontendNodeGateway.updateNode(
+      (currentNode as IRecipeNode).descriptionID,
+      [nodeProperty]
+    );
+    if (!updateRespDesc.success) {
+      console.error(updateRespDesc.message);
+      return;
+    }
+    // update steps node
+    const updateRespSteps = await FrontendNodeGateway.updateNode(
+      (currentNode as IRecipeNode).stepsID,
+      [nodeProperty]
+    );
+    if (!updateRespSteps.success) {
+      console.error(updateRespSteps.message);
+      return;
+    }
+    // update ingredients node
+    const updateRespIngre = await FrontendNodeGateway.updateNode(
+      (currentNode as IRecipeNode).ingredientsID,
+      [nodeProperty]
+    );
+    if (!updateRespIngre.success) {
+      console.error(updateRespIngre.message);
       return;
     }
     setRefresh(!refresh);
@@ -99,7 +127,7 @@ export const ShareModal = (props: IShareModalProps) => {
       return;
     }
     if (userDbCheckResp.payload.email == userSession?.email) {
-      setError("개새끼 don't add yourself.");
+      setError("You cannot add yourself.");
       return;
     }
     const newCollabUpdate = [userToAdd, ...currentNodeCollabs];

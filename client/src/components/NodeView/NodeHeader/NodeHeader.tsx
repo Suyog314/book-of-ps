@@ -248,11 +248,13 @@ export const NodeHeader = (props: INodeHeaderProps) => {
               text="Graph"
               onClick={onGraphButtonClick}
             />
-            <Button
-              icon={<IoPersonAddOutline />}
-              text="Share"
-              onClick={onShareModalClick}
-            />
+            {currentNode.type == "recipe" && (
+              <Button
+                icon={<IoPersonAddOutline />}
+                text="Share"
+                onClick={onShareModalClick}
+              />
+            )}
 
             {isFolder && (
               <div className="select">
