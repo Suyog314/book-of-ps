@@ -41,6 +41,14 @@ export default function Register() {
       setError("Passwords do not match.");
       return;
     }
+    // errors if password is not strong enough
+    if (!validatePassword(password)) {
+      setError(
+        "Password is too weak.  Must have at least 8 characters, 1 upper case, 1 special character, and 1 number"
+      );
+      return;
+    }
+
     // else, create new user
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = makeIUser(name, email, hashedPassword, avatar);
@@ -70,6 +78,12 @@ export default function Register() {
     }
   };
 
+  // to validate the password
+  function validatePassword(password: string): boolean {
+    const strongPasswordRegex = /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{8,}$/;
+    return strongPasswordRegex.test(password);
+  }
+
   return (
     <div>
       {loading ? (
@@ -85,26 +99,38 @@ export default function Register() {
             <div className="register-form">
               <Input
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setError("");
+                }}
                 placeholder="Full Name"
                 onKeyDown={handleKeyPress}
               />
               <Input
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError("");
+                }}
                 placeholder="Email"
                 onKeyDown={handleKeyPress}
               />
               <Input
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError("");
+                }}
                 placeholder="Password"
                 type="password"
                 onKeyDown={handleKeyPress}
               />
               <Input
                 value={verifyPassword}
-                onChange={(e) => setVerifyPassword(e.target.value)}
+                onChange={(e) => {
+                  setVerifyPassword(e.target.value);
+                  setError("");
+                }}
                 placeholder="Retype Password"
                 type="password"
                 onKeyDown={handleKeyPress}

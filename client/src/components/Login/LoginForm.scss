@@ -19,6 +19,7 @@ $enlargement-factor: 120%;
   height: 100vh;
   font-family: "Helvetica";
   font-weight: 100;
+  z-index: 1;
 
   .login-box {
     width: 30%;
@@ -26,6 +27,7 @@ $enlargement-factor: 120%;
     border-radius: 8px;
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
     border-top: 4px solid $primary-theme-color;
+    background-color: white;
 
     .login-header {
       margin-top: 1rem;
@@ -61,10 +63,16 @@ $enlargement-factor: 120%;
       }
 
       .login-error-message {
-        color: red;
-        margin-bottom: 10px;
-        font-size: 1rem;
         font-family: "Helvetica";
+        color: white;
+        font-size: 0.8rem;
+        background-color: $error-color;
+        padding: 5px 10px;
+        margin: 0px 20px;
+        left: 0;
+        font-weight: 500;
+        width: fit-content;
+        margin-left: 0%;
       }
 
       .login-no-account {

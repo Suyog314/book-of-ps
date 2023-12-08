@@ -24,6 +24,8 @@
     "@tiptap/extension-underline": "^2.1.12",
     "@tiptap/react": "^2.1.12",
     "@tiptap/starter-kit": "^2.1.12",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.0.2",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "convert": "^4.14.0",
@@ -39,6 +41,7 @@
     "react-timer-hook": "^3.0.7",
     "recoil": "^0.7.7",
     "rxjs": "^7.8.1",
+    "tsparticles": "^3.0.2",
     "uniqid": "^5.4.0",
     "uuid": "^9.0.1"
   },

@@ -18,6 +18,7 @@ $enlargement-factor: 120%; /* Enlargement factor */
   place-items: center;
   height: 100vh;
   font-family: "Helvetica";
+  z-index: 1;
 
   .register-box {
     width: 30%; /* Set width to 40% of the screen */
@@ -25,6 +26,7 @@ $enlargement-factor: 120%; /* Enlargement factor */
     border-radius: 8px;
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
     border-top: 4px solid $primary-theme-color;
+    background-color: white;
 
     .register-header {
       margin-top: 1rem;
@@ -55,10 +57,16 @@ $enlargement-factor: 120%; /* Enlargement factor */
       }
 
       .register-error-message {
-        color: red;
-        margin-bottom: 10px;
-        font-size: 1rem; /* Enlarged by 20% */
         font-family: "Helvetica";
+        color: white;
+        font-size: 0.8rem;
+        background-color: $error-color;
+        padding: 5px 10px;
+        margin: 0px 20px;
+        left: 0;
+        font-weight: 500;
+        width: fit-content;
+        margin-left: 0%;
       }
 
       .register-have-account-already {
