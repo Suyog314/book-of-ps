@@ -123,10 +123,15 @@ export const FrontendNodeGateway = {
     }
   },
 
-  getRoots: async (): Promise<IServiceResponse<RecursiveNodeTree[]>> => {
+  getRoots: async (
+    userId: string
+  ): Promise<IServiceResponse<RecursiveNodeTree[]>> => {
     try {
-      return await get<IServiceResponse<RecursiveNodeTree[]>>(
-        baseEndpoint + servicePath + "roots"
+      return await post<IServiceResponse<RecursiveNodeTree[]>>(
+        baseEndpoint + servicePath + "roots",
+        {
+          userId: userId,
+        }
       );
     } catch (exception) {
       return failureServiceResponse("[getNodeByPath] Unable to access backend");

@@ -72,10 +72,12 @@ export const MainView = React.memo(function MainView() {
   const [availCuisines, setAvailCuisines] = useState<Cuisine[]>([]);
   const [maxTime, setMaxTime] = useState(60);
   const [maxServing, setMaxServing] = useState<number>(1);
+  // user
+  const user = useRecoilValue(userSessionState);
 
   /** update our frontend root nodes from the database */
   const loadRootsFromDB = useCallback(async () => {
-    const rootsFromDB = await FrontendNodeGateway.getRoots();
+    const rootsFromDB = await FrontendNodeGateway.getRoots(user?.userId ?? "");
     if (rootsFromDB.success) {
       rootsFromDB.payload && setRootNodes(rootsFromDB.payload);
       setIsAppLoaded(true);

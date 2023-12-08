@@ -199,10 +199,11 @@ export class NodeRouter {
      * @param req request object coming from client
      * @param res response object to send to client
      */
-    NodeExpressRouter.get("/roots", async (req: Request, res: Response) => {
+    NodeExpressRouter.post("/roots", async (req: Request, res: Response) => {
       try {
+        const userId = req.body.userId;
         const response: IServiceResponse<RecursiveNodeTree[]> =
-          await this.BackendNodeGateway.getRoots();
+          await this.BackendNodeGateway.getRoots(userId);
         res.status(200).send(response);
       } catch (e) {
         res.status(500).send(e.message);

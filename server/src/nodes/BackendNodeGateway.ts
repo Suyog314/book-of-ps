@@ -371,8 +371,13 @@ export class BackendNodeGateway {
    * Method to get nodes with no parent and all their children.
    * @returns IServiceResponse<RecursiveNodeTree[]>
    */
-  async getRoots(): Promise<IServiceResponse<RecursiveNodeTree[]>> {
-    const findRootsResp = await this.nodeCollectionConnection.findRoots();
+  async getRoots(
+    userId: string
+  ): Promise<IServiceResponse<RecursiveNodeTree[]>> {
+    if (userId == "") {
+      return failureServiceResponse("userId not available");
+    }
+    const findRootsResp = await this.nodeCollectionConnection.findRoots(userId);
     if (!findRootsResp.success) {
       return failureServiceResponse(findRootsResp.message);
     }
