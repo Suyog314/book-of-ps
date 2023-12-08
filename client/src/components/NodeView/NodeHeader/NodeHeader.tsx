@@ -273,15 +273,17 @@ export const NodeHeader = (props: INodeHeaderProps) => {
           </>
         )}
       </div>
-      <div className="profile-pic-container">
-        {collabIcons &&
-          collabIcons.map((icon, i) => (
-            <div key={i} className="profile-pic-wrapper">
-              <img alt="profile-pic" src={icon} />
-              <span className="tooltip">Author</span>
-            </div>
-          ))}
-      </div>
+      {currentNode && (
+        <div className="profile-pic-container">
+          {collabIcons &&
+            collabIcons.map((icon, i) => (
+              <div key={i} className="profile-pic-wrapper">
+                <img alt="profile-pic" src={icon} />
+                <span className="tooltip">Author</span>
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 };
