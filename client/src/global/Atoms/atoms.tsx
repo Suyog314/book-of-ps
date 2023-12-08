@@ -124,3 +124,8 @@ export const userSessionState = atom<IUser | null>({
   default: null,
   effects_UNSTABLE: [localStorageEffect("order")],
 });
+
+export const currentNodeCollabsState = atom<string[]>({
+  key: "currentNodeCollabs",
+  default: [],
+});

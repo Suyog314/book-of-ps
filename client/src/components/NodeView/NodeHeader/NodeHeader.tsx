@@ -23,7 +23,10 @@ import {
   alertTitleState,
   alertMessageState,
   currentNodeState,
+  userSessionState,
+  currentNodeCollabsState,
 } from "../../../global/Atoms";
+import { FrontendUserGateway } from "~/users";
 
 interface INodeHeaderProps {
   onHandleCompleteLinkClick: () => void;
@@ -52,6 +55,9 @@ export const NodeHeader = (props: INodeHeaderProps) => {
   const setAlertIsOpen = useSetRecoilState(alertOpenState);
   const setAlertTitle = useSetRecoilState(alertTitleState);
   const setAlertMessage = useSetRecoilState(alertMessageState);
+  const userSession = useRecoilValue(userSessionState);
+  const currentNodeCollabs = useRecoilValue(currentNodeCollabsState);
+  const [collabIcons, setCollabIcons] = useState<string[]>([]);
 
   /* Method to update the current folder view */
   const handleUpdateFolderView = async (e: React.ChangeEvent) => {
@@ -108,11 +114,57 @@ export const NodeHeader = (props: INodeHeaderProps) => {
     ContextMenuItems.push(menuItem);
   };
 
+  const getCollaborators = async () => {
+    // store list of names of collaborators here, with the author's name being first
+    // max size shown is 5
+    const collaborators: string[] = [];
+    if (!currentNode.authorId) {
+      console.error("Current node has not author.");
+      return;
+    }
+    // get author's name from db
+    const authorResp = await FrontendUserGateway.findUserById(
+      currentNode.authorId
+    );
+    if (!authorResp.success) {
+      console.error(authorResp.message);
+      return;
+    }
+    collaborators.push(
+      `https://ui-avatars.com/api/?name=${authorResp.payload.name}&background=random&rounded=true&bold=true&color=ffffff`
+    );
+    // get a most 4 other other collaborators
+    if (!currentNodeCollabs) {
+      // no collaborators
+      return;
+    }
+    const top4Collabs = currentNodeCollabs.slice(0, 4);
+    const collabsResp = await FrontendUserGateway.findUsersByEmail(top4Collabs);
+    if (!collabsResp.success) {
+      console.error(collabsResp.message);
+      return;
+    }
+    collabsResp.payload.forEach((user) => {
+      collaborators.push(
+        `https://ui-avatars.com/api/?name=${user.name}&background=random&rounded=true&bold=true&color=ffffff`
+      );
+    });
+    setCollabIcons(collaborators);
+  };
+
   /* useEffect which updates the title and editing state when the node is changed */
   useEffect(() => {
     setTitle(currentNode.title);
     setEditingTitle(false);
   }, [currentNode]);
+
+  // useEffect to get all collaborators
+  useEffect(() => {
+    async function getCollabs() {
+      await getCollaborators();
+    }
+    getCollabs();
+  }, [currentNodeCollabs]);
 
   /* Node key handlers*/
   const nodeKeyHandlers = (e: KeyboardEvent) => {
@@ -196,11 +248,13 @@ export const NodeHeader = (props: INodeHeaderProps) => {
               text="Graph"
               onClick={onGraphButtonClick}
             />
-            <Button
-              icon={<IoPersonAddOutline />}
-              text="Share"
-              onClick={onShareModalClick}
-            />
+            {currentNode.type == "recipe" && (
+              <Button
+                icon={<IoPersonAddOutline />}
+                text="Share"
+                onClick={onShareModalClick}
+              />
+            )}
 
             {isFolder && (
               <div className="select">
@@ -218,6 +272,15 @@ export const NodeHeader = (props: INodeHeaderProps) => {
             )}
           </>
         )}
+      </div>
+      <div className="profile-pic-container">
+        {collabIcons &&
+          collabIcons.map((icon, i) => (
+            <div key={i} className="profile-pic-wrapper">
+              <img alt="profile-pic" src={icon} />
+              <span className="tooltip">Author</span>
+            </div>
+          ))}
       </div>
     </div>
   );

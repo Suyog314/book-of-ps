@@ -76,13 +76,19 @@ export default function Login() {
             <div className="login-form">
               <Input
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError("");
+                }}
                 placeholder="Email"
                 onKeyDown={handleKeyPress}
               />
               <Input
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError("");
+                }}
                 placeholder="Password"
                 type="password"
                 onKeyDown={handleKeyPress}

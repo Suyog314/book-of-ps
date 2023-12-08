@@ -16,7 +16,6 @@ import {
 import "./Header.scss";
 import { Button } from "@chakra-ui/react";
 import { Button as IButton } from "../Button";
-import { signOut } from "next-auth/react";
 
 interface IHeaderProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;

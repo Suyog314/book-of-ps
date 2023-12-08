@@ -183,6 +183,17 @@ export class BackendUserGateway {
   }
 
   /**
+   * Method to find a users by email
+   *
+   * @param userEmail - The email of the user to look for
+   */
+  async getUsersByEmail(
+    userEmails: string[]
+  ): Promise<IServiceResponse<IUser[]>> {
+    return this.userCollectionConnection.findUsersByEmail(userEmails);
+  }
+
+  /**
    * Method to delete a users by id
    *
    * @param userId - The id of the user to delete

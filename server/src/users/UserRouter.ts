@@ -61,6 +61,26 @@ export class UserRouter {
     );
 
     /**
+     * Request to find users by email
+     *
+     * @param req request object coming from client
+     * @param res response object to send to client
+     */
+    UserExpressRouter.post(
+      "/getByEmails",
+      async (req: Request, res: Response) => {
+        try {
+          const userEmails = req.body.emails;
+          const response: IServiceResponse<IUser[]> =
+            await this.BackendUserGateway.getUsersByEmail(userEmails);
+          res.status(200).send(response);
+        } catch (e) {
+          res.status(500).send(e.message);
+        }
+      }
+    );
+
+    /**
      * Request to find users by their ids
      *
      * @param req request object coming from client
