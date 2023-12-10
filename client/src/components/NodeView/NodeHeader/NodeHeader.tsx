@@ -49,7 +49,7 @@ export const NodeHeader = (props: INodeHeaderProps) => {
   const currentNode = useRecoilValue(currentNodeState);
   const [refresh, setRefresh] = useRecoilState(refreshState);
   const isLinking = useRecoilValue(isLinkingState);
-  const setSelectedNode = useSetRecoilState(selectedNodeState);
+  const [selectedNode, setSelectedNode] = useRecoilState(selectedNodeState);
   const [title, setTitle] = useState(currentNode.title);
   const [editingTitle, setEditingTitle] = useState<boolean>(false);
   const setAlertIsOpen = useSetRecoilState(alertOpenState);
@@ -273,13 +273,13 @@ export const NodeHeader = (props: INodeHeaderProps) => {
           </>
         )}
       </div>
-      {currentNode && (
+      {selectedNode && (
         <div className="profile-pic-container">
           {collabIcons &&
             collabIcons.map((icon, i) => (
               <div key={i} className="profile-pic-wrapper">
                 <img alt="profile-pic" src={icon} />
-                <span className="tooltip">Author</span>
+                {/* <span className="tooltip">Author</span> */}
               </div>
             ))}
         </div>
