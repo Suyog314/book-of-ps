@@ -290,6 +290,7 @@ export const MainView = React.memo(function MainView() {
             avatarSrc={`https://ui-avatars.com/api/?name=${userSession?.name}&background=random&rounded=true&bold=true&color=ffffff`}
             userName={userSession?.name}
             userEmail={userSession?.email}
+            isAppLoaded={setIsAppLoaded}
           />
           <SearchModal
             isOpen={searchModalOpen}

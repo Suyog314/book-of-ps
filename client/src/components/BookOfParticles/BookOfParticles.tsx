@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Container, Engine } from "@tsparticles/engine";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
-// import { loadFull } from "tsparticles"; // if you are going to use `loadFull`, install the "tsparticles" package too.
+import { loadFull } from "tsparticles"; // if you are going to use `loadFull`, install the "tsparticles" package too.
 import { loadSlim } from "@tsparticles/slim"; // if you are going to use `loadSlim`, install the "@tsparticles/slim" package too.
 
 export const BookOfParticles = () => {
@@ -15,7 +15,7 @@ export const BookOfParticles = () => {
       // starting from v2 you can add only the features you need reducing the bundle size
       //await loadAll(engine);
       //await loadFull(engine);
-      await loadSlim(engine);
+      await loadFull(engine);
       //await loadBasic(engine);
     }).then(() => {
       setInit(true);
