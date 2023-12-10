@@ -1,3 +1,4 @@
+import { BookOfParticles } from "~/components/BookOfParticles";
 import LoginForm from "~/components/Login/LoginForm";
 
 export default function Login() {
@@ -5,5 +6,10 @@ export default function Login() {
 
   // if (session) redirect("/dashboard");
 
-  return <LoginForm />;
+  return (
+    <>
+      <BookOfParticles />
+      <LoginForm />
+    </>
+  );
 }

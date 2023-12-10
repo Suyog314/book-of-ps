@@ -114,6 +114,25 @@ export class UserCollectionConnection {
   }
 
   /**
+   * Finds users with the email in the database
+   *
+   * @param {string} email
+   * @return successfulServiceResponse<IUser> on success
+   *         failureServiceResponse on failure
+   */
+  async findUsersByEmail(emails: string[]): Promise<IServiceResponse<IUser[]>> {
+    const foundUsers: IUser[] = [];
+    await this.client
+      .db()
+      .collection(this.collectionName)
+      .find({ email: { $in: emails } })
+      .forEach(function (doc) {
+        foundUsers.push(doc);
+      });
+    return successfulServiceResponse(foundUsers);
+  }
+
+  /**
    * Deletes user with the id in the database
    *
    * @param {string} userId

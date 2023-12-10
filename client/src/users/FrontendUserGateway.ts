@@ -50,6 +50,23 @@ export const FrontendUserGateway = {
     }
   },
 
+  findUsersByEmail: async (
+    emails: string[]
+  ): Promise<IServiceResponse<IUser[]>> => {
+    try {
+      return await post<IServiceResponse<IUser[]>>(
+        baseEndpoint + servicePath + "getByEmails",
+        {
+          emails: emails,
+        }
+      );
+    } catch (exception) {
+      return failureServiceResponse(
+        "[findUsersByEmail] Unable to access backend"
+      );
+    }
+  },
+
   findUserById: async (userId: string): Promise<IServiceResponse<IUser>> => {
     try {
       return await post<IServiceResponse<IUser>>(

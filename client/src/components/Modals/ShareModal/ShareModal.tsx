@@ -14,11 +14,12 @@ import { IoPersonAddOutline } from "react-icons/io5";
 import "./ShareModal.scss";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
+  currentNodeCollabsState,
   currentNodeState,
   refreshState,
   userSessionState,
 } from "~/global/Atoms";
-import { INodeProperty, makeINodeProperty } from "~/types";
+import { INodeProperty, IRecipeNode, makeINodeProperty } from "~/types";
 import { FrontendNodeGateway } from "~/nodes";
 import { FrontendUserGateway } from "~/users";
 import { Button } from "~/components/Button";
@@ -39,12 +40,12 @@ export const ShareModal = (props: IShareModalProps) => {
   const [refresh, setRefresh] = useRecoilState(refreshState);
   const [userToAdd, setUserToAdd] = useState("");
   const [error, setError] = useState("");
-  const [newCollabEmails, setNewCollabEmails] = useState<string[]>(
-    currentNode.collaborators ? currentNode.collaborators : []
+  const [currentNodeCollabs, setCurrentNodeCollabs] = useRecoilState(
+    currentNodeCollabsState
   );
 
   useEffect(() => {
-    setNewCollabEmails(
+    setCurrentNodeCollabs(
       currentNode.collaborators ? currentNode.collaborators : []
     );
   }, [currentNode]);
@@ -55,12 +56,40 @@ export const ShareModal = (props: IShareModalProps) => {
       "collaborators",
       newCollabs
     );
-    const updateResp = await FrontendNodeGateway.updateNode(
+    // update the parent node
+    const updateRespPar = await FrontendNodeGateway.updateNode(
       currentNode.nodeId,
       [nodeProperty]
     );
-    if (!updateResp.success) {
-      console.error(updateResp.message);
+    if (!updateRespPar.success) {
+      console.error(updateRespPar.message);
+      return;
+    }
+    // update description node
+    const updateRespDesc = await FrontendNodeGateway.updateNode(
+      (currentNode as IRecipeNode).descriptionID,
+      [nodeProperty]
+    );
+    if (!updateRespDesc.success) {
+      console.error(updateRespDesc.message);
+      return;
+    }
+    // update steps node
+    const updateRespSteps = await FrontendNodeGateway.updateNode(
+      (currentNode as IRecipeNode).stepsID,
+      [nodeProperty]
+    );
+    if (!updateRespSteps.success) {
+      console.error(updateRespSteps.message);
+      return;
+    }
+    // update ingredients node
+    const updateRespIngre = await FrontendNodeGateway.updateNode(
+      (currentNode as IRecipeNode).ingredientsID,
+      [nodeProperty]
+    );
+    if (!updateRespIngre.success) {
+      console.error(updateRespIngre.message);
       return;
     }
     setRefresh(!refresh);
@@ -69,7 +98,7 @@ export const ShareModal = (props: IShareModalProps) => {
   // Reset our state variables and close the modal
   const handleClose = async () => {
     onClose();
-    await handleUpdateShare(newCollabEmails);
+    await handleUpdateShare(currentNodeCollabs);
     setUserToAdd("");
     setError("");
   };
@@ -98,11 +127,11 @@ export const ShareModal = (props: IShareModalProps) => {
       return;
     }
     if (userDbCheckResp.payload.email == userSession?.email) {
-      setError("개새끼 don't add yourself.");
+      setError("You cannot add yourself.");
       return;
     }
-    const newCollabUpdate = [userToAdd, ...newCollabEmails];
-    setNewCollabEmails(newCollabUpdate);
+    const newCollabUpdate = [userToAdd, ...currentNodeCollabs];
+    setCurrentNodeCollabs(newCollabUpdate);
     setUserToAdd("");
     setError("");
   };
@@ -110,13 +139,13 @@ export const ShareModal = (props: IShareModalProps) => {
   // Remove item from newCollabs
   const handleRemoveUser = (userId: string) => {
     const newCollabUpdate: string[] = [];
-    newCollabEmails.forEach((user) => {
+    currentNodeCollabs.forEach((user) => {
       if (user == userId) {
         return;
       }
       newCollabUpdate.push(user);
     });
-    setNewCollabEmails(newCollabUpdate);
+    setCurrentNodeCollabs(newCollabUpdate);
   };
 
   return (
@@ -144,16 +173,16 @@ export const ShareModal = (props: IShareModalProps) => {
             </div>
             <div className="share-list-item-container">
               <ul className="share-list-people">
-                {newCollabEmails &&
-                  newCollabEmails.map((userId) => (
-                    <div key={userId} className="share-list-item-wrapper">
+                {currentNodeCollabs &&
+                  currentNodeCollabs.map((userEmail) => (
+                    <div key={userEmail} className="share-list-item-wrapper">
                       <li className="share-list-item">
-                        <div className="share-title">{newCollabEmails}</div>
+                        <div className="share-title">{userEmail}</div>
                       </li>
                       <Button
                         style={{ marginLeft: "10px", height: "44px" }}
                         icon={<IoPersonRemoveOutline />}
-                        onClick={() => handleRemoveUser(userId)}
+                        onClick={() => handleRemoveUser(userEmail)}
                       />
                     </div>
                   ))}

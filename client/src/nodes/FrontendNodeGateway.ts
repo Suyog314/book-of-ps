@@ -124,13 +124,15 @@ export const FrontendNodeGateway = {
   },
 
   getRoots: async (
-    userId: string
+    userId: string,
+    userEmail: string
   ): Promise<IServiceResponse<RecursiveNodeTree[]>> => {
     try {
       return await post<IServiceResponse<RecursiveNodeTree[]>>(
         baseEndpoint + servicePath + "roots",
         {
           userId: userId,
+          userEmail: userEmail,
         }
       );
     } catch (exception) {

@@ -182,6 +182,10 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
     }
 
     if (selectedType == "recipe") {
+      if (selectedParentNode !== null) {
+        setError("Error: Can't nest recipes");
+        return;
+      }
       if (serving == 0) {
         setError("Error: No serving amount");
         return;
@@ -449,7 +453,7 @@ export const CreateNodeModal = (props: ICreateNodeModalProps) => {
                   </div>
                   <div className="recipe-type-inputs">
                     <Textarea
-                      style={{ width: "90%" }}
+                      style={{ width: "100%", marginRight: "10px" }}
                       value={description}
                       onChange={handleDescriptionchange}
                       placeholder={"Description..."}

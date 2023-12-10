@@ -77,8 +77,13 @@ export const MainView = React.memo(function MainView() {
 
   /** update our frontend root nodes from the database */
   const loadRootsFromDB = useCallback(async () => {
-    const rootsFromDB = await FrontendNodeGateway.getRoots(user?.userId ?? "");
+    console.log(user?.email);
+    const rootsFromDB = await FrontendNodeGateway.getRoots(
+      user?.userId ?? "",
+      user?.email ?? ""
+    );
     if (rootsFromDB.success) {
+      console.log(rootsFromDB.payload);
       rootsFromDB.payload && setRootNodes(rootsFromDB.payload);
       setIsAppLoaded(true);
     }

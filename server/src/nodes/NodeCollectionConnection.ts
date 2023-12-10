@@ -268,10 +268,13 @@ export class NodeCollectionConnection {
    *
    * @return successfulServiceResponse<INode[]>
    */
-  async findRoots(userId: string): Promise<IServiceResponse<INode[]>> {
+  async findRoots(
+    userId: string,
+    userEmail: string
+  ): Promise<IServiceResponse<INode[]>> {
     const query = {
       "filePath.path": { $size: 1 },
-      $or: [{ authorId: userId }, { collaborators: { $in: [userId] } }],
+      $or: [{ authorId: userId }, { collaborators: { $in: [userEmail] } }],
     };
     const roots: INode[] = [];
     await this.client

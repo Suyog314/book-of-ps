@@ -1,14 +1,16 @@
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { MainView } from "~/components";
+import { LoadingScreen } from "~/components/LoadingScreen";
 import { selectedNodeState, userSessionState } from "~/global/Atoms";
 import { FrontendUserGateway } from "~/users";
 
 export default function Home() {
   const selectedNode = useRecoilValue(selectedNodeState);
   const setUserSession = useSetRecoilState(userSessionState);
+  const [isLoaded, setIsLoaded] = useState(false);
   const title = `${selectedNode?.title ?? "Home"} | MyHypermedia`;
 
   const { data: session } = useSession();
@@ -27,6 +29,7 @@ export default function Home() {
         return;
       }
       setUserSession(userSessionResp.payload);
+      setIsLoaded(true);
     }
 
     loadUserState();
@@ -39,7 +42,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="container">
-        <MainView />
+        {isLoaded ? <MainView /> : <LoadingScreen hasTimeout={true} />}
       </div>
     </>
   );

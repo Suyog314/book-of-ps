@@ -29,6 +29,12 @@ export const StepsInput = (props: StepsInputProps) => {
     setButtonPressed(true);
   };
 
+  const handleDeleteInputClick = (index: number) => {
+    const newSteps = [...steps];
+    newSteps.splice(index, 1);
+    setSteps(newSteps);
+  };
+
   useLayoutEffect(() => {
     if (buttonPressed && lastInputRef.current && containerRef.current) {
       lastInputRef.current.focus();
@@ -37,33 +43,46 @@ export const StepsInput = (props: StepsInputProps) => {
     }
   }, [buttonPressed, steps]);
 
-  const buttonStyle = { marginTop: "5px", width: "100%", height: "24px" };
+  const addButtonStyle = { marginTop: "5px", width: "100%", height: "24px" };
+
+  const deleteButtonStyle = {
+    marginLeft: "5px",
+    width: "40px",
+    height: "40px",
+  };
 
   const displaySteps = () => {
-    return steps.map((ingredient, index) => {
+    return steps.map((step, index) => {
       const isLast = index === steps.length - 1;
       return (
         <div className="steps-input-container" key={`ingredient-${index}`}>
           {index === 0 ? (
             <Input
-              className="ingredient-input"
+              className="step-input"
               placeholder="Steps..."
-              value={ingredient}
+              value={step}
               onChange={(event) => handleInputChange(event, index)}
               ref={isLast ? lastInputRef : null}
             />
           ) : (
-            <Input
-              className="ingredient-input"
-              value={ingredient}
-              onChange={(event) => handleInputChange(event, index)}
-              ref={isLast ? lastInputRef : null}
-            />
+            <div className="input-and-cancel">
+              <Input
+                className="step-input"
+                value={step}
+                onChange={(event) => handleInputChange(event, index)}
+                ref={isLast ? lastInputRef : null}
+              />
+              <Button
+                icon={<ri.RiCloseLine />}
+                style={deleteButtonStyle}
+                onClick={() => handleDeleteInputClick(index)}
+              />
+            </div>
           )}
 
           {isLast && (
             <Button
-              style={buttonStyle}
+              style={addButtonStyle}
               onClick={handleAddInputClick}
               icon={<ri.RiAddFill />}
               text="Add Step"

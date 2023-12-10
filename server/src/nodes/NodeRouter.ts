@@ -202,8 +202,9 @@ export class NodeRouter {
     NodeExpressRouter.post("/roots", async (req: Request, res: Response) => {
       try {
         const userId = req.body.userId;
+        const userEmail = req.body.userEmail;
         const response: IServiceResponse<RecursiveNodeTree[]> =
-          await this.BackendNodeGateway.getRoots(userId);
+          await this.BackendNodeGateway.getRoots(userId, userEmail);
         res.status(200).send(response);
       } catch (e) {
         res.status(500).send(e.message);

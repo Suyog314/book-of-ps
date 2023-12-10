@@ -4,11 +4,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 1px;
+  padding-left: 10px;
   margin-bottom: 5px;
-  margin-left: 10px;
   margin-right: 20px;
-
-  .ingredient-input {
-    // width: 120px;
+  .input-and-cancel {
+    display: flex;
+    flex-direction: row;
   }
 }

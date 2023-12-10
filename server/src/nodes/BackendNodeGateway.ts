@@ -372,12 +372,19 @@ export class BackendNodeGateway {
    * @returns IServiceResponse<RecursiveNodeTree[]>
    */
   async getRoots(
-    userId: string
+    userId: string,
+    userEmail: string
   ): Promise<IServiceResponse<RecursiveNodeTree[]>> {
     if (userId == "") {
-      return failureServiceResponse("userId not available");
+      return failureServiceResponse("[getRoots] userId not available");
     }
-    const findRootsResp = await this.nodeCollectionConnection.findRoots(userId);
+    if (userEmail == "") {
+      return failureServiceResponse("[getRoots] userEmail not avaiable");
+    }
+    const findRootsResp = await this.nodeCollectionConnection.findRoots(
+      userId,
+      userEmail
+    );
     if (!findRootsResp.success) {
       return failureServiceResponse(findRootsResp.message);
     }
