@@ -12,17 +12,41 @@ $primary-color: #ff7f50;
 $background-color: #f8f8f8;
 $enlargement-factor: 120%;
 
+.main-container {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
+  .BOP-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    .BOP-text {
+      font-size: 210px;
+      font-family: "Helvetica";
+      font-weight: 900;
+      width: 60%;
+    }
+    .logo-container {
+      width: 65%;
+      height: 60%;
+    }
+  }
+}
 /* Login wrapper */
 .login-wrapper {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 100vh;
+  width: 50%;
   font-family: "Helvetica";
   font-weight: 100;
   z-index: 1;
 
   .login-box {
-    width: 30%;
+    width: 50%;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);

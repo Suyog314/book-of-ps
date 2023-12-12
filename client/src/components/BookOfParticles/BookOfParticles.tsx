@@ -8,7 +8,7 @@ export const BookOfParticles = () => {
   const [init, setInit] = useState(false);
 
   // this should be run only once per application lifetime
-  useEffect(() => {
+  const startParticles = useCallback(() => {
     initParticlesEngine(async (engine) => {
       // you can initiate the tsParticles instance (engine) here, adding custom shapes or presets
       // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
@@ -20,6 +20,10 @@ export const BookOfParticles = () => {
     }).then(() => {
       setInit(true);
     });
+  }, []);
+
+  useEffect(() => {
+    startParticles();
   }, []);
 
   const particlesLoaded = (
@@ -63,13 +67,6 @@ export const BookOfParticles = () => {
               color: {
                 value: "#000000",
               },
-              links: {
-                color: "#000000",
-                distance: 150,
-                enable: true,
-                opacity: 0.5,
-                width: 1,
-              },
               move: {
                 direction: "none",
                 enable: true,
@@ -77,23 +74,28 @@ export const BookOfParticles = () => {
                   default: "out",
                 },
                 random: false,
-                speed: 6,
+                speed: 4,
                 straight: false,
               },
               number: {
                 density: {
                   enable: true,
                 },
-                value: 80,
+                value: 60,
               },
               opacity: {
-                value: 0.5,
+                value: { min: 0.5, max: 0.7 },
               },
               shape: {
-                type: "circle",
+                type: "emoji",
+                options: {
+                  emoji: {
+                    value: ["🥨", "🍕", "🥞", "🍝", "🥜"],
+                  },
+                },
               },
               size: {
-                value: { min: 1, max: 5 },
+                value: { min: 10, max: 15 },
               },
             },
             detectRetina: true,
