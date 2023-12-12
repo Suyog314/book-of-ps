@@ -31,7 +31,7 @@ describe("Unit Test: findRoots", () => {
     await mongoMemoryServer.stop();
   });
 
-  test("finds valid roots", async () => {
+  test("finds valid root recipes", async () => {
     const validNode1: INode = makeINode("1", ["1"]);
     const validNode2: INode = makeINode("2", ["2"], ["3", "4"]);
     const validNode3: INode = makeINode("3", ["2", "3"], ["5"]);

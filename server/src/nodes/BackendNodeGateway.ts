@@ -422,11 +422,7 @@ export class BackendNodeGateway {
    * @returns
    */
   async getCuisines(): Promise<IServiceResponse<Cuisine[]>> {
-    const getCuisinesRes = await this.nodeCollectionConnection.getCuisines();
-    if (!getCuisinesRes.success) {
-      return failureServiceResponse(getCuisinesRes.message);
-    }
-    return successfulServiceResponse(getCuisinesRes.payload);
+    return await this.nodeCollectionConnection.getCuisines();
   }
 
   /**
