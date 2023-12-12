@@ -268,7 +268,28 @@ export class NodeCollectionConnection {
    *
    * @return successfulServiceResponse<INode[]>
    */
-  async findRoots(
+  async findRoots(): Promise<IServiceResponse<INode[]>> {
+    const roots: INode[] = [];
+    await this.client
+      .db()
+      .collection(this.collectionName)
+      .find({ "filePath.path": { $size: 1 } })
+      .forEach(function (node) {
+        const validNode = isINode(node);
+        if (validNode) {
+          roots.push(node);
+        }
+      });
+    return successfulServiceResponse(roots);
+  }
+
+  /**
+   * Find user recipes from database.
+   * Returns empty array when no recipes found.
+   *
+   * @return successfulServiceResponse<INode[]>
+   */
+  async findUserRecipes(
     userId: string,
     userEmail: string
   ): Promise<IServiceResponse<INode[]>> {

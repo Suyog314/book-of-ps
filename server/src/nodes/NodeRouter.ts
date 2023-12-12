@@ -199,17 +199,36 @@ export class NodeRouter {
      * @param req request object coming from client
      * @param res response object to send to client
      */
-    NodeExpressRouter.post("/roots", async (req: Request, res: Response) => {
+    NodeExpressRouter.get("/roots", async (req: Request, res: Response) => {
       try {
-        const userId = req.body.userId;
-        const userEmail = req.body.userEmail;
         const response: IServiceResponse<RecursiveNodeTree[]> =
-          await this.BackendNodeGateway.getRoots(userId, userEmail);
+          await this.BackendNodeGateway.getRoots();
         res.status(200).send(response);
       } catch (e) {
         res.status(500).send(e.message);
       }
     });
+
+    /**
+     * Request to retrieve all nodes that are created or shared with the author
+     *
+     * @param req request object coming from client
+     * @param res response object to send to client
+     */
+    NodeExpressRouter.post(
+      "/userRecipes",
+      async (req: Request, res: Response) => {
+        try {
+          const userId = req.body.userId;
+          const userEmail = req.body.userEmail;
+          const response: IServiceResponse<RecursiveNodeTree[]> =
+            await this.BackendNodeGateway.getUserRecipes(userId, userEmail);
+          res.status(200).send(response);
+        } catch (e) {
+          res.status(500).send(e.message);
+        }
+      }
+    );
 
     /**
      * Request to retrieve all the cuisines from current recipes

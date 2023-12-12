@@ -371,17 +371,36 @@ export class BackendNodeGateway {
    * Method to get nodes with no parent and all their children.
    * @returns IServiceResponse<RecursiveNodeTree[]>
    */
-  async getRoots(
+  async getRoots(): Promise<IServiceResponse<RecursiveNodeTree[]>> {
+    const findRootsResp = await this.nodeCollectionConnection.findRoots();
+    if (!findRootsResp.success) {
+      return failureServiceResponse(findRootsResp.message);
+    }
+    const nodeQueue: INode[] = findRootsResp.payload;
+    const rootsToReturn: RecursiveNodeTree[] = [];
+    for (const root of nodeQueue) {
+      rootsToReturn.push(
+        await this.buildSubtreeHelper(new RecursiveNodeTree(root))
+      );
+    }
+    return successfulServiceResponse(rootsToReturn);
+  }
+
+  /**
+   * Method to get recipes that are created by or shared with the user.
+   * @returns IServiceResponse<RecursiveNodeTree[]>
+   */
+  async getUserRecipes(
     userId: string,
     userEmail: string
   ): Promise<IServiceResponse<RecursiveNodeTree[]>> {
     if (userId == "") {
-      return failureServiceResponse("[getRoots] userId not available");
+      return failureServiceResponse("[getUserRecipes] userId not available");
     }
     if (userEmail == "") {
-      return failureServiceResponse("[getRoots] userEmail not avaiable");
+      return failureServiceResponse("[getUserRecipes] userEmail not avaiable");
     }
-    const findRootsResp = await this.nodeCollectionConnection.findRoots(
+    const findRootsResp = await this.nodeCollectionConnection.findUserRecipes(
       userId,
       userEmail
     );
