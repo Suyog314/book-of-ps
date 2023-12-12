@@ -21,6 +21,12 @@ export const rootNodesState = atom<RecursiveNodeTree[]>({
   default: [new RecursiveNodeTree(emptyNode)],
 });
 
+// user recipes to display on home page
+export const userRecipesState = atom<RecursiveNodeTree[]>({
+  key: "userRecipesState",
+  default: [new RecursiveNodeTree(emptyNode)],
+});
+
 // the selected node
 export const selectedNodeState = atom<INode | null>({
   key: "selectedNodeState",

@@ -45,4 +45,19 @@
       bottom: 1px;
     }
   }
+
+  .cuisine-section,
+  .serving-section,
+  .time-section {
+    display: flex;
+    align-items: center;
+  }
+
+  .recipe-text {
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left: 5px;
+  }
 }

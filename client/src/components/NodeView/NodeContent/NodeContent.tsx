@@ -12,6 +12,7 @@ import { RecipeContent } from "./RecipeContent/RecipeContent";
 export interface INodeContentProps {
   childNodes?: INode[];
   onCreateNodeButtonClick: () => void;
+  homeView: string;
   nodeIdsToNodesMap: NodeIdsToNodesMap;
 }
 
@@ -22,7 +23,8 @@ export interface INodeContentProps {
  * @returns Content that any type of node renders
  */
 export const NodeContent = (props: INodeContentProps) => {
-  const { onCreateNodeButtonClick, childNodes, nodeIdsToNodesMap } = props;
+  const { onCreateNodeButtonClick, childNodes, homeView, nodeIdsToNodesMap } =
+    props;
   const currentNode = useRecoilValue(currentNodeState);
   switch (currentNode.type) {
     case "image":
@@ -43,6 +45,7 @@ export const NodeContent = (props: INodeContentProps) => {
           <FolderContent
             node={currentNode as IFolderNode}
             onCreateNodeButtonClick={onCreateNodeButtonClick}
+            homeView={homeView}
             childNodes={childNodes}
           />
         );

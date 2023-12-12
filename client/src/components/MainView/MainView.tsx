@@ -18,6 +18,7 @@ import {
   isAppLoadedState,
   rootNodesState,
   userSessionState,
+  userRecipesState,
 } from "../../global/Atoms";
 import { useRouter } from "next/router";
 import { FrontendNodeGateway } from "../../nodes";
@@ -59,7 +60,9 @@ export const MainView = React.memo(function MainView() {
   // node states
   const [selectedNode, setSelectedNode] = useRecoilState(selectedNodeState);
   const [rootNodes, setRootNodes] = useRecoilState(rootNodesState);
+  const [userRecipes, setUserRecipes] = useRecoilState(userRecipesState);
   const refresh = useRecoilValue(refreshState);
+  const [homeView, setHomeView] = useState("grid");
   // anchor states
   const setSelectedAnchors = useSetRecoilState(selectedAnchorsState);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
@@ -77,14 +80,16 @@ export const MainView = React.memo(function MainView() {
 
   /** update our frontend root nodes from the database */
   const loadRootsFromDB = useCallback(async () => {
-    console.log(user?.email);
-    const rootsFromDB = await FrontendNodeGateway.getRoots(
+    const rootsFromDB = await FrontendNodeGateway.getRoots();
+    if (rootsFromDB.success) {
+      rootsFromDB.payload && setRootNodes(rootsFromDB.payload);
+    }
+    const recipesFromDB = await FrontendNodeGateway.getUserRecipes(
       user?.userId ?? "",
       user?.email ?? ""
     );
-    if (rootsFromDB.success) {
-      console.log(rootsFromDB.payload);
-      rootsFromDB.payload && setRootNodes(rootsFromDB.payload);
+    if (recipesFromDB.success) {
+      recipesFromDB.payload && setUserRecipes(recipesFromDB.payload);
       setIsAppLoaded(true);
     }
   }, []);
@@ -351,7 +356,7 @@ export const MainView = React.memo(function MainView() {
                 childNodes={
                   selectedNode
                     ? getSelectedNodeChildren()
-                    : rootNodes.map((root) => root.node)
+                    : userRecipes.map((root) => root.node)
                 }
                 currentNode={selectedNode ?? rootRecursiveNodeTree.node}
                 onDeleteButtonClick={handleDeleteNodeButtonClick}
@@ -360,6 +365,8 @@ export const MainView = React.memo(function MainView() {
                 onCompleteLinkClick={handleCompleteLinkClick}
                 onCreateNodeButtonClick={handleCreateNodeButtonClick}
                 onShareModalClick={handleShareModalClick}
+                homeView={homeView}
+                setHomeView={setHomeView}
                 nodeIdsToNodesMap={nodeIdsToNodesMap}
               />
             </div>

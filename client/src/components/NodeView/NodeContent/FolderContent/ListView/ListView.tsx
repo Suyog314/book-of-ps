@@ -1,8 +1,20 @@
 import React from "react";
 import * as ri from "react-icons/ri";
-import { INode } from "../../../../../types";
+import { INode, IRecipeNode } from "../../../../../types";
 import "./ListView.scss";
 import { ListViewItem } from "./ListViewItem";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverAnchor,
+} from "@chakra-ui/react";
+import { LuUtensils } from "react-icons/lu";
 
 export type IViewType = "list" | "grid";
 
@@ -17,7 +29,43 @@ export const ListView = (props: IListViewProps) => {
 
   const nodes = childNodes.map(
     (childNode) =>
-      childNode && <ListViewItem key={childNode.nodeId} node={childNode} />
+      childNode &&
+      (childNode.type == "recipe" ? (
+        <Popover key={childNode.nodeId} trigger="hover" placement="top">
+          <PopoverTrigger>
+            <div>
+              <ListViewItem node={childNode} />
+            </div>
+          </PopoverTrigger>
+          <PopoverContent>
+            <PopoverBody>
+              <div className="cuisine-section">
+                <LuUtensils className="cuisine-logo" />
+                <div className="recipe-text">
+                  {(childNode as IRecipeNode).cuisine}
+                </div>
+              </div>
+              <div className="serving-section">
+                <ri.RiUserLine className="serving-icon" />
+                <div className="recipe-text">
+                  {(childNode as IRecipeNode).serving}
+                </div>
+              </div>
+              <div className="time-section">
+                <ri.RiTimerLine className="time-icon" />
+                <div className="recipe-text">
+                  {Math.floor((childNode as IRecipeNode).time / 60) != 0 &&
+                    Math.floor((childNode as IRecipeNode).time / 60) + "hr "}
+                  {(childNode as IRecipeNode).time % 60 != 0 &&
+                    ((childNode as IRecipeNode).time % 60) + " min"}
+                </div>
+              </div>
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
+      ) : (
+        <ListViewItem node={childNode} />
+      ))
   );
 
   return (
