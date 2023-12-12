@@ -57,21 +57,65 @@ export class NodeCollectionConnection {
     };
 
     const nodes: INode[] = [];
-    let sort = {};
+
+    let aggregationPipeline = [];
     if (sortType == "Newest") {
-      sort = { dateCreated: -1 };
+      aggregationPipeline = [
+        {
+          $match: myquery,
+        },
+        {
+          $sort: { dateCreated: -1 },
+        },
+        {
+          $project: projection,
+        },
+      ];
     } else if (sortType == "Oldest") {
-      sort = { dateCreated: 1 };
+      aggregationPipeline = [
+        {
+          $match: myquery,
+        },
+        {
+          $sort: { dateCreated: 1 },
+        },
+        {
+          $project: projection,
+        },
+      ];
     } else {
-      sort = { score: { $meta: "textScore" } };
+      aggregationPipeline = [
+        {
+          $match: myquery,
+        },
+        {
+          $addFields: {
+            typeOrder: {
+              $switch: {
+                branches: [
+                  { case: { $eq: ["$type", "recipe"] }, then: 1 },
+                  { case: { $eq: ["$type", "text"] }, then: 2 },
+                  { case: { $eq: ["$type", "image"] }, then: 3 },
+                  { case: { $eq: ["$type", "folder"] }, then: 4 },
+                ],
+                default: 5,
+              },
+            },
+          },
+        },
+        {
+          $sort: { typeOrder: 1, score: { $meta: "textScore" } },
+        },
+        {
+          $project: projection,
+        },
+      ];
     }
-    await collection
-      .find(myquery)
-      .sort(sort)
-      .project(projection)
-      .forEach(function (node) {
-        nodes.push(node);
-      });
+
+    await collection.aggregate(aggregationPipeline).forEach(function (node) {
+      nodes.push(node);
+    });
+
     return successfulServiceResponse(nodes);
   }
 
@@ -230,6 +274,34 @@ export class NodeCollectionConnection {
       .db()
       .collection(this.collectionName)
       .find({ "filePath.path": { $size: 1 } })
+      .forEach(function (node) {
+        const validNode = isINode(node);
+        if (validNode) {
+          roots.push(node);
+        }
+      });
+    return successfulServiceResponse(roots);
+  }
+
+  /**
+   * Find user recipes from database.
+   * Returns empty array when no recipes found.
+   *
+   * @return successfulServiceResponse<INode[]>
+   */
+  async findUserRecipes(
+    userId: string,
+    userEmail: string
+  ): Promise<IServiceResponse<INode[]>> {
+    const query = {
+      "filePath.path": { $size: 1 },
+      $or: [{ authorId: userId }, { collaborators: { $in: [userEmail] } }],
+    };
+    const roots: INode[] = [];
+    await this.client
+      .db()
+      .collection(this.collectionName)
+      .find(query)
       .forEach(function (node) {
         const validNode = isINode(node);
         if (validNode) {

@@ -133,6 +133,25 @@ export const FrontendNodeGateway = {
     }
   },
 
+  getUserRecipes: async (
+    userId: string,
+    userEmail: string
+  ): Promise<IServiceResponse<RecursiveNodeTree[]>> => {
+    try {
+      return await post<IServiceResponse<RecursiveNodeTree[]>>(
+        baseEndpoint + servicePath + "userRecipes",
+        {
+          userId: userId,
+          userEmail: userEmail,
+        }
+      );
+    } catch (exception) {
+      return failureServiceResponse(
+        "[getUserRecipes] Unable to access backend"
+      );
+    }
+  },
+
   moveNode: async ({
     nodeId,
     newParentId,

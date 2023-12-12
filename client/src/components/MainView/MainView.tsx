@@ -18,6 +18,7 @@ import {
   isAppLoadedState,
   rootNodesState,
   userSessionState,
+  userRecipesState,
 } from "../../global/Atoms";
 import { useRouter } from "next/router";
 import { FrontendNodeGateway } from "../../nodes";
@@ -59,7 +60,9 @@ export const MainView = React.memo(function MainView() {
   // node states
   const [selectedNode, setSelectedNode] = useRecoilState(selectedNodeState);
   const [rootNodes, setRootNodes] = useRecoilState(rootNodesState);
+  const [userRecipes, setUserRecipes] = useRecoilState(userRecipesState);
   const refresh = useRecoilValue(refreshState);
+  const [homeView, setHomeView] = useState("grid");
   // anchor states
   const setSelectedAnchors = useSetRecoilState(selectedAnchorsState);
   const setSelectedExtent = useSetRecoilState(selectedExtentState);
@@ -72,12 +75,21 @@ export const MainView = React.memo(function MainView() {
   const [availCuisines, setAvailCuisines] = useState<Cuisine[]>([]);
   const [maxTime, setMaxTime] = useState(60);
   const [maxServing, setMaxServing] = useState<number>(1);
+  // user
+  const user = useRecoilValue(userSessionState);
 
   /** update our frontend root nodes from the database */
   const loadRootsFromDB = useCallback(async () => {
     const rootsFromDB = await FrontendNodeGateway.getRoots();
     if (rootsFromDB.success) {
       rootsFromDB.payload && setRootNodes(rootsFromDB.payload);
+    }
+    const recipesFromDB = await FrontendNodeGateway.getUserRecipes(
+      user?.userId ?? "",
+      user?.email ?? ""
+    );
+    if (recipesFromDB.success) {
+      recipesFromDB.payload && setUserRecipes(recipesFromDB.payload);
       setIsAppLoaded(true);
     }
   }, []);
@@ -283,6 +295,7 @@ export const MainView = React.memo(function MainView() {
             avatarSrc={`https://ui-avatars.com/api/?name=${userSession?.name}&background=random&rounded=true&bold=true&color=ffffff`}
             userName={userSession?.name}
             userEmail={userSession?.email}
+            isAppLoaded={setIsAppLoaded}
           />
           <SearchModal
             isOpen={searchModalOpen}
@@ -343,7 +356,7 @@ export const MainView = React.memo(function MainView() {
                 childNodes={
                   selectedNode
                     ? getSelectedNodeChildren()
-                    : rootNodes.map((root) => root.node)
+                    : userRecipes.map((root) => root.node)
                 }
                 currentNode={selectedNode ?? rootRecursiveNodeTree.node}
                 onDeleteButtonClick={handleDeleteNodeButtonClick}
@@ -352,6 +365,8 @@ export const MainView = React.memo(function MainView() {
                 onCompleteLinkClick={handleCompleteLinkClick}
                 onCreateNodeButtonClick={handleCreateNodeButtonClick}
                 onShareModalClick={handleShareModalClick}
+                homeView={homeView}
+                setHomeView={setHomeView}
                 nodeIdsToNodesMap={nodeIdsToNodesMap}
               />
             </div>

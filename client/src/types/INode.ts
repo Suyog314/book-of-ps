@@ -1,7 +1,7 @@
 import { INodePath, makeINodePath } from "./INodePath";
 
 // nodeTypes returns a string array of the types available
-export const nodeTypes: string[] = ["text", "image", "folder", "recipe"];
+export const nodeTypes: string[] = ["recipe", "text", "image", "folder"];
 
 // Supported nodeTypes for file browser
 export type NodeType =

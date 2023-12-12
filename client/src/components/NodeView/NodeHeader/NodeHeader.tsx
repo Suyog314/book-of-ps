@@ -35,6 +35,8 @@ interface INodeHeaderProps {
   onDeleteButtonClick: (node: INode) => void;
   onMoveButtonClick: (node: INode) => void;
   onShareModalClick: () => void;
+  homeView: string;
+  setHomeView: (type: string) => void;
 }
 
 export const NodeHeader = (props: INodeHeaderProps) => {
@@ -45,11 +47,13 @@ export const NodeHeader = (props: INodeHeaderProps) => {
     onHandleStartLinkClick,
     onHandleCompleteLinkClick,
     onShareModalClick,
+    homeView,
+    setHomeView,
   } = props;
   const currentNode = useRecoilValue(currentNodeState);
   const [refresh, setRefresh] = useRecoilState(refreshState);
   const isLinking = useRecoilValue(isLinkingState);
-  const setSelectedNode = useSetRecoilState(selectedNodeState);
+  const [selectedNode, setSelectedNode] = useRecoilState(selectedNodeState);
   const [title, setTitle] = useState(currentNode.title);
   const [editingTitle, setEditingTitle] = useState<boolean>(false);
   const setAlertIsOpen = useSetRecoilState(alertOpenState);
@@ -61,6 +65,14 @@ export const NodeHeader = (props: INodeHeaderProps) => {
 
   /* Method to update the current folder view */
   const handleUpdateFolderView = async (e: React.ChangeEvent) => {
+    if (currentNode.nodeId == "root") {
+      if (homeView == "grid") {
+        setHomeView("list");
+      } else {
+        setHomeView("grid");
+      }
+      return;
+    }
     const nodeProperty: INodeProperty = makeINodeProperty(
       "viewType",
       (e.currentTarget as any).value as any
@@ -202,6 +214,7 @@ export const NodeHeader = (props: INodeHeaderProps) => {
 
   const isFolder: boolean = currentNode.type === "folder";
   const isRoot: boolean = currentNode.nodeId === "root";
+
   return (
     <div className="nodeHeader">
       <div
@@ -255,33 +268,36 @@ export const NodeHeader = (props: INodeHeaderProps) => {
                 onClick={onShareModalClick}
               />
             )}
-
-            {isFolder && (
-              <div className="select">
-                <Select
-                  bg="rgb(241, 241, 241)"
-                  variant={"filled"}
-                  defaultValue={(currentNode as IFolderNode).viewType}
-                  onChange={handleUpdateFolderView}
-                  height={35}
-                >
-                  <option value="grid">Grid</option>
-                  <option value="list">List</option>
-                </Select>
-              </div>
-            )}
           </>
         )}
+        {isFolder && (
+          <div className="select">
+            <Select
+              bg="rgb(241, 241, 241)"
+              variant={"filled"}
+              defaultValue={
+                selectedNode ? (currentNode as IFolderNode).viewType : homeView
+              }
+              onChange={handleUpdateFolderView}
+              height={35}
+            >
+              <option value="grid">Grid</option>
+              <option value="list">List</option>
+            </Select>
+          </div>
+        )}
       </div>
-      <div className="profile-pic-container">
-        {collabIcons &&
-          collabIcons.map((icon, i) => (
-            <div key={i} className="profile-pic-wrapper">
-              <img alt="profile-pic" src={icon} />
-              <span className="tooltip">Author</span>
-            </div>
-          ))}
-      </div>
+      {selectedNode && (
+        <div className="profile-pic-container">
+          {collabIcons &&
+            collabIcons.map((icon, i) => (
+              <div key={i} className="profile-pic-wrapper">
+                <img alt="profile-pic" src={icon} />
+                {/* <span className="tooltip">Author</span> */}
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 };

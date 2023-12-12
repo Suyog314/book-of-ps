@@ -43,6 +43,10 @@ export interface INodeViewProps {
   onMoveButtonClick: (node: INode) => void;
   // handler for opening share modal
   onShareModalClick: () => void;
+  // describes home viewing mode
+  homeView: string;
+  // set home viewing mode
+  setHomeView: (type: string) => void;
   // children used when rendering folder node
   childNodes?: INode[];
 }
@@ -58,6 +62,8 @@ export const NodeView = (props: INodeViewProps) => {
     onGraphButtonClick,
     onMoveButtonClick,
     onShareModalClick,
+    homeView,
+    setHomeView,
     childNodes,
   } = props;
   const setIsLinking = useSetRecoilState(isLinkingState);
@@ -220,6 +226,8 @@ export const NodeView = (props: INodeViewProps) => {
           onHandleStartLinkClick={handleStartLinkClick}
           onHandleCompleteLinkClick={handleCompleteLinkClick}
           onShareModalClick={onShareModalClick}
+          homeView={homeView}
+          setHomeView={setHomeView}
         />
         <div className="nodeView-scrollable">
           {hasBreadcrumb && (
@@ -234,6 +242,7 @@ export const NodeView = (props: INodeViewProps) => {
             <NodeContent
               childNodes={childNodes}
               onCreateNodeButtonClick={onCreateNodeButtonClick}
+              homeView={homeView}
               nodeIdsToNodesMap={nodeIdsToNodesMap}
             />
           </div>

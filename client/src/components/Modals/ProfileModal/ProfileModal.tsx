@@ -13,6 +13,7 @@ import React from "react";
 
 import "./ProfileModal.scss";
 import { signOut } from "next-auth/react";
+import { SetterOrUpdater } from "recoil";
 
 export interface IProfileModalProps {
   isOpen: boolean;
@@ -20,18 +21,25 @@ export interface IProfileModalProps {
   avatarSrc: string;
   userName: string | undefined;
   userEmail: string | undefined;
+  isAppLoaded: SetterOrUpdater<boolean>;
 }
 
 /**
  * Modal for moving a node to a new location
  */
 export const ProfileModal = (props: IProfileModalProps) => {
-  const { isOpen, onClose, avatarSrc, userName, userEmail } = props;
+  const { isOpen, onClose, avatarSrc, userName, userEmail, isAppLoaded } =
+    props;
   // state variables
 
   // Reset our state variables and close the modal
   const handleClose = () => {
     onClose();
+  };
+
+  const handleSignOut = () => {
+    isAppLoaded(false);
+    signOut();
   };
 
   return (
@@ -55,7 +63,7 @@ export const ProfileModal = (props: IProfileModalProps) => {
                 <div className="sign-out">
                   <Button
                     style={{ fontWeight: "bold" }}
-                    onClick={() => signOut()}
+                    onClick={handleSignOut}
                   >
                     <span className="sign-out-button">Sign Out</span>
                   </Button>

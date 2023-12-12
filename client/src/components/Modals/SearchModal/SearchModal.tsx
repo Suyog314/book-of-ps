@@ -85,7 +85,7 @@ export const SearchModal = (props: ISearchModalProps) => {
     }
 
     const newSearchNodes: INode[] = [];
-
+    console.log(searchNodes);
     searchNodes.forEach((node) => {
       //if node is a recipe, check if valid search match
       if (node.type == "recipe") {
@@ -108,6 +108,7 @@ export const SearchModal = (props: ISearchModalProps) => {
         }
       }
     });
+    console.log(newSearchNodes);
     setSearchResults(newSearchNodes);
   };
 
