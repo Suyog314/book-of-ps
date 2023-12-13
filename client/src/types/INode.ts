@@ -17,6 +17,7 @@ export type NodeType =
 export type Cuisine =
   | "American"
   | "Italian"
+  | "Spanish"
   | "Chinese"
   | "Korean"
   | "Japanese"

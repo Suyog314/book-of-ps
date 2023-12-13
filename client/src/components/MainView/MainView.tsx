@@ -308,7 +308,7 @@ export const MainView = React.memo(function MainView() {
           <CreateNodeModal
             isOpen={createNodeModalOpen}
             onClose={() => setCreateNodeModalOpen(false)}
-            roots={rootNodes}
+            roots={userRecipes}
             nodeIdsToNodesMap={nodeIdsToNodesMap}
             onSubmit={loadRootsFromDB}
           />
