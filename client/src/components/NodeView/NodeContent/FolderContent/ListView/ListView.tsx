@@ -31,7 +31,7 @@ export const ListView = (props: IListViewProps) => {
     (childNode) =>
       childNode &&
       (childNode.type == "recipe" ? (
-        <Popover key={childNode.nodeId} trigger="hover" placement="top">
+        <Popover key={childNode.nodeId} trigger="hover" placement="auto">
           <PopoverTrigger>
             <div>
               <ListViewItem node={childNode} />

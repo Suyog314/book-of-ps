@@ -345,7 +345,7 @@ export const MainView = React.memo(function MainView() {
               style={{ width: 350 }}
             >
               <TreeView
-                roots={rootNodes}
+                roots={userRecipes}
                 parentNode={selectedNode}
                 setParentNode={setSelectedNode}
               />

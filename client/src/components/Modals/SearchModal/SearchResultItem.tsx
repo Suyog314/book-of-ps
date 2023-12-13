@@ -20,8 +20,10 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
 
   const [formattedDate, setFormattedDate] = useState<string>("");
 
-  const hours = Math.floor(time / 60);
-  const mins = time % 60;
+  const days = Math.floor(time / 1440);
+  const daysOverflow = time - days * 1440;
+  const hours = Math.floor(daysOverflow / 60);
+  const mins = daysOverflow % 60;
 
   const processDate = () => {
     const d = new Date(date);
@@ -58,7 +60,8 @@ export const SearchResultItem = (props: ISearchResultItemProps) => {
             <div className="time-section">
               <ri.RiTimerLine className="time-icon" />
               <div className="recipe-text">
-                {hours != 0 && hours + "hr "} {mins != 0 && mins + " min"}
+                {days != 0 && (days == 1 ? days + "day " : days + "days")}{" "}
+                {hours != 0 && hours + "hr "} {mins != 0 && mins + "min"}
               </div>
             </div>
           </div>
