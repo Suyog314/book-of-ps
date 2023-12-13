@@ -71,6 +71,14 @@ export default function Login() {
         </ChakraProvider>
       ) : (
         <div className="main-container">
+          <div className="BOP-container">
+            {/* <p className="BOP-text">Book of P&rsquo;s</p> */}
+            <img
+              className="logo-container"
+              src="https://i.imgur.com/4rE3sZd.png"
+              alt="Image"
+            ></img>
+          </div>
           <div className="login-wrapper">
             <div className="login-box">
               <h1 className="login-header">Sign In</h1>
