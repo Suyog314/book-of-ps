@@ -70,52 +70,54 @@ export default function Login() {
           </div>
         </ChakraProvider>
       ) : (
-        <div className="login-wrapper">
-          <div className="login-box">
-            <h1 className="login-header">Enter Your Details</h1>
-            <div className="login-form">
-              <Input
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setError("");
-                }}
-                placeholder="Email"
-                onKeyDown={handleKeyPress}
-              />
-              <Input
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError("");
-                }}
-                placeholder="Password"
-                type="password"
-                onKeyDown={handleKeyPress}
-              />
-
-              <button
-                className={
-                  "login-button" +
-                  (email !== "" && password !== "" ? "-active" : "")
-                }
-                onClick={handleLogin}
-              >
-                Login
-              </button>
-
-              {error && <div className="login-error-message">{error}</div>}
-
-              <div className="login-no-account">
-                Do not have an account?{" "}
-                <Link
-                  href={"/register"}
-                  onClick={() => {
-                    setLoading(true);
+        <div className="main-container">
+          <div className="login-wrapper">
+            <div className="login-box">
+              <h1 className="login-header">Sign In</h1>
+              <div className="login-form">
+                <Input
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setError("");
                   }}
+                  placeholder="Email"
+                  onKeyDown={handleKeyPress}
+                />
+                <Input
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError("");
+                  }}
+                  placeholder="Password"
+                  type="password"
+                  onKeyDown={handleKeyPress}
+                />
+
+                <button
+                  className={
+                    "login-button" +
+                    (email !== "" && password !== "" ? "-active" : "")
+                  }
+                  onClick={handleLogin}
                 >
-                  <span className="login-to-register-link">Register</span>
-                </Link>
+                  Login
+                </button>
+
+                {error && <div className="login-error-message">{error}</div>}
+
+                <div className="login-no-account">
+                  Do not have an account?{" "}
+                  <Link
+                    href={"/register"}
+                    onClick={() => {
+                      setLoading(true);
+                    }}
+                  >
+                    <span className="login-to-register-link">Register</span>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

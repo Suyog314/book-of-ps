@@ -100,6 +100,7 @@ export const StepsInput = (props: StepsInputProps) => {
         overflowY: "auto",
         width: "500px",
       }}
+      className="steps-container"
       ref={containerRef}
     >
       {displaySteps()}
