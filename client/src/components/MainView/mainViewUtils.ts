@@ -25,7 +25,7 @@ export const makeRootWrapper = (rootNodes: any) => {
       [],
       [],
       "folder",
-      "MyHypermedia Dashboard",
+      "MyHypermedia P's",
       "",
       "grid"
     ),
