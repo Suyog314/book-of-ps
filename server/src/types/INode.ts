@@ -20,9 +20,13 @@ export type Cuisine =
   | "Italian"
   | "Chinese"
   | "Korean"
+  | "Japanese"
   | "French"
   | "Mexican"
   | "Japanese"
+  | "Vietnamese"
+  | "Thai"
+  | "Greek"
   | "British";
 
 /**
