@@ -3,9 +3,9 @@ import * as ri from "react-icons/ri";
 import { LuUtensils } from "react-icons/lu";
 
 import { useRecoilState } from "recoil";
-import { currentNodeState, refreshState } from "~/global/Atoms";
+import { currentNodeState } from "~/global/Atoms";
 import "./RecipeContent.scss";
-import { Cuisine, INode, IRecipeNode, NodeIdsToNodesMap } from "~/types";
+import { IRecipeNode, NodeIdsToNodesMap } from "~/types";
 import convert from "convert";
 import {
   NumberDecrementStepper,
@@ -60,7 +60,7 @@ export const RecipeContent = (props: RecipeContentProps) => {
     );
 
     // Limit the number of decimal places to 3
-    const roundedValue = parseFloat(convertedValue.toFixed(3));
+    const roundedValue = parseFloat((convertedValue as any).toFixed(3));
 
     setRightUnitValue(roundedValue);
   };
