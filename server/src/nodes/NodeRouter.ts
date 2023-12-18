@@ -59,8 +59,15 @@ export class NodeRouter {
       try {
         const query = req.body.query;
         const sortType = req.body.sortType;
+        const userId = req.body.userId;
+        const userEmail = req.body.userEmail;
         const response: IServiceResponse<INode[]> =
-          await this.BackendNodeGateway.searchNodes(query, sortType);
+          await this.BackendNodeGateway.searchNodes(
+            query,
+            sortType,
+            userId,
+            userEmail
+          );
         res.status(200).send(response);
       } catch (e) {
         res.status(500).send(e.message);

@@ -74,11 +74,16 @@ export type NodeIdsToNodesMap = { [nodeId: string]: INode };
 export const allCuisines: string[] = [
   "American",
   "Italian",
+  "Spanish",
   "Chinese",
   "Korean",
+  "Japanese",
   "French",
   "Mexican",
   "Japanese",
+  "Vietnamese",
+  "Thai",
+  "Greek",
   "British",
 ];
 /**

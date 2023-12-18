@@ -125,7 +125,7 @@ export const MainView = React.memo(function MainView() {
 
   useEffect(() => {
     getParameters();
-  }, [createNodeModalOpen]);
+  }, [refresh]);
 
   useEffect(() => {
     loadRootsFromDB();

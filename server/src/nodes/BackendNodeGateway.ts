@@ -97,9 +97,16 @@ export class BackendNodeGateway {
    */
   async searchNodes(
     query: string,
-    sortType: string
+    sortType: string,
+    userId: string,
+    userEmail: string
   ): Promise<IServiceResponse<INode[]>> {
-    return this.nodeCollectionConnection.searchNodes(query, sortType);
+    return this.nodeCollectionConnection.searchNodes(
+      query,
+      sortType,
+      userId,
+      userEmail
+    );
   }
   /**
    * Method to retrieve node with a given nodeId.

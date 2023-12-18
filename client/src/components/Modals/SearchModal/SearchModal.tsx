@@ -68,9 +68,14 @@ export const SearchModal = (props: ISearchModalProps) => {
   };
 
   const onSearch = async () => {
+    if (!user?.userId) {
+      return;
+    }
     const searchRes = await FrontendNodeGateway.searchNodes(
       searchInput,
-      sortType
+      sortType,
+      user?.userId,
+      user?.email
     );
     if (!searchRes.success) {
       console.error(searchRes.message);

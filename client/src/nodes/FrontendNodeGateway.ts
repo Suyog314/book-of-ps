@@ -188,7 +188,9 @@ export const FrontendNodeGateway = {
 
   searchNodes: async (
     query: string,
-    sortType: string
+    sortType: string,
+    userId: string,
+    userEmail: string
   ): Promise<IServiceResponse<INode[]>> => {
     try {
       return await post<IServiceResponse<INode[]>>(
@@ -196,6 +198,8 @@ export const FrontendNodeGateway = {
         {
           query: query,
           sortType: sortType,
+          userId: userId,
+          userEmail: userEmail,
         }
       );
     } catch (exception) {

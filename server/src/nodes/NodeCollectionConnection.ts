@@ -34,13 +34,21 @@ export class NodeCollectionConnection {
     this.collectionName = collectionName ?? "nodes";
   }
 
-  async searchNodes(query: string, sortType: string): Promise<any> {
+  async searchNodes(
+    query: string,
+    sortType: string,
+    userId: string,
+    userEmail: string
+  ): Promise<any> {
     const collection = await this.client.db().collection(this.collectionName);
 
     //create text indices for title and content fields
     collection.createIndex({ title: "text", content: "text" });
 
-    const myquery = { $text: { $search: query } };
+    const myquery = {
+      $text: { $search: query },
+      $or: [{ authorId: userId }, { collaborators: { $in: [userEmail] } }],
+    };
 
     const projection = {
       _id: 0,

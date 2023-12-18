@@ -90,11 +90,16 @@ export const allNodeFields: string[] = [
 export const allCuisines: string[] = [
   "American",
   "Italian",
+  "Spanish",
   "Chinese",
   "Korean",
+  "Japanese",
   "French",
   "Mexican",
   "Japanese",
+  "Vietnamese",
+  "Thai",
+  "Greek",
   "British",
 ];
 
