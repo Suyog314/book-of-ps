@@ -19,7 +19,6 @@ import Link from "next/link";
 
 import { TextContent } from "../TextContent";
 import { FrontendNodeGateway } from "~/nodes";
-import { RecipeTimer } from "./RecipeTimer";
 
 export interface RecipeContentProps {
   nodeIdsToNodesMap: NodeIdsToNodesMap;
