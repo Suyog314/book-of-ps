@@ -10,9 +10,9 @@ export const CookTimeInput = (props: CookTimeInputProps) => {
   const [hours, setHours] = useState("");
   const [minutes, setMinutes] = useState("");
 
-  const daysInputRef = useRef(null);
-  const hoursInputRef = useRef(null);
-  const minutesInputRef = useRef(null);
+  const daysInputRef = useRef<HTMLInputElement>(null);
+  const hoursInputRef = useRef<HTMLInputElement>(null);
+  const minutesInputRef = useRef<HTMLInputElement>(null);
 
   const inputs = [daysInputRef, hoursInputRef, minutesInputRef];
 
@@ -27,7 +27,7 @@ export const CookTimeInput = (props: CookTimeInputProps) => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     setter: React.Dispatch<React.SetStateAction<string>>,
-    ref: React.MutableRefObject<null>
+    ref: React.RefObject<HTMLInputElement>
   ) => {
     let value = e.target.value;
 
@@ -46,10 +46,9 @@ export const CookTimeInput = (props: CookTimeInputProps) => {
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
     setter: React.Dispatch<React.SetStateAction<string>>,
-    ref: React.MutableRefObject<null>
+    ref: React.RefObject<HTMLInputElement>
   ) => {
     const { key } = e;
-    console.log(ref?.current?.value);
     if (key === "Enter") {
       const nextRef = inputs[inputs.indexOf(ref) + 1];
       nextRef?.current?.focus();
