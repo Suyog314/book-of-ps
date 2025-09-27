@@ -27,12 +27,3 @@ It serves as a "virtual cookbook" where users can record, search, and share reci
 
 ⚠️ **Archived** — This project was developed between **November and December 2023** as a personal project.  
 It is not actively maintained, but the code remains available as a portfolio showcase.  
-
-## Getting Started
-
-If you’d like to run the project locally:
-
-1. Clone the repository  
-   ```bash
-   git clone https://github.com/your-username/book-of-ps.git
-   cd book-of-ps
