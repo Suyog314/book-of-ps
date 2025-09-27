@@ -19,10 +19,6 @@ It serves as a "virtual cookbook" where users can record, search, and share reci
 - **Database**: MongoDB  
 - **Other**: Authentication middleware, RESTful APIs  
 
-## Screenshots
-
-*(Add screenshots here if you have them — UI always makes projects stand out!)*
-
 ## Project Status
 
 ⚠️ **Archived** — This project was developed between **November and December 2023** as a personal project.  
