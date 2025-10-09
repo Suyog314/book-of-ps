@@ -1,7 +1,19 @@
 # Book of P's
 
-Book of P's is a full-stack web application built with the **MERN stack (MongoDB, Express.js, React, Node.js)**.  
-It serves as a "virtual cookbook" where users can record, search, and share recipes in a clean, intuitive interface.  
+<div align="center">
+  <p align="center">
+    Digital Recipe Repository Built on a Custom Hypertext Framework
+    <br />
+    <a href="https://youtu.be/06mUj7hBhy0"><strong>View Demo »</strong></a>
+    <br />
+    <br />
+  </p>
+</div>
+
+ <img src="login.PNG" alt="Logo">
+
+The Book of Ps (i.e. Recipes) is a collaborative hypertext framework-based recipe repository. The site supports user login, authentication, and persistent user data storage via MongoDB. Users use our hypertext nodes to store recipes, create links to other nodes, and share their nodes with others (a la style of Google Docs). The key feature of the Book of Ps is the persistence of links between text, images, and nodes themselves across the whole system and user space. The website is deployed via Vercel and built with React, Typescript, and MongoDB.
+
 
 ## Features
 
